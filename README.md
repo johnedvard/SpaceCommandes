@@ -33,7 +33,7 @@ import the following project into Eclipse:
 * spine-libgdx
 
 clone [SpaceCommandes][3]  
-import the following project into Eclipse:
+import the following projects into Eclipse:
 * SpaceCommandes
 * SpaceCommandes-android
 * SpaceCommandes-desktop
