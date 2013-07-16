@@ -20,7 +20,7 @@ Start Eclipse with a fresh workpace
 
 ###  Specifics
 
-clone [LibGDX][1]
+clone [LibGDX][1]  
 build it from source (basically ant -f fetch.xml; ant)
 import the following projects into Eclipse:
 * gdx
@@ -28,11 +28,11 @@ import the following projects into Eclipse:
 * gdx-jnigen
 * gdx-openal
 
-clone [spine-runtimes][2]
+clone [spine-runtimes][2]  
 import the following project into Eclipse:
 * spine-libgdx
 
-clone [SpaceCommandes][3]
+clone [SpaceCommandes][3]  
 import the following project into Eclipse:
 * SpaceCommandes
 * SpaceCommandes-android
@@ -40,7 +40,7 @@ import the following project into Eclipse:
 * SpaceCommandes-html
 
 
-If you're lucky, everything, save the HTML-project, will compile
+If you're lucky, everything, save the HTML-project, will compile.  
 If you're unlucky, there will be other problems. If so, `<insert preferred course of action here>`
 
 
