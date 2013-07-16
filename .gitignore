@@ -3,7 +3,7 @@
 # Package Files #
 *.jar
 # Do not ignore some jar files #
-!SpaceCommandes/libs/*
+!*/libs/*
 *.war
 *.ear
 SpaceCommandes-android/gen
