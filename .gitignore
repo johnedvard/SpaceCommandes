@@ -4,3 +4,5 @@
 *.jar
 *.war
 *.ear
+SpaceCommandes-android/gen
+SpaceCommandes-android/bin
