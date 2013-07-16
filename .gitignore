@@ -4,6 +4,7 @@
 *.jar
 # Do not ignore some jar files #
 !*/libs/*
+!*/lib/*
 *.war
 *.ear
 SpaceCommandes-android/gen
