@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<module>
-    <entry-point class="com.rauma.lille.client.GwtLauncher"/>
-    <set-configuration-property name="gdx.assetpath" value="../SpaceCommandes-android/assets"/>
-    <inherits name="Game"/>
-    <inherits name="com.badlogic.gdx.backends.gdx_backends_gwt"/>
-</module>

@@ -34,7 +34,7 @@ public class AbstractScreen implements Screen {
 		TextureRegion region = new TextureRegion(texture, 0, 0, 512, 275);
 
 		sprite = new Sprite(region);
-		sprite.setSize(0.9f, 0.9f * sprite.getHeight() / sprite.getWidth());
+		sprite.setSize(0.5f, 0.5f * sprite.getHeight() / sprite.getWidth());
 		sprite.setOrigin(sprite.getWidth() / 2, sprite.getHeight() / 2);
 		sprite.setPosition(-sprite.getWidth() / 2, -sprite.getHeight() / 2);
 	}
@@ -44,12 +44,11 @@ public class AbstractScreen implements Screen {
 		// the following code clears the screen with the given RGB color (black)
 		Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		camera.update();
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -80,7 +79,6 @@ public class AbstractScreen implements Screen {
 	public void dispose() {
 		batch.dispose();
 		texture.dispose();
-
 	}
 
 }
