@@ -54,8 +54,4 @@ public class SplashScreen extends AbstractScreen {
 		super.dispose();
 		splashTexture.dispose();
 	}
-	@Override
-	public void resize(int width, int height) {
-		super.resize(width, height);
-	}
 }
