@@ -37,16 +37,13 @@ public class SplashScreen extends AbstractScreen {
 	public void render(float delta) {
 		super.render(delta);
 
-		// we use the SpriteBatch to draw 2D textures (it is defined in our base
-		// class: AbstractScreen)
 		batch.begin();
-
-		// we tell the batch to draw the region starting at (0,0) of the
-		// lower-left corner with the size of the screen
 		batch.draw(splashTextureRegion, splashScreenRectangle.x,splashScreenRectangle.y);
-
-		// the end method does the drawing
 		batch.end();
+		
+		// go to main menu
+		if (Gdx.input.justTouched())
+            game.setScreen(game.getMainMenuScreen());
 	}
 
 	@Override

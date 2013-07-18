@@ -3,19 +3,24 @@ package com.rauma.lille;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.FPSLogger;
+import com.rauma.lille.screens.AbstractScreen;
+import com.rauma.lille.screens.MainMenuScreen;
 import com.rauma.lille.screens.SplashScreen;
 
 public class SpaceGame extends Game {
 	private FPSLogger fpsLogger;
-
+	private Screen splashScreen;
+	private Screen mainMenuScreen;
+	private Screen gameScreen;
+	
 	@Override
 	public void create() {
 		fpsLogger = new FPSLogger();
-		setScreen(getSplashScreen());
-	}
-
-	private Screen getSplashScreen() {
-		return new SplashScreen(this);
+		mainMenuScreen = new MainMenuScreen(this);
+		splashScreen = new SplashScreen(this);
+		//TODO create a real gameScreen
+		gameScreen = new SplashScreen(this);
+		setScreen(splashScreen);
 	}
 
 	@Override
@@ -26,7 +31,6 @@ public class SpaceGame extends Game {
 	@Override
 	public void render() {
 		super.render();
-
 		// output the current FPS
 		fpsLogger.log();
 	}
@@ -44,5 +48,13 @@ public class SpaceGame extends Game {
 	@Override
 	public void resume() {
 		super.resume();
+	}
+
+	public Screen getMainMenuScreen() {
+		return mainMenuScreen;
+	}
+
+	public Screen getGameScreen() {
+		return gameScreen;
 	}
 }
