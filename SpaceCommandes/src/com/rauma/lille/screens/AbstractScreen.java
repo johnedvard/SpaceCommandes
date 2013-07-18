@@ -4,20 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.rauma.lille.SpaceGame;
 
 public class AbstractScreen implements Screen {
 	protected OrthographicCamera camera;
 	protected SpriteBatch batch;
-	protected Texture texture;
-	protected Sprite sprite;
 
-	private SpaceGame game;
+	protected SpaceGame game;
 
 	public AbstractScreen(SpaceGame game) {
 		this.game = game;
@@ -28,15 +22,6 @@ public class AbstractScreen implements Screen {
 		camera = new OrthographicCamera(1, h / w);
 		batch = new SpriteBatch();
 
-		texture = new Texture(Gdx.files.internal("data/libgdx.png"));
-		texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-
-		TextureRegion region = new TextureRegion(texture, 0, 0, 512, 275);
-
-		sprite = new Sprite(region);
-		sprite.setSize(0.5f, 0.5f * sprite.getHeight() / sprite.getWidth());
-		sprite.setOrigin(sprite.getWidth() / 2, sprite.getHeight() / 2);
-		sprite.setPosition(-sprite.getWidth() / 2, -sprite.getHeight() / 2);
 	}
 
 	@Override
@@ -78,7 +63,6 @@ public class AbstractScreen implements Screen {
 	@Override
 	public void dispose() {
 		batch.dispose();
-		texture.dispose();
 	}
 
 }
