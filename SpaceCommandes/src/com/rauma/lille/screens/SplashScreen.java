@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.rauma.lille.SpaceGame;
+import com.rauma.lille.screens.levels.Level001Screen;
 
 public class SplashScreen extends AbstractScreen {
 	private Texture splashTexture;
@@ -33,6 +34,11 @@ public class SplashScreen extends AbstractScreen {
 				Gdx.graphics.getHeight());
 	}
 
+	@Override
+	public void hide() {
+		dispose();
+	}
+	
 	@Override
 	public void render(float delta) {
 		super.render(delta);
