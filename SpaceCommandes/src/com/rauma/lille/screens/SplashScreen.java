@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.rauma.lille.SpaceGame;
+import com.rauma.lille.screens.levels.Level001Screen;
 
 public class SplashScreen extends AbstractScreen {
 	private Texture splashTexture;
@@ -34,6 +35,11 @@ public class SplashScreen extends AbstractScreen {
 	}
 
 	@Override
+	public void hide() {
+		dispose();
+	}
+	
+	@Override
 	public void render(float delta) {
 		super.render(delta);
 
@@ -47,6 +53,10 @@ public class SplashScreen extends AbstractScreen {
 
 		// the end method does the drawing
 		batch.end();
+		
+		if(Gdx.input.justTouched()) {
+			game.setScreen(new Level001Screen(game));
+		}
 	}
 
 	@Override
