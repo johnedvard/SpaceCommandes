@@ -3,7 +3,8 @@ package com.rauma.lille;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.FPSLogger;
-import com.rauma.lille.screens.AbstractScreen;
+import com.badlogic.gdx.math.Vector2;
+import com.rauma.lille.level001.Level001Screen;
 import com.rauma.lille.screens.MainMenuScreen;
 import com.rauma.lille.screens.SplashScreen;
 
@@ -12,14 +13,30 @@ public class SpaceGame extends Game {
 	private Screen splashScreen;
 	private Screen mainMenuScreen;
 	private Screen gameScreen;
-	
+
+	public static final float SCREEN_WIDTH = 480;
+	public static final float SCREEN_HEIGHT = 800;
+
+	public static final float WORLD_SCALE = 100;
+	public static final Vector2 WORLD_GRAVITY = new Vector2(0f, -10f);
+
+	public static final float FRAME_BASE = 10.0f;
+	public static final float GROUND_Y = 96.0f;
+	public static final float SKY_Y = SCREEN_HEIGHT - 64.0f;
+
+	public static boolean DEBUG = false;
+	public static boolean COLLISION = true;
+	public static boolean ADDACTOR = false;
+
 	@Override
 	public void create() {
 		fpsLogger = new FPSLogger();
+		
+		Resource.initalize();
+		
 		mainMenuScreen = new MainMenuScreen(this);
 		splashScreen = new SplashScreen(this);
-		//TODO create a real gameScreen
-		gameScreen = new SplashScreen(this);
+		gameScreen = new Level001Screen(this);
 		setScreen(splashScreen);
 	}
 
