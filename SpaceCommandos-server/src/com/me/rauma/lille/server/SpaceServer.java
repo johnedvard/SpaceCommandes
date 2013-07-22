@@ -1,6 +1,5 @@
 package com.me.rauma.lille.server;
 
-import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -15,14 +14,15 @@ import java.util.logging.Logger;
 public class SpaceServer {
 	private static final Logger LOG = Logger.getLogger("SpaceServer");
 
-	private List<SpaceClientConnection> clients = new ArrayList<>();
+	private List<SpaceClientConnection> clients = new ArrayList<SpaceClientConnection>();
 
 	private boolean running = false;
 
 	public SpaceServer(final int port) {
 		new Thread() {
 			public void run() {
-				try (ServerSocket ss = new ServerSocket(port);) {
+				try {
+					ServerSocket ss = new ServerSocket(port);
 					LOG.log(Level.INFO, "Started server");
 					running = true;
 					while (running) {

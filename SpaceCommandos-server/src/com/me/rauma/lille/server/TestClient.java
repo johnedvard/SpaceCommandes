@@ -23,8 +23,6 @@ public class TestClient {
 			Thread.sleep(1000);
 		}
 
-		Thread.sleep(2000);
-
 		Socket socket = null;
 		try {
 			try {
@@ -74,7 +72,6 @@ public class TestClient {
 				
 				spaceServer.stop();
 			}
-			
 			
 		} catch (UnknownHostException e) {
 			e.printStackTrace();

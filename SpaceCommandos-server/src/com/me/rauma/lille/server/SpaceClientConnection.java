@@ -81,7 +81,7 @@ public class SpaceClientConnection {
 
 	class OutputStreamHandler extends Thread {
 		private BufferedOutputStream bos;
-		private Queue<byte[]> queue = new LinkedList<>();
+		private Queue<byte[]> queue = new LinkedList<byte[]>();
 		
 		public OutputStreamHandler(OutputStream outputStream) {
 			this.bos = new BufferedOutputStream(outputStream);
