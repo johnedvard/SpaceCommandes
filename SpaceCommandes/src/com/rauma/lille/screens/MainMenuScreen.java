@@ -6,21 +6,19 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Button.ButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.rauma.lille.MyStage;
 import com.rauma.lille.SpaceGame;
 
 public class MainMenuScreen extends AbstractScreen {
@@ -35,12 +33,14 @@ public class MainMenuScreen extends AbstractScreen {
 	private Texture splashTexture;
 
 	private Label lblWelcome;
+
+	private Touchpad touchpad;
     
 	public MainMenuScreen(final SpaceGame game) {
 		super(game);
 		int width = Gdx.graphics.getWidth();
 		int height = Gdx.graphics.getHeight();
-		stage = new Stage(width,height,false);
+		stage = new MyStage(width,height,false);
 		Gdx.input.setInputProcessor(stage);
 		
 		//create the welcome label
@@ -71,7 +71,7 @@ public class MainMenuScreen extends AbstractScreen {
 			public void clicked(InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
 				// change the screen to the game screen.
-				System.out.println("clicked");
+				System.out.println("clicked x,y: " + x +","+ y);
 				game.setScreen(game.getGameScreen());
 			}
 		});

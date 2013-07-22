@@ -42,8 +42,9 @@ public class SplashScreen extends AbstractScreen {
 		batch.end();
 		
 		// go to main menu
-		if (Gdx.input.justTouched())
-            game.setScreen(game.getMainMenuScreen());
+		if (Gdx.input.justTouched()) {
+			game.setScreen(game.getMainMenuScreen());
+		}
 	}
 
 	@Override
