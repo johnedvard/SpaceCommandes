@@ -3,18 +3,23 @@ package com.rauma.lille.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.rauma.lille.SpaceGame;
-import com.rauma.lille.screens.levels.Level001Screen;
+import com.rauma.lille.level001.Level001Screen;
 
 public class SplashScreen extends AbstractScreen {
+	protected SpriteBatch batch;
+
 	private Texture splashTexture;
 	private TextureRegion splashTextureRegion;
 	private Rectangle splashScreenRectangle;
 
 	public SplashScreen(SpaceGame game) {
 		super(game);
+		batch = new SpriteBatch();
+		
 	}
 
 	@Override
@@ -57,5 +62,6 @@ public class SplashScreen extends AbstractScreen {
 	public void dispose() {
 		super.dispose();
 		splashTexture.dispose();
+		batch.dispose();
 	}
 }

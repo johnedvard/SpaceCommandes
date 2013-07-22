@@ -9,7 +9,6 @@ import com.rauma.lille.SpaceGame;
 
 public class AbstractScreen implements Screen {
 	protected OrthographicCamera camera;
-	protected SpriteBatch batch;
 
 	protected SpaceGame game;
 
@@ -20,8 +19,6 @@ public class AbstractScreen implements Screen {
 		float h = Gdx.graphics.getHeight();
 
 		camera = new OrthographicCamera(1, h / w);
-		batch = new SpriteBatch();
-
 	}
 
 	@Override
@@ -62,7 +59,7 @@ public class AbstractScreen implements Screen {
 
 	@Override
 	public void dispose() {
-		batch.dispose();
+		// TODO Auto-generated method stub
+		
 	}
-
 }
