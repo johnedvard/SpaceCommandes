@@ -10,8 +10,6 @@ import com.rauma.lille.stages.UIStage;
 
 public class Level001Screen extends AbstractScreen {
 
-	private Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
-
 	private BackgroundStage backgroundStage;
 	private ActorStage actorStage;
 	private UIStage uiStage;
@@ -26,7 +24,13 @@ public class Level001Screen extends AbstractScreen {
 		uiStage = new UIStage(Gdx.graphics.getWidth(),
 				Gdx.graphics.getHeight(), true);
 
+	}
+	
+	@Override
+	public void show() {
 		Gdx.input.setInputProcessor(actorStage);
+
+		super.show();
 	}
 
 	@Override

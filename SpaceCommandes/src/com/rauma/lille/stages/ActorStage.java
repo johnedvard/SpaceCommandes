@@ -1,6 +1,17 @@
 package com.rauma.lille.stages;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.rauma.lille.Resource;
+import com.rauma.lille.SpaceGame;
+import com.rauma.lille.Utils;
+import com.rauma.lille.actors.BodyImageActor;
 
 /**
  * This class is responsible for maintaining and drawing actors in the game, and
@@ -11,13 +22,99 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
  */
 public class ActorStage extends Stage {
 
+	private Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
+	private World world;
+
+	private Group frameGroup = new Group();
+    private Group actorGroup = new Group();
+
 	public ActorStage(int width, int height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
+
+		world = new World(SpaceGame.WORLD_GRAVITY, true);
+
+		initFrame();
 		
-		// init world (box2d)
 		// init actors (scene2s) with bodies (box2d)
-		// translate events and such from world and bodies to actors in the scene
-		// best/easiest example I've seen so far: https://code.google.com/p/codejie/source/browse/#svn%2Fjava%2Fgdx%2FDemoDraft%2Fsrc%2Fcom%2Fjie%2Fandroid%2Fgdx%2Fdemo
-		
+		// translate events and such from world and bodies to actors in the
+		// scene
+		// best/easiest example I've seen so far:
+		// https://code.google.com/p/codejie/source/browse/#svn%2Fjava%2Fgdx%2FDemoDraft%2Fsrc%2Fcom%2Fjie%2Fandroid%2Fgdx%2Fdemo
+
 	}
+
+	private void initFrame() {
+		//create frame
+        BodyDef def = new BodyDef();
+        def.type = BodyType.StaticBody;
+        
+        PolygonShape shape = new PolygonShape();
+                        
+        //bottom
+        float width = SpaceGame.SCREEN_WIDTH - SpaceGame.FRAME_BASE * 2;
+        float height = SpaceGame.FRAME_BASE;
+        float x = SpaceGame.FRAME_BASE;
+        float y = SpaceGame.GROUND_Y;
+        
+        shape.setAsBox(Utils.Screen2World(width / 2), Utils.Screen2World(height / 2));      
+        def.position.set(Utils.getWorldBoxCenter(Utils.Screen2World(x, y), Utils.Screen2World(width, height)));
+
+        BodyImageActor bottom = new BodyImageActor("bottom", new TextureRegion(Resource.colorTexture, 0, 0, 64, 64), world, def, shape, 1.0f);
+        bottom.setWidth(width);
+        bottom.setHeight(height);
+        
+        frameGroup.addActor(bottom);
+        
+        //top
+        y = SpaceGame.SKY_Y;
+        def.position.set(Utils.getWorldBoxCenter(Utils.Screen2World(x, y), Utils.Screen2World(width, height)));
+        
+        BodyImageActor top = new BodyImageActor("top", new TextureRegion(Resource.colorTexture, 0, 64 * 3, 64, 64), world, def, shape, 1.0f);
+        top.setWidth(width);
+        top.setHeight(height);
+        
+        frameGroup.addActor(top);
+        
+        //left
+        width = SpaceGame.FRAME_BASE;
+        height = SpaceGame.SKY_Y -  SpaceGame.GROUND_Y + SpaceGame.FRAME_BASE;
+        x = 0;
+        y = SpaceGame.GROUND_Y;
+        
+        shape.setAsBox(Utils.Screen2World(width / 2), Utils.Screen2World(height / 2));      
+        def.position.set(Utils.getWorldBoxCenter(Utils.Screen2World(x, y), Utils.Screen2World(width, height)));
+
+        BodyImageActor left = new BodyImageActor("left", new TextureRegion(Resource.colorTexture, 0, 64, 64, 64), world, def, shape, 1.0f);
+        left.setWidth(width);
+        left.setHeight(height);
+        
+        frameGroup.addActor(left);
+        
+        //right
+        width = SpaceGame.FRAME_BASE;
+        height = SpaceGame.SKY_Y -  SpaceGame.GROUND_Y + SpaceGame.FRAME_BASE;
+        x = SpaceGame.SCREEN_WIDTH - SpaceGame.FRAME_BASE;
+        y = SpaceGame.GROUND_Y;
+        
+        shape.setAsBox(Utils.Screen2World(width / 2), Utils.Screen2World(height / 2));      
+        def.position.set(Utils.getWorldBoxCenter(Utils.Screen2World(x, y), Utils.Screen2World(width, height)));
+
+        BodyImageActor right = new BodyImageActor("right", new TextureRegion(Resource.colorTexture, 0, 64 * 2, 64, 64), world, def, shape, 1.0f);
+        right.setWidth(width);
+        right.setHeight(height);
+        
+        frameGroup.addActor(right);
+
+        shape.dispose();        
+        
+        this.addActor(frameGroup);              		
+	}
+
+	@Override
+	public void draw() {
+		super.draw();
+
+		debugRenderer.render(world, getCamera().combined);
+	}
+
 }
