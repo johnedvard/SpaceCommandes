@@ -1,4 +1,4 @@
-package com.rauma.lille;
+package com.rauma.lille.stages;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -11,17 +11,22 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 
-public class MyStage extends Stage{
+/**
+ * This stage should handle controllers, such as Touchpad and keyboard input.
+ * @author john
+ *
+ */
+public class ControllerStage extends AbstractStage{
 	private Touchpad touchpadLeft; 
 	private Touchpad touchpadRight;
 	
-	public MyStage() {
+	public ControllerStage() {
 		super();
 		intit();
 	}
 
-	public MyStage(int width, int height, boolean b) {
-		super(width, height, b);
+	public ControllerStage(int width, int height, boolean keepAspectRatio) {
+		super(width, height, keepAspectRatio);
 		intit();
 	}
 	

@@ -18,8 +18,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
-import com.rauma.lille.MyStage;
 import com.rauma.lille.SpaceGame;
+import com.rauma.lille.stages.ControllerStage;
 
 public class MainMenuScreen extends AbstractScreen {
 	private Stage stage;
@@ -40,7 +40,7 @@ public class MainMenuScreen extends AbstractScreen {
 		super(game);
 		int width = Gdx.graphics.getWidth();
 		int height = Gdx.graphics.getHeight();
-		stage = new MyStage(width,height,false);
+		stage = new ControllerStage(width,height,false);
 		Gdx.input.setInputProcessor(stage);
 		
 		//create the welcome label
