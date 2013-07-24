@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 
@@ -53,6 +52,7 @@ public class ControllerStage extends AbstractStage{
 		touchpad.setName("touchpad");
 		return touchpad;
 	}
+
 	
 	@Override
 	public void addActor(Actor actor) {

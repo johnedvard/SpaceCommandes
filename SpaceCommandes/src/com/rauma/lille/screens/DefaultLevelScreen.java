@@ -25,13 +25,16 @@ public class DefaultLevelScreen extends AbstractScreen {
 	}
 
 	@Override
+	public void show() {
+		Gdx.input.setInputProcessor(controllerStage);
+	}
+
+	@Override
 	public void render(float delta) {
 		super.render(delta);
 		bgStage.draw();
 		actorStage.draw();
 		uiStage.draw();
 		controllerStage.draw();
-		Gdx.input.setInputProcessor(controllerStage);
 	}
-
 }

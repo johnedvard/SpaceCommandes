@@ -1,6 +1,5 @@
 package com.rauma.lille.stages;
 
-import com.badlogic.gdx.scenes.scene2d.Stage;
 
 /**
  * This class will be responsible for showing real time information during the
