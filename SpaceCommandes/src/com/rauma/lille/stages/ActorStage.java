@@ -19,17 +19,12 @@ import com.rauma.lille.actors.BodyImageActor;
  * @author frank
  * 
  */
-public class ActorStage extends AbstractStage {
-
-	private Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
-	private World world;
+public class ActorStage extends DefaultActorStage {
 
     private Group actorGroup = new Group();
 
 	public ActorStage(int width, int height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
-
-		world = new World(SpaceGame.WORLD_GRAVITY, true);
 
 		initFrame();
 		
@@ -106,11 +101,4 @@ public class ActorStage extends AbstractStage {
         shape.dispose();        
         
 	}
-
-	@Override
-	public void draw() {
-		super.draw();
-		debugRenderer.render(world, getCamera().combined);
-	}
-
 }
