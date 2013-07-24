@@ -10,7 +10,6 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.rauma.lille.SpaceGame;
 
 public class BodyImageActor extends Image {
@@ -19,7 +18,7 @@ public class BodyImageActor extends Image {
 
 	public BodyImageActor(String name, TextureRegion texture, World world,
 			BodyDef def, Shape shape, float density) {
-		super(new TextureRegionDrawable(texture));
+		super(new TextureRegion(texture));
 		setName(name);
 		
 		body = world.createBody(def);
@@ -27,11 +26,10 @@ public class BodyImageActor extends Image {
 		body.setUserData(this);
 	}
 
-	public BodyImageActor(String name, TextureRegionDrawable texture, World world,
+	public BodyImageActor(String name, TextureRegion texture, World world,
 			BodyDef def, FixtureDef fixturedef) {
-		super(new TextureRegionDrawable(texture));
+		super(new TextureRegion(texture));
 		setName(name);
-
 		body = world.createBody(def);
 		body.createFixture(fixturedef);
 		body.setUserData(this);
@@ -73,10 +71,9 @@ public class BodyImageActor extends Image {
 
 	public void draw(SpriteBatch batch, float parentAlpha) {
 		if (body != null) {
+			setRotation(MathUtils.radDeg * body.getAngle());
 			setX(body.getPosition().x * SpaceGame.WORLD_SCALE - getWidth() / 2);
 			setY(body.getPosition().y * SpaceGame.WORLD_SCALE - getHeight() / 2);
-
-			setRotation(MathUtils.radiansToDegrees * body.getAngle());
 		}
 
 		super.draw(batch, parentAlpha);

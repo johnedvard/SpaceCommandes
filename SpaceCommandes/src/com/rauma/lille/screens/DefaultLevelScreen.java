@@ -1,6 +1,9 @@
 package com.rauma.lille.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.rauma.lille.SpaceGame;
 import com.rauma.lille.stages.BackgroundStage;
 import com.rauma.lille.stages.ControllerStage;
@@ -21,7 +24,26 @@ public class DefaultLevelScreen extends AbstractScreen {
 		controllerStage = new ControllerStage(width, height, true);
 		actorStage = new DefaultActorStage(width, height, true);
 		bgStage = new BackgroundStage(width, height, true);
-		uiStage =  new UIStage(width, height, true);
+		uiStage = new UIStage(width, height, true);
+
+		controllerStage.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				if (actor instanceof Touchpad) {
+					Touchpad touchpad = (Touchpad) actor;
+					float knobPercentX = touchpad.getKnobPercentX();
+					float knobPercentY = touchpad.getKnobPercentY();
+					float knobX = touchpad.getKnobX();
+					float knobY = touchpad.getKnobY();
+					
+					if (actor.getName().equals("touchpadLeft")) {
+						actorStage.playerMoved(knobX, knobY, knobPercentX, knobPercentY);
+					} else if (actor.getName().equals("touchpadRight")) {
+						actorStage.playerAimed(knobX, knobY, knobPercentX, knobPercentY);
+					}
+				}
+			}
+		});
 	}
 
 	@Override

@@ -1,13 +1,15 @@
 package com.rauma.lille.stages;
 
+import java.util.HashSet;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 
 /**
@@ -19,6 +21,8 @@ public class ControllerStage extends AbstractStage{
 	private Touchpad touchpadLeft; 
 	private Touchpad touchpadRight;
 	
+	private HashSet<ChangeListener> changeListeners	= new HashSet<ChangeListener>();
+	
 	public ControllerStage(int width, int height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
 		init();
@@ -26,9 +30,13 @@ public class ControllerStage extends AbstractStage{
 	
 	private void init() {
 		touchpadLeft = createNewTouchpad();
-		touchpadRight = createNewTouchpad();
+		touchpadLeft.setName("touchpadLeft");
 		touchpadLeft.setVisible(false);
+
+		touchpadRight = createNewTouchpad();
+		touchpadRight.setName("touchpadRight");
 		touchpadRight.setVisible(false);
+		
 		addActor(touchpadLeft);
 		addActor(touchpadRight);
 	}
@@ -44,16 +52,9 @@ public class ControllerStage extends AbstractStage{
 		NinePatchDrawable knobDrawable = new NinePatchDrawable(ninePatchTouchpadKnob);
 		Touchpad touchpad = new Touchpad(5, new Touchpad.TouchpadStyle(backgroundDrawable, knobDrawable));
 		touchpad.setSize(50, 50);
-		touchpad.setName("touchpad");
 		return touchpad;
 	}
 
-	
-	@Override
-	public void addActor(Actor actor) {
-		super.addActor(actor);
-	}
-	
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		Vector2 stageCoords = this.screenToStageCoordinates(new Vector2(screenX,screenY));

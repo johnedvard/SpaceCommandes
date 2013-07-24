@@ -12,5 +12,6 @@ public class Level001Screen extends DefaultLevelScreen {
 		actorStage = new Level001ActorStage(Gdx.graphics.getWidth(),
 				Gdx.graphics.getHeight(), true);
 
+		
 	}
 }
