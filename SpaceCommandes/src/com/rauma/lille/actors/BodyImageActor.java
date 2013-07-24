@@ -9,29 +9,27 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.rauma.lille.SpaceGame;
 
 public class BodyImageActor extends Image {
 
 	private Body body = null;
 
-	private MouseJoint mouseJoint = null;
-
 	public BodyImageActor(String name, TextureRegion texture, World world,
 			BodyDef def, Shape shape, float density) {
-		super(texture);
+		super(new TextureRegionDrawable(texture));
 		setName(name);
-
+		
 		body = world.createBody(def);
 		body.createFixture(shape, density);
 		body.setUserData(this);
 	}
 
-	public BodyImageActor(String name, TextureRegion texture, World world,
+	public BodyImageActor(String name, TextureRegionDrawable texture, World world,
 			BodyDef def, FixtureDef fixturedef) {
-		super(texture);
+		super(new TextureRegionDrawable(texture));
 		setName(name);
 
 		body = world.createBody(def);
@@ -50,11 +48,13 @@ public class BodyImageActor extends Image {
 	public Body getBody() {
 		return body;
 	}
-
-	public boolean remove() {
+	
+	@Override
+	protected void finalize() throws Throwable {
 		this.destroyBody();
-		return super.remove();
+		super.finalize();
 	}
+
 
 	public void applyForce(Vector2 force, Vector2 point) {
 		if (body != null) {

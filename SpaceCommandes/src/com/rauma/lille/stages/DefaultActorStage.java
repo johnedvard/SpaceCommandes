@@ -1,6 +1,5 @@
 package com.rauma.lille.stages;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.rauma.lille.SpaceGame;
@@ -9,7 +8,7 @@ import com.rauma.lille.SpaceGame;
  * @author frank
  *
  */
-public abstract class DefaultActorStage extends AbstractStage {
+public class DefaultActorStage extends AbstractStage {
 
 	private Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
 	protected World world;
@@ -17,13 +16,6 @@ public abstract class DefaultActorStage extends AbstractStage {
 	public DefaultActorStage(float width, float height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
 		init();
-	}
-	
-	/**
-	 * will call <code>this(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true)</code>;
-	 */
-	public DefaultActorStage() {
-		this(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 	}
 
 	private void init() {
@@ -33,6 +25,7 @@ public abstract class DefaultActorStage extends AbstractStage {
 	@Override
 	public void draw() {
 		super.draw();
+		world.step(1/45f, 6, 2);
 		debugRenderer.render(world, getCamera().combined);
 	}
 }

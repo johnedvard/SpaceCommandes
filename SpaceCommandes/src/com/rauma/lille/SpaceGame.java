@@ -37,7 +37,7 @@ public class SpaceGame extends Game {
 		splashScreen = new SplashScreen(this);
 		gameScreen = new Level001Screen(this);
 		level002 = new Level002Screen(this);
-		setScreen(level002);
+		setScreen(gameScreen);
 	}
 
 	@Override

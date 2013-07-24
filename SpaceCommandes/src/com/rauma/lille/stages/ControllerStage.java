@@ -19,17 +19,12 @@ public class ControllerStage extends AbstractStage{
 	private Touchpad touchpadLeft; 
 	private Touchpad touchpadRight;
 	
-	public ControllerStage() {
-		super();
-		intit();
-	}
-
 	public ControllerStage(int width, int height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
-		intit();
+		init();
 	}
 	
-	private void intit() {
+	private void init() {
 		touchpadLeft = createNewTouchpad();
 		touchpadRight = createNewTouchpad();
 		touchpadLeft.setVisible(false);

@@ -16,12 +16,12 @@ public class BackgroundStage extends Stage {
 	public BackgroundStage(int width, int height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
 	}
+	
 	@Override
 	public void draw() {
 		super.draw();
 		 // the following code clears the screen with the given RGB color (green)
-        Gdx.gl.glClearColor( 0.5f, 0.8f, 0.5f, 1f );
+        Gdx.gl.glClearColor( 0.0f, 0.5f, 0.0f, 1f );
         Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT );
 	}
-	
 }

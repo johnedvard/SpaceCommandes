@@ -7,7 +7,4 @@ public abstract class AbstractStage extends Stage {
 	public AbstractStage(float width, float height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
 	}
-	public AbstractStage() {
-		super();
-	}
 }
