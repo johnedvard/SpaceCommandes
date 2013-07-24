@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
  * @author frank
  * 
  */
-public class UIStage extends Stage {
+public class UIStage extends AbstractStage {
 
 	public UIStage(int width, int height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);

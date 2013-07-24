@@ -20,11 +20,11 @@ import com.rauma.lille.actors.BodyImageActor;
  * @author frank
  * 
  */
-public class ActorStage extends Stage {
+public class ActorStage extends AbstractStage {
 
 	private Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
 	private World world;
-
+	
 	private Group frameGroup = new Group();
     private Group actorGroup = new Group();
 
@@ -113,7 +113,6 @@ public class ActorStage extends Stage {
 	@Override
 	public void draw() {
 		super.draw();
-
 		debugRenderer.render(world, getCamera().combined);
 	}
 
