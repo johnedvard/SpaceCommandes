@@ -1,6 +1,22 @@
 package com.rauma.lille.level002;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.MapProperties;
+import com.badlogic.gdx.maps.objects.PolygonMapObject;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -22,18 +38,51 @@ import com.rauma.lille.stages.DefaultActorStage;
  */
 public class Level002ActorStage extends DefaultActorStage {
 
+	private AssetManager assetManager;
+	private OrthogonalTiledMapRenderer renderer;
+	private TiledMap map;
+	private BodyDef def;
+	private PolygonShape shape;
+
 	public Level002ActorStage(int width, int height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
+		def = new BodyDef();
+        def.type = BodyType.StaticBody;
+        shape = new PolygonShape();
+		initTiledMap();
 		initFrame();
+        shape.dispose();
 	}
 
 	
+	// draw the textures from the map made in Tiled
+	// add the objects for collision detection as well.
+	private void initTiledMap() {
+		
+		assetManager = new AssetManager();
+		assetManager.setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
+		assetManager.load("data/myFirstMap.tmx", TiledMap.class);
+		assetManager.finishLoading();
+		map = assetManager.get("data/myFirstMap.tmx");
+		renderer = new OrthogonalTiledMapRenderer(map, 1f);
+		
+		// add the objects
+		MapLayer layer = map.getLayers().get("Object");
+		MapObjects objects = layer.getObjects();
+		for(MapObject o : objects){
+			System.out.println(o.getName());
+			if(o instanceof RectangleMapObject){
+				RectangleMapObject rectangleMapObject = (RectangleMapObject) o;
+				Rectangle rectangle = rectangleMapObject.getRectangle();
+				System.out.println(rectangle);
+				def.position.set(Utils.getWorldBoxCenter(Utils.Screen2World(rectangle.getX(), rectangle.getY()), Utils.Screen2World(rectangle.getWidth(), rectangle.getHeight())));
+				shape.setAsBox(Utils.Screen2World(rectangle.width)/2, Utils.Screen2World(rectangle.height)/2);
+				world.createBody(def).createFixture(shape, 0.0f);
+			}
+		}
+	}
+	
 	private void initFrame() {
-		//create frame
-        BodyDef def = new BodyDef();
-        def.type = BodyType.StaticBody;
-        
-        PolygonShape shape = new PolygonShape();
                         
         //bottom
         float width = SpaceGame.SCREEN_WIDTH;
@@ -51,7 +100,7 @@ public class Level002ActorStage extends DefaultActorStage {
         addActor(bottom);
         
         //top
-        y= SpaceGame.SCREEN_HEIGHT;
+        y= SpaceGame.SCREEN_HEIGHT - height;
         x = 0;
         def.position.set(Utils.getWorldBoxCenter(Utils.Screen2World(x, y), Utils.Screen2World(width, height)));
         BodyImageActor top = new BodyImageActor("top", new TextureRegion(Resource.colorTexture, 0, 64 * 3, 64, 64), world, def, shape, 1.0f);
@@ -87,11 +136,8 @@ public class Level002ActorStage extends DefaultActorStage {
         right.setHeight(height);
         addActor(right);
 
-        shape.dispose();  
-        
-        
-        x = 200;
-        y = 50;
+        x = 400;
+        y = 100;
         width = 62;
         height = 62;
      // Create our body in the world using our body definition
@@ -117,4 +163,12 @@ public class Level002ActorStage extends DefaultActorStage {
         
         circle.dispose();
 	}
+	@Override
+	public void draw() {
+		super.draw();
+		// draw the map
+		renderer.setView((OrthographicCamera) getCamera());
+		renderer.render();
+	}
+	
 }

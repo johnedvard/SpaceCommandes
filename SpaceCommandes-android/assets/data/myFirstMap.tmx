@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="40" height="20" tilewidth="16" tileheight="16">
+ <tileset firstgid="1" name="myFirstMap" tilewidth="16" tileheight="16">
+  <image source="myFirstMap.png" trans="ffffff" width="256" height="256"/>
+ </tileset>
+ <layer name="Tile Layer 1" width="40" height="20">
+  <data encoding="base64" compression="zlib">
+   eJwzZhi8wASIjQfaEXjAqPsoA6PuowyMuo8yMNTdpw7EGkCsCcRadHERKiDkPnMgtgBiSyC2oouLUAE58UvPMCXHffQM06GePwYaUMt9tEqT1HIfrdLkUIhfHiDmBWI+IOYngs+NJMaNRZ5cs3CpkQFiWSCWA2J5IvjSSGLSWOTJNQuXGgBhVhJz
+  </data>
+ </layer>
+ <objectgroup name="Test" width="40" height="20" visible="0">
+  <object x="196" y="180" width="57" height="25" visible="0"/>
+  <object x="273" y="242" width="60" height="27"/>
+  <object x="114" y="145" width="60" height="29"/>
+  <object x="13" y="0" height="2"/>
+  <object x="-7" y="-7" width="23" height="295"/>
+  <object x="-9" y="284" width="649" height="37"/>
+  <object x="623" y="-4" width="16" height="296"/>
+ </objectgroup>
+ <objectgroup name="Object" width="40" height="20">
+  <object name="Floor" x="-4" y="283" width="647" height="41"/>
+  <object x="272" y="241" width="64" height="31"/>
+  <object x="386" y="88" visible="0"/>
+ </objectgroup>
+</map>
