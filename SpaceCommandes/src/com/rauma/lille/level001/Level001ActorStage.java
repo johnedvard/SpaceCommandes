@@ -100,7 +100,7 @@ public class Level001ActorStage extends DefaultActorStage {
 
 		width = 64;
 		height = 64;
-		x = 10;
+		x = 60;
 		y = 40;
 		
 		def.type = BodyType.DynamicBody;
@@ -143,8 +143,10 @@ public class Level001ActorStage extends DefaultActorStage {
 
 	@Override
 	public void draw() {
-		player.applyForce(new Vector2(currentX * 2, currentY * 5),
-				new Vector2());
+//		player.applyForce(new Vector2(currentX * 2, currentY * 5),
+//				new Vector2());
+		player.applyLinearImpulse(new Vector2(currentX/100, 0),
+				new Vector2(),true);
 		super.draw();
 	}
 }

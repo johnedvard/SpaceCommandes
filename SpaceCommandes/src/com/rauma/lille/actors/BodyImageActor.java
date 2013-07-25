@@ -53,14 +53,18 @@ public class BodyImageActor extends Image {
 		super.finalize();
 	}
 
-
 	public void applyForce(Vector2 force, Vector2 point) {
 		if (body != null) {
 			body.applyForce(force, point, true);// Bugs? should use World
 												// coordinate?
 		}
 	}
-
+	public void applyLinearImpulse(Vector2 impulse, Vector2 point, boolean wake){
+		if(body != null){
+			body.applyLinearImpulse(impulse, point, wake);
+		}
+	}
+	
 	public float getBodyMass() {
 		if (body != null) {
 			return body.getMass();
