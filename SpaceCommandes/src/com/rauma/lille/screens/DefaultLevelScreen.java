@@ -17,14 +17,16 @@ public class DefaultLevelScreen extends AbstractScreen {
 	protected BackgroundStage bgStage;
 	protected UIStage uiStage;
 
-	public DefaultLevelScreen(SpaceGame game) {
+	public DefaultLevelScreen(SpaceGame game, String mapName) {
 		super(game);
 		int width = Gdx.graphics.getWidth();
 		int height = Gdx.graphics.getWidth();
-		controllerStage = new ControllerStage(width, height, true);
-		actorStage = new DefaultActorStage(width, height, true);
 		bgStage = new BackgroundStage(width, height, true);
+		actorStage = new DefaultActorStage(width, height, true);
+		actorStage.initMap(mapName);
+		
 		uiStage = new UIStage(width, height, true);
+		controllerStage = new ControllerStage(width, height, true);
 
 		controllerStage.addListener(new ChangeListener() {
 			@Override

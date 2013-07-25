@@ -12,35 +12,31 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
-import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.rauma.lille.SpaceGame;
-import com.rauma.lille.stages.ControllerStage;
 
 public class MainMenuScreen extends AbstractScreen {
-	private Stage stage;
+	private Stage stage = new Stage();
 	
 	 // setup the dimensions of the menu buttons
     private static final float BUTTON_WIDTH = 100f;
     private static final float BUTTON_HEIGHT = 30f;
     private static final float BUTTON_SPACING = 10f;
-	private TextButton btnNewGame;
 
 	private Texture splashTexture;
 
 	private Label lblWelcome;
 
-	private Touchpad touchpad;
+	private TextButton levelOneBtn;
+
+	private TextButton levelTwoBtn;
+
     
 	public MainMenuScreen(final SpaceGame game) {
 		super(game);
-		int width = Gdx.graphics.getWidth();
-		int height = Gdx.graphics.getHeight();
-		stage = new ControllerStage(width,height,false);
 		Gdx.input.setInputProcessor(stage);
-		
 		//create the welcome label
         BitmapFont defaultFont = new BitmapFont();
         LabelStyle style = new LabelStyle(defaultFont,Color.WHITE); 
@@ -59,27 +55,39 @@ public class MainMenuScreen extends AbstractScreen {
 		Drawable drawableUp = new NinePatchDrawable(ninePatchUp);
 		Drawable drawableDown = new NinePatchDrawable(ninePatchDown);
 		TextButtonStyle buttonStyle = new TextButtonStyle(drawableUp,drawableDown,drawableUp,defaultFont);
-		btnNewGame = new TextButton("New Game",buttonStyle);
-		btnNewGame.setWidth(BUTTON_WIDTH);
-		btnNewGame.setHeight(BUTTON_HEIGHT);
-		btnNewGame.setX((stage.getWidth() - btnNewGame.getWidth())/2);
-		btnNewGame.setY((stage.getHeight()/2)-100);
-		btnNewGame.addListener(new ClickListener(){
+
+		levelOneBtn = new TextButton("Level 1", buttonStyle);
+		levelOneBtn.setWidth(BUTTON_WIDTH);
+		levelOneBtn.setHeight(BUTTON_HEIGHT);
+		levelOneBtn.setX((stage.getWidth() - levelOneBtn.getWidth())/2);
+		levelOneBtn.setY((stage.getHeight()/2)-100);
+		levelOneBtn.addListener(new ClickListener(){
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
 				// change the screen to the game screen.
 				System.out.println("clicked x,y: " + x +","+ y);
-				game.setScreen(game.getGameScreen());
+				game.startMap("data/test.tmx");
 			}
 		});
-		stage.addActor(btnNewGame);
-		
-	}
+		stage.addActor(levelOneBtn);
 
-	@Override
-	public void show() {
-		super.show();
+		levelTwoBtn = new TextButton("Level 2", buttonStyle);
+		levelTwoBtn.setWidth(BUTTON_WIDTH);
+		levelTwoBtn.setHeight(BUTTON_HEIGHT);
+		levelTwoBtn.setX((stage.getWidth() - levelTwoBtn.getWidth())/2);
+		levelTwoBtn.setY((stage.getHeight()/2)-200);
+		levelTwoBtn.addListener(new ClickListener(){
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				super.clicked(event, x, y);
+				// change the screen to the game screen.
+				System.out.println("clicked x,y: " + x +","+ y);
+				game.startMap("data/myFirstMap.tmx");
+			}
+		});
+		stage.addActor(levelTwoBtn);
+		
 	}
 
 	@Override
@@ -94,8 +102,11 @@ public class MainMenuScreen extends AbstractScreen {
 		System.out.println("width, height" + width +","+ height);
 		stage.setViewport(width, height, false);
 		
-		btnNewGame.setX((stage.getWidth() - btnNewGame.getWidth())/2);
-		btnNewGame.setY((stage.getHeight()/2)-100);
+		levelOneBtn.setX((stage.getWidth() - levelOneBtn.getWidth())/2);
+		levelOneBtn.setY((stage.getHeight()/2)-100);
+		
+		levelTwoBtn.setX((stage.getWidth() - levelTwoBtn.getWidth())/2);
+		levelTwoBtn.setY((stage.getHeight()/2)-100);
 		
 		lblWelcome.setX((stage.getWidth() - lblWelcome.getWidth())/2);
 		lblWelcome.setY((stage.getHeight()/2)+100);

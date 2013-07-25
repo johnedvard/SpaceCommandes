@@ -4,8 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.math.Vector2;
-import com.rauma.lille.level001.Level001Screen;
-import com.rauma.lille.level002.Level002Screen;
+import com.rauma.lille.screens.DefaultLevelScreen;
 import com.rauma.lille.screens.MainMenuScreen;
 import com.rauma.lille.screens.SplashScreen;
 
@@ -13,8 +12,6 @@ public class SpaceGame extends Game {
 	private FPSLogger fpsLogger;
 	private Screen splashScreen;
 	private Screen mainMenuScreen;
-	private Screen gameScreen;
-	private Screen level002;
 
 	public static final float SCREEN_WIDTH = 800;
 	public static final float SCREEN_HEIGHT = 480;
@@ -32,11 +29,14 @@ public class SpaceGame extends Game {
 		
 		Resource.initalize();
 		
-		mainMenuScreen = new MainMenuScreen(this);
 		splashScreen = new SplashScreen(this);
-		gameScreen = new Level001Screen(this);
-		level002 = new Level002Screen(this);
-		setScreen(gameScreen);
+		mainMenuScreen = new MainMenuScreen(this);
+		setScreen(mainMenuScreen);
+	}
+	
+	public void startMap(String mapName) {
+		DefaultLevelScreen screen = new DefaultLevelScreen(this, mapName);
+		setScreen(screen);
 	}
 
 	@Override
@@ -68,9 +68,5 @@ public class SpaceGame extends Game {
 
 	public Screen getMainMenuScreen() {
 		return mainMenuScreen;
-	}
-
-	public Screen getGameScreen() {
-		return gameScreen;
 	}
 }

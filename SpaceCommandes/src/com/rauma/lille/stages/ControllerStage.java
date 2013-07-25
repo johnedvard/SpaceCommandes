@@ -14,20 +14,19 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 
 /**
  * This stage should handle controllers, such as Touchpad and keyboard input.
+ * 
  * @author john
- *
+ * 
  */
-public class ControllerStage extends AbstractStage{
-	private Touchpad touchpadLeft; 
+public class ControllerStage extends AbstractStage {
+	private Touchpad touchpadLeft;
 	private Touchpad touchpadRight;
-	
-	private HashSet<ChangeListener> changeListeners	= new HashSet<ChangeListener>();
-	
+
 	public ControllerStage(int width, int height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
 		init();
 	}
-	
+
 	private void init() {
 		touchpadLeft = createNewTouchpad();
 		touchpadLeft.setName("touchpadLeft");
@@ -36,7 +35,7 @@ public class ControllerStage extends AbstractStage{
 		touchpadRight = createNewTouchpad();
 		touchpadRight.setName("touchpadRight");
 		touchpadRight.setVisible(false);
-		
+
 		addActor(touchpadLeft);
 		addActor(touchpadRight);
 	}
@@ -57,29 +56,28 @@ public class ControllerStage extends AbstractStage{
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		Vector2 stageCoords = this.screenToStageCoordinates(new Vector2(screenX,screenY));
-		if(screenX< getWidth()/2){
-			touchpadLeft.setX(stageCoords.x-touchpadLeft.getWidth()/2);
-			touchpadLeft.setY(stageCoords.y-touchpadLeft.getHeight()/2);
+		Vector2 stageCoords = this.screenToStageCoordinates(new Vector2(screenX, screenY));
+		if (screenX < getWidth() / 2) {
+			touchpadLeft.setX(stageCoords.x - touchpadLeft.getWidth() / 2);
+			touchpadLeft.setY(stageCoords.y - touchpadLeft.getHeight() / 2);
 			touchpadLeft.setVisible(true);
 			touchpadLeft.validate();
-		}else{
-			touchpadRight.setX(stageCoords.x-touchpadLeft.getWidth()/2);
-			touchpadRight.setY(stageCoords.y-touchpadLeft.getHeight()/2);
+		} else {
+			touchpadRight.setX(stageCoords.x - touchpadRight.getWidth() / 2);
+			touchpadRight.setY(stageCoords.y - touchpadRight.getHeight() / 2);
 			touchpadRight.setVisible(true);
 			touchpadRight.validate();
 		}
 		return super.touchDown(screenX, screenY, pointer, button) && true;
 	}
-	
+
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		if(screenX< getWidth()/2){
-			touchpadLeft.setVisible(false);
-		}else{
-			touchpadRight.setVisible(false);
-		}
-		return super.touchUp(screenX, screenY, pointer, button);
+		boolean b = super.touchUp(screenX, screenY, pointer, button);
+		touchpadLeft.setVisible(touchpadLeft.isTouched());
+		touchpadRight.setVisible(touchpadRight.isTouched());
+
+		return b;
 	}
 	
 }
