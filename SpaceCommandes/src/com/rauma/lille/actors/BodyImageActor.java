@@ -20,15 +20,12 @@ public class BodyImageActor extends Image {
 			BodyDef def, Shape shape, float density) {
 		super(new TextureRegion(texture));
 		setName(name);
-		
+
 		body = world.createBody(def);
 		body.createFixture(shape, density);
 		body.setUserData(this);
 	}
-	
-	public void setLinearVelocity(Vector2 v){
-		body.setLinearVelocity(v);
-	}
+
 	public BodyImageActor(String name, TextureRegion texture, World world,
 			BodyDef def, FixtureDef fixturedef) {
 		super(new TextureRegion(texture));
@@ -49,7 +46,7 @@ public class BodyImageActor extends Image {
 	public Body getBody() {
 		return body;
 	}
-	
+
 	@Override
 	protected void finalize() throws Throwable {
 		this.destroyBody();
@@ -62,12 +59,30 @@ public class BodyImageActor extends Image {
 												// coordinate?
 		}
 	}
-	public void applyLinearImpulse(Vector2 impulse, Vector2 point, boolean wake){
-		if(body != null){
+
+	/**
+	 * apply force to center
+	 * 
+	 * @param force
+	 */
+	public void applyForce(Vector2 force) {
+		if (body != null) {
+			body.applyForceToCenter(force, true);
+		}
+	}
+
+	public void applyLinearImpulse(Vector2 impulse, Vector2 point, boolean wake) {
+		if (body != null) {
 			body.applyLinearImpulse(impulse, point, wake);
 		}
 	}
-	
+
+	public void setLinearVelocity(Vector2 v) {
+		if (body != null) {
+			body.setLinearVelocity(v);
+		}
+	}
+
 	public float getBodyMass() {
 		if (body != null) {
 			return body.getMass();
@@ -85,4 +100,5 @@ public class BodyImageActor extends Image {
 
 		super.draw(batch, parentAlpha);
 	}
+
 }

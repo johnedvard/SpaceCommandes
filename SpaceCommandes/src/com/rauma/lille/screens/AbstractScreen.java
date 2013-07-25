@@ -1,28 +1,18 @@
 package com.rauma.lille.screens;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.rauma.lille.SpaceGame;
 
 public class AbstractScreen implements Screen {
-	protected OrthographicCamera camera;
 
 	protected SpaceGame game;
 
 	public AbstractScreen(SpaceGame game) {
 		this.game = game;
-
-		float w = Gdx.graphics.getWidth();
-		float h = Gdx.graphics.getHeight();
-
-		camera = new OrthographicCamera(1, h / w);
 	}
 
 	@Override
 	public void render(float delta) {
-		camera.update();
 	}
 
 	@Override

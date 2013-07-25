@@ -8,7 +8,6 @@ public class Level001Screen extends DefaultLevelScreen {
 
 	public Level001Screen(SpaceGame game) {
 		super(game);
-		
 		actorStage = new Level001ActorStage(Gdx.graphics.getWidth(),
 				Gdx.graphics.getHeight(), true);
 

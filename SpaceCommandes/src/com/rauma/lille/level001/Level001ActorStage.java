@@ -1,17 +1,32 @@
 package com.rauma.lille.level001;
 
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.MapProperties;
+import com.badlogic.gdx.maps.objects.PolygonMapObject;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.Shape;
 import com.rauma.lille.Resource;
 import com.rauma.lille.SpaceGame;
 import com.rauma.lille.Utils;
 import com.rauma.lille.actors.BodyImageActor;
 import com.rauma.lille.stages.DefaultActorStage;
+import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
 /**
  * @author frank
@@ -26,92 +41,25 @@ public class Level001ActorStage extends DefaultActorStage {
 	public Level001ActorStage(int width, int height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
 
+		initMap("test.tmx");
 		initLevel();
-
 	}
 
 	private void initLevel() {
 
-		// bottom
-		float width = SpaceGame.SCREEN_WIDTH;
-		float height = 10;
-		float x = 0;
-		float y = 0;
+		// player
+		float width = 64;
+		float height = 64;
+		float x = 100;
+		float y = 100;
 
 		BodyDef def = new BodyDef();
-		def.type = BodyType.StaticBody;
-		def.position.set(Utils.getWorldBoxCenter(Utils.Screen2World(x, y),
-				Utils.Screen2World(width, height)));
-
-		PolygonShape shape = new PolygonShape();
-		shape.setAsBox(Utils.Screen2World(width / 2),
-				Utils.Screen2World(height / 2));
-
-		FixtureDef fixtureDef = new FixtureDef();
-		fixtureDef.shape = shape;
-		fixtureDef.density = 0.0f;
-		fixtureDef.friction = 0.9f;
-
-		BodyImageActor bottom = new BodyImageActor("bottom", new TextureRegion(
-				Resource.colorTexture, 0, 0, 64, 64), world, def, fixtureDef);
-		bottom.setWidth(width);
-		bottom.setHeight(height);
-		addActor(bottom);
-
-		// left
-		width = 10;
-		height = SpaceGame.SCREEN_HEIGHT;
-		x = 0;
-		y = 0;
-
-		def.type = BodyType.StaticBody;
-		def.position.set(Utils.getWorldBoxCenter(Utils.Screen2World(x, y),
-				Utils.Screen2World(width, height)));
-
-		shape.setAsBox(Utils.Screen2World(width / 2),
-				Utils.Screen2World(height / 2));
-
-		BodyImageActor left = new BodyImageActor("left", new TextureRegion(
-				Resource.colorTexture, 0, 0, 64, 64), world, def, shape, 0.0f);
-		left.setWidth(width);
-		left.setHeight(height);
-		addActor(left);
-
-		// right
-		width = 10;
-		height = SpaceGame.SCREEN_HEIGHT;
-		x = SpaceGame.SCREEN_WIDTH - width;
-		y = 0;
-
-		def.type = BodyType.StaticBody;
-		def.position.set(Utils.getWorldBoxCenter(Utils.Screen2World(x, y),
-				Utils.Screen2World(width, height)));
-
-		shape.setAsBox(Utils.Screen2World(width / 2),
-				Utils.Screen2World(height / 2));
-
-		BodyImageActor right = new BodyImageActor("right", new TextureRegion(
-				Resource.colorTexture, 0, 0, 64, 64), world, def, shape, 0.0f);
-		right.setWidth(width);
-		right.setHeight(height);
-		addActor(right);
-
-		// player
-
-		width = 64;
-		height = 64;
-		x = 60;
-		y = 40;
-		
 		def.type = BodyType.DynamicBody;
-		def.position.set(Utils.getWorldBoxCenter(Utils.Screen2World(x, y),
-				Utils.Screen2World(width, height)));
-
-		shape.dispose();
-
+		def.position.set(Utils.Screen2World(x), Utils.Screen2World(y));
 		CircleShape circle = new CircleShape();
 		circle.setRadius(Utils.Screen2World(width / 2));
 
+		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = circle;
 		fixtureDef.density = 0.5f;
 		fixtureDef.friction = 0.9f;
@@ -125,6 +73,7 @@ public class Level001ActorStage extends DefaultActorStage {
 		addActor(player);
 
 		circle.dispose();
+		
 	}
 
 	@Override
@@ -132,7 +81,6 @@ public class Level001ActorStage extends DefaultActorStage {
 			float knobPercentY) {
 		currentX = knobPercentX;
 		currentY = knobPercentY;
-		player.setLinearVelocity(new Vector2(currentX*2,0));
 	}
 
 	@Override
@@ -144,9 +92,12 @@ public class Level001ActorStage extends DefaultActorStage {
 
 	@Override
 	public void draw() {
-//		player.applyForce(new Vector2(currentX * 2, currentY * 5),
-//				new Vector2());
-		//player.applyLinearImpulse(new Vector2(currentX/100, 0),new Vector2(),true);
+		if(currentX != 0)
+			player.setLinearVelocity(new Vector2(currentX*2,0));
+
+		if(currentY > 0)
+			player.applyForce(new Vector2(0, currentY * 6));
+
 		super.draw();
 	}
 }

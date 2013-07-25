@@ -8,8 +8,8 @@ public class Main {
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "SpaceCommandes";
 		cfg.useGL20 = false;
-		cfg.width = 480;
-		cfg.height = 320;
+		cfg.width = (int) SpaceGame.SCREEN_WIDTH;
+		cfg.height = (int) SpaceGame.SCREEN_HEIGHT;
 		
 		new LwjglApplication(new SpaceGame(), cfg);
 	}

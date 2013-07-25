@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="50" height="30" tilewidth="16" tileheight="16">
+ <tileset firstgid="1" name="area02_level_tiles" tilewidth="16" tileheight="16">
+  <image source="area02_level_tiles.png" trans="ff00ff" width="512" height="256"/>
+ </tileset>
+ <layer name="Tile Layer 1" width="50" height="30">
+  <data encoding="base64" compression="zlib">
+   eJztksENgDAMAyNgEmARYDdmKUxJeCDypKRVXMkn+Rv56iYROTSntEeSt/uiWTVbaKN/2O70iIceWNADC3pgQQ8s6IEFPbCgBxb0wKKmx17ozhdqeHSaXjM47+RQw2PUTJrZeSeHUh4RG1hKeURsYPF4RG9g8XhEb2DJ9UDawJLrgbSBxXZ/3rrl3P/kAkTCMis=
+  </data>
+ </layer>
+ <objectgroup name="box2d" width="50" height="30">
+  <object x="291" y="341" width="43" height="26"/>
+  <object x="244" y="373" width="41" height="26"/>
+  <object x="196" y="407" width="41" height="24"/>
+  <object x="149" y="440" width="39" height="20"/>
+  <object x="4" y="471" width="791" height="11"/>
+  <object x="15" y="3" width="31" height="473"/>
+  <object x="753" y="3" width="28" height="472"/>
+ </objectgroup>
+</map>

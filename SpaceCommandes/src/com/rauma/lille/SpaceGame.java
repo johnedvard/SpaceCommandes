@@ -16,8 +16,8 @@ public class SpaceGame extends Game {
 	private Screen gameScreen;
 	private Screen level002;
 
-	public static final float SCREEN_WIDTH = 480;
-	public static final float SCREEN_HEIGHT = 800;
+	public static final float SCREEN_WIDTH = 800;
+	public static final float SCREEN_HEIGHT = 480;
 
 	public static final float WORLD_SCALE = 100;
 	public static final Vector2 WORLD_GRAVITY = new Vector2(0f, -10f);
