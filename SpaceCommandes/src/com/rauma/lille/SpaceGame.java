@@ -16,12 +16,11 @@ public class SpaceGame extends Game {
 	private Screen gameScreen;
 	private Screen level002;
 
-	public static final float SCREEN_WIDTH = 480;
-	public static final float SCREEN_HEIGHT = 800;
+	public static final float SCREEN_WIDTH = 800;
+	public static final float SCREEN_HEIGHT = 420;
 
 	public static final float WORLD_SCALE = 100;
 	public static final Vector2 WORLD_GRAVITY = new Vector2(0f, -10f);
-
 
 	public static boolean DEBUG = false;
 	public static boolean COLLISION = true;
@@ -37,7 +36,7 @@ public class SpaceGame extends Game {
 		splashScreen = new SplashScreen(this);
 		gameScreen = new Level001Screen(this);
 		level002 = new Level002Screen(this);
-		setScreen(gameScreen);
+		setScreen(level002);
 	}
 
 	@Override
