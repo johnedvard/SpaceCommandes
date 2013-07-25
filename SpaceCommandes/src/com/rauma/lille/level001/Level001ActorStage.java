@@ -132,6 +132,7 @@ public class Level001ActorStage extends DefaultActorStage {
 			float knobPercentY) {
 		currentX = knobPercentX;
 		currentY = knobPercentY;
+		player.setLinearVelocity(new Vector2(currentX*2,0));
 	}
 
 	@Override
@@ -145,8 +146,7 @@ public class Level001ActorStage extends DefaultActorStage {
 	public void draw() {
 //		player.applyForce(new Vector2(currentX * 2, currentY * 5),
 //				new Vector2());
-		player.applyLinearImpulse(new Vector2(currentX/100, 0),
-				new Vector2(),true);
+		//player.applyLinearImpulse(new Vector2(currentX/100, 0),new Vector2(),true);
 		super.draw();
 	}
 }

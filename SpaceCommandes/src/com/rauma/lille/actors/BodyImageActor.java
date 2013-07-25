@@ -25,7 +25,10 @@ public class BodyImageActor extends Image {
 		body.createFixture(shape, density);
 		body.setUserData(this);
 	}
-
+	
+	public void setLinearVelocity(Vector2 v){
+		body.setLinearVelocity(v);
+	}
 	public BodyImageActor(String name, TextureRegion texture, World world,
 			BodyDef def, FixtureDef fixturedef) {
 		super(new TextureRegion(texture));
