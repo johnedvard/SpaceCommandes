@@ -41,7 +41,7 @@ public class Level001ActorStage extends DefaultActorStage {
 	public Level001ActorStage(int width, int height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
 
-		initMap("test.tmx");
+		initMap("data/test.tmx");
 		initLevel();
 	}
 
