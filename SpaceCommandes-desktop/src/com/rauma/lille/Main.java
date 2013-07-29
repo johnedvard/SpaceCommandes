@@ -12,6 +12,7 @@ public class Main {
 		cfg.width = (int) SpaceGame.SCREEN_WIDTH;
 		cfg.height = (int) SpaceGame.SCREEN_HEIGHT;
 		Box2DExample a = new Box2DExample();
-		new LwjglApplication(a, cfg);
+		SpaceGame s = new SpaceGame();
+		new LwjglApplication(s, cfg);
 	}
 }
