@@ -22,6 +22,7 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.rauma.lille.Player;
 import com.rauma.lille.Resource;
 import com.rauma.lille.SpaceGame;
 import com.rauma.lille.Utils;
@@ -131,7 +132,8 @@ public class DefaultActorStage extends AbstractStage {
 		player.setWidth(width);
 		player.setHeight(height);
 		player.getBody().setFixedRotation(true);
-		addActor(player);
+		Player p = new Player();
+		addActor(p);
 
 		circle.dispose();
 

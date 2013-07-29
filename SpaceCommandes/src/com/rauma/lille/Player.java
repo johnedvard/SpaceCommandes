@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.esotericsoftware.spine.Animation;
 import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.SkeletonData;
+import com.esotericsoftware.spine.SkeletonJson;
 import com.esotericsoftware.spine.SkeletonRenderer;
 import com.esotericsoftware.spine.Skin;
 import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
@@ -22,33 +23,32 @@ public class Player extends Actor{
 	SkeletonData skeletonData; //The json file from Spine
 	Skeleton skeleton; // The skeleton containing the json data (skeletonData) from Spine
 	Animation animation; //The object used to store an animation found in the SkeletonData and to be applied later
-	SkeletonRenderer skeletonRenderer; // The object used to draw the skeleton
+	SkeletonRenderer skeletonRenderer = new SkeletonRenderer(); // The object used to draw the skeleton
+	float time;
 
 	public Player() {
 		atlas = new TextureAtlas(Gdx.files.internal("spineboy.atlas"));
-		// This loader creates Box2dAttachments instead of RegionAttachments for an easy way to keep
-		// track of the Box2D body for each attachment.
-		AtlasAttachmentLoader atlasLoader = new AtlasAttachmentLoader(atlas) {
-			public Attachment newAttachment (Skin skin, AttachmentType type, String name) {
-				Box2dAttachment attachment = new Box2dAttachment(name);
-				AtlasRegion region = atlas.findRegion(attachment.getName());
-				if (region == null) throw new RuntimeException("Region not found in atlas: " + attachment);
-				attachment.setRegion(region);
-				return attachment;
-			}
-		};
-		
+		SkeletonJson json = new SkeletonJson(atlas);
+		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("skeleton.json"));
+		json.setScale(0.05f);
+		animation = skeletonData.findAnimation("animation");
+		skeleton = new Skeleton(skeletonData);
+		skeleton.setX(50);
+		skeleton.setY(50);
+		skeleton.updateWorldTransform();
 		
 	}
 	public void draw(SpriteBatch batch, float parentAlpha) {
+		float delta = Gdx.graphics.getDeltaTime();
+		float remaining = delta;
+		while (remaining > 0) {
+			float d = Math.min(0.016f, remaining);
+			time += d;
+			remaining -= d;
+		}
+		
+		animation.apply(skeleton, time, true);
 		skeleton.updateWorldTransform();
 		skeletonRenderer.draw(batch, skeleton);
 	};
-
-	static class Box2dAttachment extends RegionAttachment {
-		Body body;
-		public Box2dAttachment (String name) {
-			super(name);
-		}
-	}
 }
