@@ -1,7 +1,5 @@
 package com.rauma.lille.stages;
 
-import java.util.HashSet;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
@@ -9,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 
 /**
@@ -50,14 +47,15 @@ public class ControllerStage extends AbstractStage {
 		NinePatchDrawable backgroundDrawable = new NinePatchDrawable(ninePatchTouchpadBg);
 		NinePatchDrawable knobDrawable = new NinePatchDrawable(ninePatchTouchpadKnob);
 		Touchpad touchpad = new Touchpad(5, new Touchpad.TouchpadStyle(backgroundDrawable, knobDrawable));
-		touchpad.setSize(50, 50);
+		touchpad.setSize(100, 100);
 		return touchpad;
 	}
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		Vector2 stageCoords = this.screenToStageCoordinates(new Vector2(screenX, screenY));
-		if (screenX < getWidth() / 2) {
+		Vector2 stageCoords = screenToStageCoordinates(new Vector2(screenX, screenY));
+		
+		if (stageCoords.x < getWidth() / 2) {
 			touchpadLeft.setX(stageCoords.x - touchpadLeft.getWidth() / 2);
 			touchpadLeft.setY(stageCoords.y - touchpadLeft.getHeight() / 2);
 			touchpadLeft.setVisible(true);

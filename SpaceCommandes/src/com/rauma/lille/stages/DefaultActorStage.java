@@ -1,7 +1,6 @@
 package com.rauma.lille.stages;
 
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayer;
@@ -12,18 +11,17 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.rauma.lille.Resource;
 import com.rauma.lille.SpaceGame;
 import com.rauma.lille.Utils;
@@ -55,7 +53,7 @@ public class DefaultActorStage extends AbstractStage {
 	private void init() {
 		world = new World(SpaceGame.WORLD_GRAVITY, true);
 		debugRenderer = new Box2DDebugRenderer();
-		getCamera().update();
+
 		debugMatrix = getCamera().combined.cpy();
 		debugMatrix.scale(SpaceGame.WORLD_SCALE, SpaceGame.WORLD_SCALE, 1f);
 	}
@@ -69,10 +67,10 @@ public class DefaultActorStage extends AbstractStage {
 		// assetManager.load("data/myFirstMap.tmx", TiledMap.class);
 		// assetManager.finishLoading();
 		// map = assetManager.get("data/myFirstMap.tmx");
-		// renderer = new OrthogonalTiledMapRenderer(map, 1f);
 
 		map = new TmxMapLoader().load(mapName);
 		renderer = new OrthogonalTiledMapRenderer(map, 1f);
+		OrthographicCamera camera = (OrthographicCamera) getCamera();
 
 		BodyDef def = new BodyDef();
 		MapLayer box2dLayer = map.getLayers().get("box2d");
@@ -147,16 +145,17 @@ public class DefaultActorStage extends AbstractStage {
 
 	public void playerAimed(float knobX, float knobY, float knobPercentX,
 			float knobPercentY) {
-		
-		angleRad = (float) Math.atan2(knobPercentY, knobPercentX);
-//		angleRad += Math.PI/2.0;
-//		angle = (float) Math.toDegrees(theta);
-//
-//		if (angle < 0) {
-//			angle += 360;
-//		}
 
-		System.out.println("Aimed " + knobPercentX + ", " + knobPercentY + " -> " + angleRad);
+		angleRad = (float) Math.atan2(knobPercentY, knobPercentX);
+		// angleRad += Math.PI/2.0;
+		// angle = (float) Math.toDegrees(theta);
+		//
+		// if (angle < 0) {
+		// angle += 360;
+		// }
+
+		System.out.println("Aimed " + knobPercentX + ", " + knobPercentY
+				+ " -> " + angleRad);
 	}
 
 	public void updatePlayer() {
@@ -179,9 +178,14 @@ public class DefaultActorStage extends AbstractStage {
 	public void draw() {
 		super.draw();
 		updatePlayer();
-		OrthographicCamera camera = (OrthographicCamera) getCamera();
-		camera.update();
-		renderer.setView(camera);
+
+		Camera stageCamera = getCamera();
+		if (stageCamera instanceof OrthographicCamera) {
+			OrthographicCamera camera = (OrthographicCamera) stageCamera;
+			camera.setToOrtho(false, getWidth() / 2, getHeight() / 2);
+			camera.update();
+			renderer.setView(camera);
+		}
 		renderer.render();
 
 		debugRenderer.render(world, debugMatrix);

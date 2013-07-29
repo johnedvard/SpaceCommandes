@@ -60,7 +60,7 @@ public class MainMenuScreen extends AbstractScreen {
 		levelOneBtn.setWidth(BUTTON_WIDTH);
 		levelOneBtn.setHeight(BUTTON_HEIGHT);
 		levelOneBtn.setX((stage.getWidth() - levelOneBtn.getWidth())/2);
-		levelOneBtn.setY((stage.getHeight()/2)-100);
+		levelOneBtn.setY((stage.getHeight()/2));
 		levelOneBtn.addListener(new ClickListener(){
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
@@ -76,7 +76,7 @@ public class MainMenuScreen extends AbstractScreen {
 		levelTwoBtn.setWidth(BUTTON_WIDTH);
 		levelTwoBtn.setHeight(BUTTON_HEIGHT);
 		levelTwoBtn.setX((stage.getWidth() - levelTwoBtn.getWidth())/2);
-		levelTwoBtn.setY((stage.getHeight()/2)-200);
+		levelTwoBtn.setY((stage.getHeight()/2)-BUTTON_HEIGHT-BUTTON_SPACING);
 		levelTwoBtn.addListener(new ClickListener(){
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
@@ -103,10 +103,10 @@ public class MainMenuScreen extends AbstractScreen {
 		stage.setViewport(width, height, false);
 		
 		levelOneBtn.setX((stage.getWidth() - levelOneBtn.getWidth())/2);
-		levelOneBtn.setY((stage.getHeight()/2)-100);
+		levelOneBtn.setY((stage.getHeight()/2)-BUTTON_HEIGHT);
 		
 		levelTwoBtn.setX((stage.getWidth() - levelTwoBtn.getWidth())/2);
-		levelTwoBtn.setY((stage.getHeight()/2)-100);
+		levelTwoBtn.setY((stage.getHeight()/2)-BUTTON_HEIGHT-BUTTON_SPACING);
 		
 		lblWelcome.setX((stage.getWidth() - lblWelcome.getWidth())/2);
 		lblWelcome.setY((stage.getHeight()/2)+100);
