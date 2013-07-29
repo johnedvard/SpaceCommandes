@@ -29,9 +29,9 @@ public class Player extends Actor{
 	public Player() {
 		atlas = new TextureAtlas(Gdx.files.internal("spineboy.atlas"));
 		SkeletonJson json = new SkeletonJson(atlas);
-		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("skeleton.json"));
+		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy.json"));
 		json.setScale(0.05f);
-		animation = skeletonData.findAnimation("animation");
+		animation = skeletonData.findAnimation("walk");
 		skeleton = new Skeleton(skeletonData);
 		skeleton.setX(50);
 		skeleton.setY(50);
