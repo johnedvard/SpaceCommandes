@@ -1,13 +1,11 @@
 package com.rauma.lille.stages;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.g2d.NinePatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.scenes.scene2d.ui.Touchpad.TouchpadStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
 /**
  * This stage should handle controllers, such as Touchpad and keyboard input.
@@ -36,25 +34,36 @@ public class ControllerStage extends AbstractStage {
 		addActor(touchpadLeft);
 		addActor(touchpadRight);
 	}
-	
-	private Touchpad createNewTouchpad(){
-		Texture touchpadTexture = new Texture(Gdx.files.internal("data/libgdx.png"));
-		touchpadTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);     
-		TextureRegion background = new TextureRegion(touchpadTexture, 80, 80, 17, 17);
-		TextureRegion knob = new TextureRegion(touchpadTexture, 50, 191, 20, 20);
-		NinePatch ninePatchTouchpadBg = new NinePatch(background);
-		NinePatch ninePatchTouchpadKnob = new NinePatch(knob);
-		NinePatchDrawable backgroundDrawable = new NinePatchDrawable(ninePatchTouchpadBg);
-		NinePatchDrawable knobDrawable = new NinePatchDrawable(ninePatchTouchpadKnob);
-		Touchpad touchpad = new Touchpad(5, new Touchpad.TouchpadStyle(backgroundDrawable, knobDrawable));
-		touchpad.setSize(100, 100);
+
+	private Touchpad createNewTouchpad() {
+		// Create a touchpad skin
+		Skin touchpadSkin = new Skin();
+		Texture background = new Texture("data/touchBackground.png");
+		Texture knob = new Texture("data/touchKnob.png");
+
+		// Set background and knob image
+		touchpadSkin.add("touchBackground", background);
+		touchpadSkin.add("touchKnob", knob);
+
+		// Create TouchPad Style
+		TouchpadStyle touchpadStyle = new Touchpad.TouchpadStyle();
+		// Create Drawable's from TouchPad skin
+		Drawable touchBackground = touchpadSkin.getDrawable("touchBackground");
+		Drawable touchKnob = touchpadSkin.getDrawable("touchKnob");
+
+		// Apply the drawables to the TouchPad Style
+		touchpadStyle.background = touchBackground;
+		touchpadStyle.knob = touchKnob;
+
+		Touchpad touchpad = new Touchpad(5, touchpadStyle);
 		return touchpad;
 	}
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		Vector2 stageCoords = screenToStageCoordinates(new Vector2(screenX, screenY));
-		
+		Vector2 stageCoords = screenToStageCoordinates(new Vector2(screenX,
+				screenY));
+
 		if (stageCoords.x < getWidth() / 2) {
 			touchpadLeft.setX(stageCoords.x - touchpadLeft.getWidth() / 2);
 			touchpadLeft.setY(stageCoords.y - touchpadLeft.getHeight() / 2);
@@ -77,5 +86,5 @@ public class ControllerStage extends AbstractStage {
 
 		return b;
 	}
-	
+
 }

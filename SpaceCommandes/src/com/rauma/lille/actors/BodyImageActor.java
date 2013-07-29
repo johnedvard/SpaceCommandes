@@ -3,7 +3,6 @@ package com.rauma.lille.actors;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -51,36 +50,6 @@ public class BodyImageActor extends Image {
 	protected void finalize() throws Throwable {
 		this.destroyBody();
 		super.finalize();
-	}
-
-	public void applyForce(Vector2 force, Vector2 point) {
-		if (body != null) {
-			body.applyForce(force, point, true);// Bugs? should use World
-												// coordinate?
-		}
-	}
-
-	/**
-	 * apply force to center
-	 * 
-	 * @param force
-	 */
-	public void applyForce(Vector2 force) {
-		if (body != null) {
-			body.applyForceToCenter(force, true);
-		}
-	}
-
-	public void applyLinearImpulse(Vector2 impulse, Vector2 point, boolean wake) {
-		if (body != null) {
-			body.applyLinearImpulse(impulse, point, wake);
-		}
-	}
-
-	public void setLinearVelocity(Vector2 v) {
-		if (body != null) {
-			body.setLinearVelocity(v);
-		}
 	}
 
 	public float getBodyMass() {
