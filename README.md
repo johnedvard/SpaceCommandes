@@ -16,7 +16,7 @@ This is a brief description of how to get everything setup properly.
 Start Eclipse with a fresh workpace
 
 * Install Android SDK and target device 2.3.3
-* Install GWT plugin (or something like it, I guess, I didn't try it yet)
+* Install GWT plugin and SDK (you do not need the Google App Egnine)
 
 ###  Specifics
 
