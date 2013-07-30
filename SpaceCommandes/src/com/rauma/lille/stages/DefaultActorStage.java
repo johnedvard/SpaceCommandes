@@ -1,6 +1,7 @@
+
 package com.rauma.lille.stages;
 
-import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayer;
@@ -22,7 +23,6 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.rauma.lille.Player;
 import com.rauma.lille.Resource;
 import com.rauma.lille.SpaceGame;
 import com.rauma.lille.Utils;
@@ -69,9 +69,18 @@ public class DefaultActorStage extends AbstractStage {
 		// assetManager.finishLoading();
 		// map = assetManager.get("data/myFirstMap.tmx");
 
+		int width = Gdx.graphics.getWidth();
+		int height = Gdx.graphics.getHeight();
+		float aspectRatio = (float) width / (float) height;
+
+		OrthographicCamera camera = (OrthographicCamera) getCamera();
+		// camera.setToOrtho(false, 10f*aspectRatio, 10f);
+		camera.setToOrtho(false, width, height);
+
 		map = new TmxMapLoader().load(mapName);
 		renderer = new OrthogonalTiledMapRenderer(map, 1f);
-		OrthographicCamera camera = (OrthographicCamera) getCamera();
+
+		renderer.setView(camera);
 
 		BodyDef def = new BodyDef();
 		MapLayer box2dLayer = map.getLayers().get("box2d");
@@ -79,8 +88,13 @@ public class DefaultActorStage extends AbstractStage {
 
 		PolygonShape shape = new PolygonShape();
 		def.type = BodyType.StaticBody;
+
+		FixtureDef fixtureDef = new FixtureDef();
+		fixtureDef.density = 0.0195f;
+		fixtureDef.friction = 1.0f;
+		fixtureDef.restitution = 0.3f; // Make it bounce a little bit
+
 		for (MapObject mapObject : box2dObjects) {
-			System.out.println("adding box2d object: " + mapObject);
 			if (mapObject instanceof PolygonMapObject) {
 				PolygonMapObject polyObj = (PolygonMapObject) mapObject;
 				Polygon moShape = polyObj.getPolygon();
@@ -99,7 +113,8 @@ public class DefaultActorStage extends AbstractStage {
 						Utils.Screen2World(moShape.height) / 2);
 			}
 
-			world.createBody(def).createFixture(shape, 0.0f);
+			fixtureDef.shape = shape;
+			world.createBody(def).createFixture(fixtureDef);
 		}
 		shape.dispose();
 
@@ -122,18 +137,19 @@ public class DefaultActorStage extends AbstractStage {
 
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = circle;
-		fixtureDef.density = 0.5f;
-		fixtureDef.friction = 0.9f;
-		fixtureDef.restitution = 0.6f; // Make it bounce a little bit
+		fixtureDef.density = 0.0195f;
+		fixtureDef.friction = 1.0f;
+		fixtureDef.restitution = 0.3f; // Make it bounce a little bit
 
 		player = new BodyImageActor("player", new TextureRegion(
 				Resource.ballTexture, 0, 0, 64, 64), world, def, fixtureDef);
 		player.setOrigin(width / 2, height / 2);
 		player.setWidth(width);
 		player.setHeight(height);
-		player.getBody().setFixedRotation(true);
-		Player p = new Player();
-		addActor(p);
+		// player.getBody().setFixedRotation(true);
+		player.getBody().setAngularDamping(10.0f);
+
+		addActor(player);
 
 		circle.dispose();
 
@@ -149,49 +165,44 @@ public class DefaultActorStage extends AbstractStage {
 			float knobPercentY) {
 
 		angleRad = (float) Math.atan2(knobPercentY, knobPercentX);
-		// angleRad += Math.PI/2.0;
-		// angle = (float) Math.toDegrees(theta);
-		//
-		// if (angle < 0) {
-		// angle += 360;
-		// }
 
 		System.out.println("Aimed " + knobPercentX + ", " + knobPercentY
 				+ " -> " + angleRad);
 	}
 
-	public void updatePlayer() {
+	public void updatePlayer(float delta) {
+		Vector2 linearVelocity = player.getBody().getLinearVelocity();
+
 		if (currentX != 0) {
-			player.setLinearVelocity(new Vector2(currentX * 2, 0));
+			// set speed to [0, 2>
+			player.getBody().setLinearVelocity(currentX * 2, linearVelocity.y);
 		}
 
 		if (currentY > 0) {
-			player.applyForce(new Vector2(0, currentY * 6));
+			player.getBody().applyForceToCenter(
+					new Vector2(0, (float) (currentY * .1)), true);
 		}
 
 		if (angleRad != 0 && player.getRotation() != angleRad) {
 			player.getBody().setTransform(player.getBody().getPosition(),
 					angleRad);
 		}
-		super.draw();
+	}
+
+	@Override
+	public void act(float delta) {
+		super.act(delta);
+		updatePlayer(delta);
 	}
 
 	@Override
 	public void draw() {
 		super.draw();
-		updatePlayer();
 
-		Camera stageCamera = getCamera();
-		if (stageCamera instanceof OrthographicCamera) {
-			OrthographicCamera camera = (OrthographicCamera) stageCamera;
-			camera.setToOrtho(false, getWidth() / 2, getHeight() / 2);
-			camera.update();
-			renderer.setView(camera);
-		}
+		getCamera().update();
 		renderer.render();
 
 		debugRenderer.render(world, debugMatrix);
 		world.step(1 / 45f, 6, 2);
 	}
-
 }

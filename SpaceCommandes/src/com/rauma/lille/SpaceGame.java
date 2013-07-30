@@ -3,6 +3,7 @@ package com.rauma.lille;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.FPSLogger;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.rauma.lille.screens.DefaultLevelScreen;
 
@@ -25,6 +26,7 @@ public class SpaceGame extends Game {
 	public void create() {
 		fpsLogger = new FPSLogger();
 		
+		Texture.setEnforcePotImages(false);
 		Resource.initalize();
 		
 //		splashScreen = new SplashScreen(this);

@@ -56,9 +56,15 @@ public class DefaultLevelScreen extends AbstractScreen {
 	@Override
 	public void render(float delta) {
 		super.render(delta);
+		bgStage.act(delta);
+		actorStage.act(delta);
+		uiStage.act(delta);
+		controllerStage.act(delta);
+		
 		bgStage.draw();
 		actorStage.draw();
 		uiStage.draw();
 		controllerStage.draw();
+
 	}
 }
