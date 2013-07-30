@@ -5,7 +5,7 @@
  </tileset>
  <layer name="Tile Layer 1" width="50" height="30">
   <data encoding="base64" compression="zlib">
-   eJztksENgDAMAyNgEmARYDdmKUxJeCDypKRVXMkn+Rv56iYROTSntEeSt/uiWTVbaKN/2O70iIceWNADC3pgQQ8s6IEFPbCgBxb0wKKmx17ozhdqeHSaXjM47+RQw2PUTJrZeSeHUh4RG1hKeURsYPF4RG9g8XhEb2DJ9UDawJLrgbSBxXZ/3rrl3P/kAkTCMis=
+   eJztk1sKg0AMRYN1JbYb8dWluRbbVXr9EIMoOM6MiXAPnC8h5BgdReQH//I8Rll3r2EDW9ONrqF3Z4c97PAFO3zBDl+wwxfs8AU7fMEOX7DDFzk7hkRzzpCjo4AvWEbOCSFHRwXf8BM5J4RUHRY30KTqsLiBJqbD+gaamI47b9DBHn4Pnod2WNxANyxuCe24+z/Ya9hr0bsv7/rJzt/JBGdYNjw=
   </data>
  </layer>
  <objectgroup name="box2d" width="50" height="30">
@@ -17,5 +17,9 @@
   <object x="15" y="3" width="31" height="473"/>
   <object x="753" y="3" width="28" height="472"/>
   <object x="0" y="-14" width="800" height="17"/>
+  <object x="572" y="526" height="6"/>
+  <object x="594" y="465">
+   <polygon points="0,0 46,-46 71,-47 111,-1"/>
+  </object>
  </objectgroup>
 </map>
