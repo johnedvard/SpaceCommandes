@@ -1,0 +1,53 @@
+laser.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+laserEffect
+  rotate: true
+  xy: 52, 68
+  size: 12, 64
+  orig: 64, 64
+  offset: 26, 0
+  index: -1
+laserEnd
+  rotate: false
+  xy: 2, 2
+  size: 46, 64
+  orig: 64, 64
+  offset: 9, 0
+  index: -1
+laserOverlay
+  rotate: false
+  xy: 98, 2
+  size: 6, 64
+  orig: 64, 64
+  offset: 29, 0
+  index: -1
+laser
+  rotate: false
+  xy: 50, 2
+  size: 46, 64
+  orig: 64, 64
+  offset: 9, 0
+  index: -1
+laserStart
+  rotate: false
+  xy: 2, 68
+  size: 48, 56
+  orig: 64, 64
+  offset: 8, 8
+  index: -1
+laserEndOverlay
+  rotate: false
+  xy: 106, 2
+  size: 6, 64
+  orig: 64, 64
+  offset: 29, 0
+  index: -1
+laserStartOverlay
+  rotate: false
+  xy: 52, 82
+  size: 16, 40
+  orig: 64, 64
+  offset: 24, 24
+  index: -1
