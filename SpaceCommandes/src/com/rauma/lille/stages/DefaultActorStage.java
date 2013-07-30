@@ -23,6 +23,7 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.rauma.lille.Player;
 import com.rauma.lille.Resource;
 import com.rauma.lille.SpaceGame;
 import com.rauma.lille.Utils;
@@ -45,6 +46,7 @@ public class DefaultActorStage extends AbstractStage {
 	private float currentX;
 	private float currentY;
 	private float angleRad;
+	private Player spinePlayer;
 
 	public DefaultActorStage(float width, float height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
@@ -150,8 +152,10 @@ public class DefaultActorStage extends AbstractStage {
 		player.getBody().setAngularDamping(10.0f);
 
 		addActor(player);
-
 		circle.dispose();
+		
+		spinePlayer = new Player(world);
+		addActor(spinePlayer);
 
 	}
 

@@ -1,0 +1,26 @@
+
+paperman.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+sc_body
+  rotate: false
+  xy: 1, 125
+  size: 241, 289
+  orig: 241, 289
+  offset: 0, 0
+  index: -1
+sc_eye
+  rotate: false
+  xy: 125, 16
+  size: 89, 107
+  orig: 89, 107
+  offset: 0, 0
+  index: -1
+sc_hand
+  rotate: false
+  xy: 1, 1
+  size: 122, 122
+  orig: 122, 122
+  offset: 0, 0
+  index: -1
