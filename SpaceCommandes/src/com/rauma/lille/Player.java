@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.World;
@@ -65,18 +66,27 @@ public class Player extends Actor{
 		// Create a body for each attachment. Note it is probably better to create just a few bodies rather than one for each
 		// region attachment, but this is just an example.
 		for (Slot slot : skeleton.getSlots()) {
+			System.out.println(slot);
 			if (!(slot.getAttachment() instanceof Box2dAttachment)) continue;
 			Box2dAttachment attachment = (Box2dAttachment)slot.getAttachment();
+			System.out.println("att: " + attachment + "" + attachment.getWidth());
 
 			PolygonShape boxPoly = new PolygonShape();
-			boxPoly.setAsBox(attachment.getWidth() / 2 * attachment.getScaleX(),
-				attachment.getHeight() / 2 * attachment.getScaleY(), vector.set(attachment.getX(), attachment.getY()),
+			boxPoly.setAsBox(Utils.Screen2World(attachment.getWidth() * attachment.getScaleX())/2,
+				Utils.Screen2World(attachment.getHeight() * attachment.getScaleY())/2,
+				vector.set(Utils.Screen2World(attachment.getX(), attachment.getY())),
 				attachment.getRotation() * MathUtils.degRad);
 
 			BodyDef boxBodyDef = new BodyDef();
 			boxBodyDef.type = BodyType.DynamicBody;
 			attachment.body = world.createBody(boxBodyDef);
-			attachment.body.createFixture(boxPoly, 1);
+			
+			FixtureDef fixtureDef = new FixtureDef();
+			fixtureDef.shape = boxPoly;
+			fixtureDef.density = 0.5f;
+			fixtureDef.restitution = 0.1f;
+			fixtureDef.friction= 0.1f;
+			attachment.body.createFixture(fixtureDef);
 
 			boxPoly.dispose();
 		}
@@ -99,11 +109,17 @@ public class Player extends Actor{
 			if (!(slot.getAttachment() instanceof Box2dAttachment)) continue;
 			Box2dAttachment attachment = (Box2dAttachment)slot.getAttachment();
 			if (attachment.body == null) continue;
-			float x = Utils.Screen2World(skeleton.getX()) + slot.getBone().getWorldX();
-			float y = Utils.Screen2World(skeleton.getY()) + slot.getBone().getWorldY();
+			float x = Utils.Screen2World(skeleton.getX() + slot.getBone().getWorldX());
+			float y = Utils.Screen2World(skeleton.getY() + slot.getBone().getWorldY());
 			float rotation = slot.getBone().getWorldRotation();
 			attachment.body.setTransform(x, y, rotation * MathUtils.degRad);
 		}
+		Box2dAttachment attachment = (Box2dAttachment) skeleton.getAttachment("sc_body", "sc_body");
+		Vector2 v = attachment.body.getPosition();
+		v.x +=1 ;
+		attachment.body.setTransform(v, attachment.body.getAngle());
+		
+		
 	}
 	
 	static class Box2dAttachment extends RegionAttachment {

@@ -46,7 +46,7 @@ public class DefaultActorStage extends AbstractStage {
 	private float currentX;
 	private float currentY;
 	private float angleRad;
-	private Player spinePlayer;
+//	private Player spinePlayer;
 
 	public DefaultActorStage(float width, float height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
@@ -155,8 +155,8 @@ public class DefaultActorStage extends AbstractStage {
 		addActor(player);
 		circle.dispose();
 		
-		spinePlayer = new Player(world);
-		addActor(spinePlayer);
+//		spinePlayer = new Player(world);
+//		addActor(spinePlayer);
 
 	}
 

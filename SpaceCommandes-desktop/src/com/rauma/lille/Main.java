@@ -11,8 +11,8 @@ public class Main {
 		cfg.useGL20 = false;
 		cfg.width = (int) SpaceGame.SCREEN_WIDTH;
 		cfg.height = (int) SpaceGame.SCREEN_HEIGHT;
-		//Box2DExample a = new Box2DExample();
+		Box2DExample a = new Box2DExample();
 		SpaceGame s = new SpaceGame();
-		new LwjglApplication(s, cfg);
+		new LwjglApplication(a, cfg);
 	}
 }
