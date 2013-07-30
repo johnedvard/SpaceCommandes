@@ -54,7 +54,14 @@ public class DefaultActorStage extends AbstractStage {
 		world = new World(SpaceGame.WORLD_GRAVITY, true);
 		debugRenderer = new Box2DDebugRenderer();
 
-		debugMatrix = getCamera().combined.cpy();
+		int width = Gdx.graphics.getWidth();
+		int height = Gdx.graphics.getHeight();
+		float aspectRatio = (float) width / (float) height;
+		
+		OrthographicCamera camera = (OrthographicCamera) getCamera();
+		// camera.setToOrtho(false, 10f*aspectRatio, 10f);
+		camera.setToOrtho(false, width, height);
+		debugMatrix = camera.combined.cpy();
 		debugMatrix.scale(SpaceGame.WORLD_SCALE, SpaceGame.WORLD_SCALE, 1f);
 	}
 
@@ -68,18 +75,12 @@ public class DefaultActorStage extends AbstractStage {
 		// assetManager.finishLoading();
 		// map = assetManager.get("data/myFirstMap.tmx");
 
-		int width = Gdx.graphics.getWidth();
-		int height = Gdx.graphics.getHeight();
-		float aspectRatio = (float) width / (float) height;
 
-		OrthographicCamera camera = (OrthographicCamera) getCamera();
-		// camera.setToOrtho(false, 10f*aspectRatio, 10f);
-		camera.setToOrtho(false, width, height);
 
 		map = new TmxMapLoader().load(mapName);
 		renderer = new OrthogonalTiledMapRenderer(map, 1f);
 
-		renderer.setView(camera);
+		renderer.setView((OrthographicCamera) getCamera());
 
 		BodyDef def = new BodyDef();
 		MapLayer box2dLayer = map.getLayers().get("box2d");
@@ -97,10 +98,9 @@ public class DefaultActorStage extends AbstractStage {
 			if (mapObject instanceof PolygonMapObject) {
 				PolygonMapObject polyObj = (PolygonMapObject) mapObject;
 				Polygon moShape = polyObj.getPolygon();
-				def.position.set(Utils.Screen2World(moShape.getOriginX(),
-						moShape.getOriginY()));
+				def.position.set(Utils.Screen2World(moShape.getX(),
+						moShape.getY()));
 				shape.set(Utils.Screen2World(moShape.getVertices()));
-				System.out.println(shape);
 			} else if (mapObject instanceof RectangleMapObject) {
 				RectangleMapObject rectObj = (RectangleMapObject) mapObject;
 				Rectangle moShape = rectObj.getRectangle();
@@ -112,6 +112,7 @@ public class DefaultActorStage extends AbstractStage {
 						Utils.Screen2World(moShape.height) / 2);
 			}
 
+			System.out.println(shape);
 			fixtureDef.shape = shape;
 			world.createBody(def).createFixture(fixtureDef);
 		}
