@@ -42,11 +42,11 @@ public class DefaultActorStage extends AbstractStage {
 	private TiledMap map;
 	private OrthogonalTiledMapRenderer renderer;
 
-	private BodyImageActor player;
+	private BodyImageActor playerOld;
 	private float currentX;
 	private float currentY;
 	private float angleRad;
-//	private Player spinePlayer;
+	private Player player;
 
 	public DefaultActorStage(float width, float height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
@@ -144,19 +144,19 @@ public class DefaultActorStage extends AbstractStage {
 		fixtureDef.friction = 1.0f;
 		fixtureDef.restitution = 0.3f; // Make it bounce a little bit
 
-		player = new BodyImageActor("player", new TextureRegion(
-				Resource.ballTexture, 0, 0, 64, 64), world, def, fixtureDef);
-		player.setOrigin(width / 2, height / 2);
-		player.setWidth(width);
-		player.setHeight(height);
-		// player.getBody().setFixedRotation(true);
-		player.getBody().setAngularDamping(10.0f);
+//		player = new BodyImageActor("player", new TextureRegion(
+//				Resource.ballTexture, 0, 0, 64, 64), world, def, fixtureDef);
+//		player.setOrigin(width / 2, height / 2);
+//		player.setWidth(width);
+//		player.setHeight(height);
+//		// player.getBody().setFixedRotation(true);
+//		player.getBody().setAngularDamping(10.0f);
 
-		addActor(player);
+		//addActor(player);
 		circle.dispose();
 		
-//		spinePlayer = new Player(world);
-//		addActor(spinePlayer);
+		player = new Player(world);
+		addActor(player);
 
 	}
 

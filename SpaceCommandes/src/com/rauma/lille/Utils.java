@@ -8,11 +8,24 @@ public final class Utils {
 		return new Vector2(vct.x / SpaceGame.WORLD_SCALE, vct.y
 				/ SpaceGame.WORLD_SCALE);
 	}
+	
+	public static Vector2 World2Screen(final Vector2 vct) {
+		return new Vector2(vct.x * SpaceGame.WORLD_SCALE, vct.y
+				* SpaceGame.WORLD_SCALE);
+	}
 
 	public static Vector2 Screen2World(final float x, final float y) {
 		return new Vector2(x / SpaceGame.WORLD_SCALE, y / SpaceGame.WORLD_SCALE);
 	}
+	
+	public static Vector2 World2Screen(final float x, final float y) {
+		return new Vector2(x * SpaceGame.WORLD_SCALE, y * SpaceGame.WORLD_SCALE);
+	}
 
+	public static float World2Screen(final float v){
+		return v * SpaceGame.WORLD_SCALE;
+	}
+	
 	public static float Screen2World(final float v) {
 		return v / SpaceGame.WORLD_SCALE;
 	}
