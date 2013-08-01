@@ -6,5 +6,7 @@
 !*/libs/*
 !SpaceCommandes-html/war/WEB-INF/lib/*
 *.war
+*.gwt-log
 *.ear
 */bin
+SpaceCommandes-html/.gwt/.gwt-log
