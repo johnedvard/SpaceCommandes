@@ -26,11 +26,11 @@ public class BodyImageActor extends Image {
 	}
 
 	public BodyImageActor(String name, TextureRegion texture, World world,
-			BodyDef def, FixtureDef fixturedef) {
+			BodyDef def, FixtureDef fixtureDef) {
 		super(new TextureRegion(texture));
 		setName(name);
 		body = world.createBody(def);
-		body.createFixture(fixturedef);
+		body.createFixture(fixtureDef);
 		body.setUserData(this);
 	}
 
