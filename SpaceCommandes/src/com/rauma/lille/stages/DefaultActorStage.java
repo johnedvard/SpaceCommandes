@@ -11,6 +11,7 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
@@ -26,6 +27,7 @@ import com.rauma.lille.Resource;
 import com.rauma.lille.SpaceGame;
 import com.rauma.lille.Utils;
 import com.rauma.lille.actors.BodyImageActor;
+import com.rauma.lille.actors.Laser;
 
 /**
  * @author frank
@@ -41,6 +43,8 @@ public class DefaultActorStage extends AbstractStage {
 	private OrthogonalTiledMapRenderer renderer;
 
 	private BodyImageActor player;
+	private Laser laser = new Laser();
+
 	private float currentX;
 	private float currentY;
 	private float angleRad;
@@ -150,7 +154,8 @@ public class DefaultActorStage extends AbstractStage {
 		player.getBody().setAngularDamping(10.0f);
 
 		addActor(player);
-
+		addActor(laser);
+		
 		circle.dispose();
 
 	}
@@ -183,9 +188,14 @@ public class DefaultActorStage extends AbstractStage {
 					new Vector2(0, (float) (currentY * .1)), true);
 		}
 
-		if (angleRad != 0 && player.getRotation() != angleRad) {
-			player.getBody().setTransform(player.getBody().getPosition(),
-					angleRad);
+		laser.setPosition(player.getX(), player.getY());
+		laser.setOrigin((player.getX()+player.getHeight())/2, (player.getY()+player.getHeight())/2);
+		laser.setRotation(angleRad * MathUtils.radDeg);
+		if (angleRad != 0) {
+			player.getBody().setTransform(player.getBody().getPosition(), angleRad);
+			laser.activate();
+		} else {
+			laser.deactivate();
 		}
 	}
 

@@ -9,6 +9,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.rauma.lille.SpaceGame;
 
 public class BodyImageActor extends Image {
@@ -17,7 +18,7 @@ public class BodyImageActor extends Image {
 
 	public BodyImageActor(String name, TextureRegion texture, World world,
 			BodyDef def, Shape shape, float density) {
-		super(new TextureRegion(texture));
+		super(new TextureRegionDrawable(texture));
 		setName(name);
 
 		body = world.createBody(def);
@@ -27,7 +28,7 @@ public class BodyImageActor extends Image {
 
 	public BodyImageActor(String name, TextureRegion texture, World world,
 			BodyDef def, FixtureDef fixturedef) {
-		super(new TextureRegion(texture));
+		super(new TextureRegionDrawable(texture));
 		setName(name);
 		body = world.createBody(def);
 		body.createFixture(fixturedef);
@@ -41,7 +42,7 @@ public class BodyImageActor extends Image {
 			body = null;
 		}
 	}
-
+	
 	public Body getBody() {
 		return body;
 	}
