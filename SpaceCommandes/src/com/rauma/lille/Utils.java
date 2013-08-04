@@ -42,4 +42,19 @@ public final class Utils {
 		}
 		return vector2s;
 	}
+	
+	/**
+	 * return a vector from the angle (in radians), multiplied with the given magnitude
+	 * @param angleRad
+	 * @param magnitude
+	 * @return
+	 */
+	public static Vector2 getVector(float angleRad, float magnitude) {
+		Vector2 v = new Vector2((float) Math.sin(angleRad), (float) Math.cos(angleRad));
+		if(magnitude != 1)
+			v = v.scl(magnitude);
+		return v;
+	}
+
+
 }

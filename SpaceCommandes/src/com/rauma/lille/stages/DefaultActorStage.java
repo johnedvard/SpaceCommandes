@@ -2,7 +2,6 @@ package com.rauma.lille.stages;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
@@ -21,30 +20,30 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.rauma.lille.BulletContactListener;
+import com.rauma.lille.BulletFactory;
 import com.rauma.lille.Resource;
 import com.rauma.lille.SpaceGame;
 import com.rauma.lille.Utils;
-import com.rauma.lille.actors.BodyImageActor;
-import com.rauma.lille.actors.Bullet;
+import com.rauma.lille.actors.SimplePlayer;
 
 /**
  * @author frank
  * 
  */
 public class DefaultActorStage extends AbstractStage {
-	final short CATEGORY_PLAYER = 0x0001;  // 0000000000000001 in binary
+	final short CATEGORY_PLAYER = 0x0001; // 0000000000000001 in binary
 	final short CATEGORY_MONSTER = 0x0002; // 0000000000000010 in binary
 	final short CATEGORY_SCENERY = 0x0004; // 0000000000000100 in binary
-	
-	final short MASK_PLAYER = CATEGORY_MONSTER | CATEGORY_SCENERY; // or ~CATEGORY_PLAYER
-	final short MASK_MONSTER = CATEGORY_PLAYER | CATEGORY_SCENERY; // or ~CATEGORY_MONSTER
-	final short MASK_SCENERY = -1;
 
+	final short MASK_PLAYER = CATEGORY_MONSTER | CATEGORY_SCENERY; // or
+																	// ~CATEGORY_PLAYER
+	final short MASK_MONSTER = CATEGORY_PLAYER | CATEGORY_SCENERY; // or
+																	// ~CATEGORY_MONSTER
+	final short MASK_SCENERY = -1;
 
 	private Box2DDebugRenderer debugRenderer;
 	private Matrix4 debugMatrix;
@@ -53,11 +52,10 @@ public class DefaultActorStage extends AbstractStage {
 	private TiledMap map;
 	private OrthogonalTiledMapRenderer renderer;
 
-	private BodyImageActor player;
+	private SimplePlayer player;
 	private float currentX;
 	private float currentY;
 	private float angleRad;
-	private Bullet bullet;
 
 	public DefaultActorStage(float width, float height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
@@ -71,13 +69,15 @@ public class DefaultActorStage extends AbstractStage {
 		int width = Gdx.graphics.getWidth();
 		int height = Gdx.graphics.getHeight();
 		float aspectRatio = (float) width / (float) height;
-		
+
+		BulletFactory.init(world);
+
 		OrthographicCamera camera = (OrthographicCamera) getCamera();
 		// camera.setToOrtho(false, 10f*aspectRatio, 10f);
 		camera.setToOrtho(false, width, height);
 		debugMatrix = camera.combined.cpy();
 		debugMatrix.scale(SpaceGame.WORLD_SCALE, SpaceGame.WORLD_SCALE, 1f);
-		
+
 		world.setContactListener(new BulletContactListener());
 	}
 
@@ -90,8 +90,6 @@ public class DefaultActorStage extends AbstractStage {
 		// assetManager.load("data/myFirstMap.tmx", TiledMap.class);
 		// assetManager.finishLoading();
 		// map = assetManager.get("data/myFirstMap.tmx");
-
-
 
 		map = new TmxMapLoader().load(mapName);
 		renderer = new OrthogonalTiledMapRenderer(map, 1f);
@@ -160,8 +158,8 @@ public class DefaultActorStage extends AbstractStage {
 		fixtureDef.restitution = 0.3f; // Make it bounce a little bit
 		fixtureDef.filter.categoryBits = CATEGORY_PLAYER;
 		fixtureDef.filter.maskBits = MASK_PLAYER;
-		
-		player = new BodyImageActor("player", new TextureRegion(
+
+		player = new SimplePlayer("player", new TextureRegion(
 				Resource.ballTexture, 0, 0, 64, 64), world, def, fixtureDef);
 		player.setOrigin(width / 2, height / 2);
 		player.setWidth(width);
@@ -178,8 +176,7 @@ public class DefaultActorStage extends AbstractStage {
 		fixtureDef.restitution = 0.0f;
 		fixtureDef.filter.categoryBits = CATEGORY_PLAYER;
 		fixtureDef.filter.maskBits = MASK_PLAYER;
-		bullet = new Bullet("bullet", new TextureRegion(new Texture(Gdx.files.internal("data/touchKnob.png"))), world, def, fixtureDef);
-		
+
 		circle.dispose();
 	}
 
@@ -192,10 +189,7 @@ public class DefaultActorStage extends AbstractStage {
 	public void playerAimed(float knobX, float knobY, float knobPercentX,
 			float knobPercentY) {
 
-		angleRad = (float) Math.atan2(knobPercentY, knobPercentX);
-
-		System.out.println("Aimed " + knobPercentX + ", " + knobPercentY
-				+ " -> " + angleRad);
+		angleRad = (float) Math.atan2(-knobPercentY, knobPercentX);
 	}
 
 	public void updatePlayer(float delta) {
@@ -212,11 +206,7 @@ public class DefaultActorStage extends AbstractStage {
 		}
 
 		if (angleRad != 0 && player.getRotation() != angleRad) {
-//			player.getBody().setTransform(player.getBody().getPosition(), angleRad);
-			if(bullet.isReady()) {
-				float angle = angleRad*MathUtils.radDeg + 90;
-				bullet.fire(player.getX()+player.getWidth()/2, player.getY()+player.getHeight()/2, angle);
-			}
+			player.fireWeapon(angleRad+MathUtils.PI/2); // adjusted +90 deg
 		}
 	}
 
@@ -232,7 +222,7 @@ public class DefaultActorStage extends AbstractStage {
 
 		getCamera().update();
 		renderer.render();
-
+		BulletFactory.deactivateFreeBullets();
 		debugRenderer.render(world, debugMatrix);
 		world.step(1 / 45f, 6, 2);
 	}

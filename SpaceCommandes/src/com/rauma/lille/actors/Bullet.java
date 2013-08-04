@@ -1,7 +1,6 @@
 package com.rauma.lille.actors;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -28,14 +27,10 @@ public class Bullet extends BodyImageActor {
 		getBody().setBullet(true);
 	}
 
-	public void fire(float x, float y, float angle) {
-		ready = false;
-		getBody().setTransform(Utils.Screen2World(new Vector2(x, y)), angle * MathUtils.degRad);
-		getBody().applyLinearImpulse(Utils.Screen2World(getVector(angle * MathUtils.degRad, 0.000001f)), getBody().getWorldCenter(), true);
-	}
-
-	private Vector2 getVector(float angle, float magnitude) {
-		return new Vector2((float) Math.sin(angle)*magnitude, (float) Math.cos(angle)*magnitude);
+	public void fire(float x, float y, float angleRad) {
+		setReady(false);
+		getBody().setTransform(Utils.Screen2World(new Vector2(x, y)), 0);
+		getBody().applyLinearImpulse(Utils.getVector(angleRad, 0.000001f), getBody().getWorldCenter(), true);
 	}
 
 	public boolean isReady() {
@@ -43,6 +38,7 @@ public class Bullet extends BodyImageActor {
 	}
 
 	public void setReady(boolean ready) {
+		getBody().setAwake(!ready);
 		this.ready = ready;
 	}
 }

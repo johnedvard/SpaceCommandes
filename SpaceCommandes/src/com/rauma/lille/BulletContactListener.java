@@ -24,7 +24,7 @@ public class BulletContactListener implements ContactListener {
 			bullet = (Bullet) userDataB;
 		}
 		if (bullet != null) {
-			bullet.setReady(true);
+			BulletFactory.release(bullet);
 		}
 	}
 
