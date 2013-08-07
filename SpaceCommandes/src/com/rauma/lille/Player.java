@@ -153,4 +153,10 @@ public class Player extends Actor{
 
 		return bodyAttachment.body;
 	}
+
+	public void setAnimation(String string) {
+		if(!animation.getName().equals(string)){
+			animation = skeletonData.findAnimation(string);
+		}
+	}
 }

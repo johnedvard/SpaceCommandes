@@ -164,6 +164,7 @@ public class DefaultActorStage extends AbstractStage {
 			float knobPercentY) {
 		currentX = knobPercentX;
 		currentY = knobPercentY;
+		player.setAnimation("jump");
 	}
 
 	public void playerAimed(float knobX, float knobY, float knobPercentX,
