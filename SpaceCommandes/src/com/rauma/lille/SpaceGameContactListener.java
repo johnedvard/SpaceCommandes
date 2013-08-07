@@ -5,6 +5,7 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Manifold;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.rauma.lille.actors.Bullet;
 
 public class SpaceGameContactListener implements ContactListener {
@@ -20,16 +21,24 @@ public class SpaceGameContactListener implements ContactListener {
 		
 		// Handle bullet impact
 		if (userDataA instanceof Bullet) {
-			handleBulletContact((Bullet) userDataA, userDataB);
+			handleBulletBeginContact((Bullet) userDataA, userDataB);
 		} else if (userDataB instanceof Bullet) {
-			handleBulletContact((Bullet) userDataB, userDataA);
+			handleBulletBeginContact((Bullet) userDataB, userDataA);
 		}
 		
 		
 	}
 
-	private void handleBulletContact(Bullet bullet, Object userDataB) {
+	private void handleBulletBeginContact(Bullet bullet, Object other) {
 		if (bullet != null) {
+			String name = bullet.getName();
+			String name2 = other==null?"unknown":other.toString();
+			if (other instanceof Actor) {
+				Actor actor = (Actor) other;
+				name2 = actor.getName();
+			}
+			System.out.println("Bullet " + name + " collided with " + name2);
+
 			bullet.release();
 		}
 	}
