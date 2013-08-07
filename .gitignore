@@ -5,6 +5,7 @@
 # Do not ignore some jar files #
 !*/libs/*
 !SpaceCommandes-html/war/WEB-INF/lib/*
+SpaceCommandes/jni/*
 *.war
 *.ear
 */bin
