@@ -173,7 +173,6 @@ public class DefaultActorStage extends AbstractStage {
 //		player.getBody().setAngularDamping(10.0f);
 
 		//addActor(player);
-		circle.dispose();
 		
 //		player = new Player(world);
 //		addActor(player);
