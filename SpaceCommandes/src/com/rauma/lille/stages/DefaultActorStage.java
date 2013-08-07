@@ -56,10 +56,11 @@ public class DefaultActorStage extends AbstractStage {
 	private OrthogonalTiledMapRenderer renderer;
 
 	private BodyImageActor playerOld;
+	private SimplePlayer player;
 	private float currentX;
 	private float currentY;
 	private float angleRad;
-	private Player player;
+//	private Player player;
 
 	public DefaultActorStage(float width, float height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
@@ -174,8 +175,10 @@ public class DefaultActorStage extends AbstractStage {
 		//addActor(player);
 		circle.dispose();
 		
-		player = new Player(world);
-		addActor(player);
+//		player = new Player(world);
+//		addActor(player);
+		player = new SimplePlayer("player", new TextureRegion(
+				Resource.ballTexture, 0, 0, 64, 64), world, def, fixtureDef);
 		player.setOrigin(width / 2, height / 2);
 		player.setWidth(width);
 		player.setHeight(height);
@@ -199,7 +202,7 @@ public class DefaultActorStage extends AbstractStage {
 			float knobPercentY) {
 		currentX = knobPercentX;
 		currentY = knobPercentY;
-		player.setAnimation("jump");
+//		player.setAnimation("jump");
 	}
 
 	public void playerAimed(float knobX, float knobY, float knobPercentX,
@@ -222,7 +225,7 @@ public class DefaultActorStage extends AbstractStage {
 		}
 
 		if (angleRad != 0 && player.getRotation() != angleRad) {
-//			player.fireWeapon(angleRad+MathUtils.PI/2); // adjusted +90 deg
+			player.fireWeapon(angleRad+MathUtils.PI/2); // adjusted +90 deg
 		}
 	}
 
