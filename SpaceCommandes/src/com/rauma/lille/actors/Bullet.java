@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.rauma.lille.BulletFactory;
 import com.rauma.lille.Utils;
 
 /**
@@ -40,5 +41,9 @@ public class Bullet extends BodyImageActor {
 	public void setReady(boolean ready) {
 		getBody().setAwake(!ready);
 		this.ready = ready;
+	}
+
+	public void release() {
+		BulletFactory.release(this);
 	}
 }

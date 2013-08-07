@@ -23,7 +23,7 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.rauma.lille.BulletContactListener;
+import com.rauma.lille.SpaceGameContactListener;
 import com.rauma.lille.BulletFactory;
 import com.rauma.lille.Resource;
 import com.rauma.lille.SpaceGame;
@@ -78,7 +78,7 @@ public class DefaultActorStage extends AbstractStage {
 		debugMatrix = camera.combined.cpy();
 		debugMatrix.scale(SpaceGame.WORLD_SCALE, SpaceGame.WORLD_SCALE, 1f);
 
-		world.setContactListener(new BulletContactListener());
+		world.setContactListener(new SpaceGameContactListener());
 	}
 
 	public void initMap(String mapName) {

@@ -7,7 +7,7 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.rauma.lille.actors.Bullet;
 
-public class BulletContactListener implements ContactListener {
+public class SpaceGameContactListener implements ContactListener {
 
 	@Override
 	public void beginContact(Contact contact) {
@@ -17,14 +17,20 @@ public class BulletContactListener implements ContactListener {
 		Object userDataA = bodyA.getUserData();
 		Object userDataB = bodyB.getUserData();
 		
-		Bullet bullet = null;
+		
+		// Handle bullet impact
 		if (userDataA instanceof Bullet) {
-			bullet = (Bullet) userDataA;
+			handleBulletContact((Bullet) userDataA, userDataB);
 		} else if (userDataB instanceof Bullet) {
-			bullet = (Bullet) userDataB;
+			handleBulletContact((Bullet) userDataB, userDataA);
 		}
+		
+		
+	}
+
+	private void handleBulletContact(Bullet bullet, Object userDataB) {
 		if (bullet != null) {
-			BulletFactory.release(bullet);
+			bullet.release();
 		}
 	}
 
