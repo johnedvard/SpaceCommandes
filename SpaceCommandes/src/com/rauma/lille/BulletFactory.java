@@ -10,21 +10,22 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.rauma.lille.actors.Bullet;
 
 public class BulletFactory {
 
-	private static final int BULLET_LIMIT = 200;
+	private static final int BULLET_LIMIT = 50;
 	private static List<Bullet> freeBullets = new ArrayList<Bullet>();
 	private static List<Bullet> busyBullets = new ArrayList<Bullet>();
 	
 	private static BodyDef def = new BodyDef();
-	private static Shape circle = new CircleShape();
-	private static float density = 0.001f;
+	
 	private static TextureRegion texture = new TextureRegion(new Texture(
 			Gdx.files.internal("data/touchKnob.png")), 0, 0, 64, 64);
+	private static FixtureDef fixtureDef = new FixtureDef();
 		
 	public static Bullet getBullet() {
 		if (freeBullets.size() == 0) {
@@ -47,7 +48,8 @@ public class BulletFactory {
 
 		def.position.x = Utils.Screen2World(MathUtils.random(SpaceGame.SCREEN_WIDTH)*1000);
 		def.position.y = Utils.Screen2World(MathUtils.random(SpaceGame.SCREEN_HEIGHT)*1000);
-		return new Bullet("bullet", texture, world, def, circle, density);
+	
+		return new Bullet("bullet", texture, world, def, fixtureDef);
 	}
 
 	/**
@@ -69,7 +71,13 @@ public class BulletFactory {
 		def.type = BodyType.DynamicBody;
 		def.active = false;
 		
+		CircleShape circle = new CircleShape();
 		circle.setRadius(Utils.Screen2World(1f));
+
+		fixtureDef.filter.groupIndex = -1;
+		fixtureDef.shape = circle;
+		fixtureDef.density = 0.001f;
+		
 		
 		create(BULLET_LIMIT);
 	}
