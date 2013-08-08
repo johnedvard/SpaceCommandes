@@ -76,6 +76,8 @@ public class Bullet extends Actor {
 
 	private void deactivate() {
 		remove();
+		contacts.clear();
+		touching = false;
 //		getBody().setTransform(-10, -10, 0);
 		getBody().setActive(false);
 		bulletFactory.release(this);
@@ -92,6 +94,10 @@ public class Bullet extends Actor {
 	public Body getBody() {
 		return body;
 	}
+	
+	public boolean isTouching() {
+		return touching;
+	}
 
 	public void draw(SpriteBatch batch, float parentAlpha) {
 		if (body != null) {
@@ -105,11 +111,10 @@ public class Bullet extends Actor {
 
 	@Override
 	public void act(float delta) {
-		System.out.println(getName() + " acting");
+		super.act(delta);
 		if (touching) {
 			deactivate();
 		}
-		super.act(delta);
 	}
 
 	@Override
@@ -120,6 +125,6 @@ public class Bullet extends Actor {
 
 	@Override
 	public String toString() {
-		return super.toString() + ", awake=" + getBody().isAwake() + ", active=" + getBody().isActive();
+		return super.toString() + " touching="+ isTouching() + ", awake=" + getBody().isAwake() + ", active=" + getBody().isActive();
 	}
 }

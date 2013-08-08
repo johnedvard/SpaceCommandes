@@ -15,9 +15,11 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -124,7 +126,9 @@ public class DefaultActorStage extends AbstractStage {
 
 			System.out.println(shape);
 			fixtureDef.shape = shape;
-			world.createBody(def).createFixture(fixtureDef);
+			Body body = world.createBody(def);
+			body.createFixture(fixtureDef);
+			body.setUserData(this);
 		}
 		shape.dispose();
 
