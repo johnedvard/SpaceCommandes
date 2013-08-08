@@ -13,8 +13,8 @@ import com.rauma.lille.actors.Bullet;
  */
 public class BulletFactory {
 	private static final int BULLET_LIMIT = 50;
-	private static List<Bullet> freeBullets = Collections.synchronizedList(new ArrayList<Bullet>());
-	private static List<Bullet> busyBullets = Collections.synchronizedList(new ArrayList<Bullet>());
+	private List<Bullet> freeBullets = Collections.synchronizedList(new ArrayList<Bullet>());
+	private List<Bullet> busyBullets = Collections.synchronizedList(new ArrayList<Bullet>());
 	
 	private World world;
 	private short categoryBits;
@@ -43,8 +43,8 @@ public class BulletFactory {
 		return bullet;
 	}
 
-	public Bullet createBullet() {
-		return new Bullet("bullet " + categoryBits, categoryBits, maskBits, world, this);
+	private Bullet createBullet() {
+		return new Bullet("Bullet " + categoryBits, categoryBits, maskBits, world, this);
 	}
 
 	/**

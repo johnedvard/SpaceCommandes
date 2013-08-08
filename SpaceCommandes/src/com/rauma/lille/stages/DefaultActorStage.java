@@ -2,7 +2,6 @@ package com.rauma.lille.stages;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
@@ -19,11 +18,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.rauma.lille.Resource;
 import com.rauma.lille.SpaceGame;
 import com.rauma.lille.SpaceGameContactListener;
 import com.rauma.lille.Utils;
@@ -50,7 +47,9 @@ public class DefaultActorStage extends AbstractStage {
 	private TiledMap map;
 	private OrthogonalTiledMapRenderer renderer;
 
-	private SimplePlayer player;
+	private SimplePlayer player1;
+	private SimplePlayer player2;
+	
 	private float currentX;
 	private float currentY;
 	private float angleRad;
@@ -129,8 +128,8 @@ public class DefaultActorStage extends AbstractStage {
 		}
 		shape.dispose();
 
-		player = spawnPlayerAtPosition("Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100);
-		spawnPlayerAtPosition("Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, SpaceGame.SCREEN_WIDTH-200, 100);
+		player1 = spawnPlayerAtPosition("Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100);
+		player2 = spawnPlayerAtPosition("Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, SpaceGame.SCREEN_WIDTH-200, 100);
 	}
 
 	private SimplePlayer spawnPlayerAtPosition(String name, short categoryBits, short maskBits, float x, float y) {
@@ -155,20 +154,20 @@ public class DefaultActorStage extends AbstractStage {
 	}
 
 	public void updatePlayer(float delta) {
-		Vector2 linearVelocity = player.getBody().getLinearVelocity();
+		Vector2 linearVelocity = player1.getBody().getLinearVelocity();
 
 		if (currentX != 0) {
 			// set speed to [0, 2>
-			player.getBody().setLinearVelocity(currentX * 2, linearVelocity.y);
+			player1.getBody().setLinearVelocity(currentX * 2, linearVelocity.y);
 		}
 
 		if (currentY > 0) {
-			player.getBody().applyForceToCenter(
+			player1.getBody().applyForceToCenter(
 					new Vector2(0, (float) (currentY * .1)), true);
 		}
 
-		if (angleRad != 0 && player.getRotation() != angleRad) {
-			player.fireWeapon(angleRad+MathUtils.PI/2); // adjusted +90 deg
+		if (angleRad != 0 && player1.getRotation() != angleRad) {
+			player1.fireWeapon(angleRad+MathUtils.PI/2); // adjusted +90 deg
 		}
 	}
 

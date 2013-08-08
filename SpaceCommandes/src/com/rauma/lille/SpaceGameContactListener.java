@@ -25,8 +25,6 @@ public class SpaceGameContactListener implements ContactListener {
 		} else if (userDataB instanceof Bullet) {
 			handleBulletBeginContact((Bullet) userDataB, userDataA);
 		}
-		
-		
 	}
 
 	private void handleBulletBeginContact(Bullet bullet, Object other) {
@@ -39,14 +37,40 @@ public class SpaceGameContactListener implements ContactListener {
 			}
 			System.out.println("Bullet " + name + " collided with " + name2);
 
-			bullet.release();
+			bullet.beginContact(other);
 		}
 	}
 
 	@Override
 	public void endContact(Contact contact) {
-		// TODO Auto-generated method stub
+		Body bodyA = contact.getFixtureA().getBody();
+		Body bodyB = contact.getFixtureB().getBody();
 
+		Object userDataA = bodyA.getUserData();
+		Object userDataB = bodyB.getUserData();
+		
+		
+		// Handle bullet impact
+		if (userDataA instanceof Bullet) {
+			handleBulletEndContact((Bullet) userDataA, userDataB);
+		} else if (userDataB instanceof Bullet) {
+			handleBulletEndContact((Bullet) userDataB, userDataA);
+		}
+	}
+
+	private void handleBulletEndContact(Bullet bullet, Object other) {
+
+		if (bullet != null) {
+			String name2 = other==null?"unknown":other.toString();
+			if (other instanceof Actor) {
+				Actor actor = (Actor) other;
+				name2 = actor.getName();
+			}
+			System.out.println(bullet + " collided with " + name2);
+
+			bullet.endContact(other);
+		}
+	
 	}
 
 	@Override

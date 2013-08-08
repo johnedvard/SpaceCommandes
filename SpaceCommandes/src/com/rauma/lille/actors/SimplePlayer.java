@@ -68,8 +68,11 @@ public class SimplePlayer extends BodyImageActor {
 		if (lastFired >= FIRE_RATE) {
 			Bullet bullet = bulletFactory.getBullet();
 			if (bullet != null) {
+				getStage().addActor(bullet);
 				bullet.fire(getX()+getWidth()+5, getY()+getHeight()/2, angleRad);
 				lastFired = 0f;
+			} else {
+				System.out.println("Out of ammo / Weapon needs cool down");
 			}
 		}
 	}
