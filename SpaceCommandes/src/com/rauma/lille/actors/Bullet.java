@@ -1,8 +1,5 @@
 package com.rauma.lille.actors;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -25,7 +22,7 @@ public class Bullet extends Actor {
 	private Body body = null;
 	private BulletFactory bulletFactory;
 	private boolean touching;
-	private Set<Object> contacts = new HashSet<Object>();
+	private float damage = 0.01f;
 
 	public Bullet(String name, short categoryBits, short maskBits, World world,
 			BulletFactory bulletFactory) {
@@ -58,28 +55,25 @@ public class Bullet extends Actor {
 	}
 
 	public void fire(float x, float y, float angleRad) {
+		getBody().setTransform(Utils.Screen2World(new Vector2(x, y)), angleRad);
 		getBody().setActive(true);
-		getBody().setTransform(Utils.Screen2World(new Vector2(x, y)), 0);
 		getBody().applyLinearImpulse(Utils.getVector(angleRad, 0.000004f),
 				getBody().getWorldCenter(), true);
 	}
 
 	public void beginContact(Object other) {
 		touching = true;
-		// contacts.add(other);
+		// inflict damage on other
 	}
 
 	public void endContact(Object other) {
-		// contacts.remove(other);
 		touching = false;
 	}
 
 	private void deactivate() {
-		remove();
-		contacts.clear();
 		touching = false;
-//		getBody().setTransform(-10, -10, 0);
 		getBody().setActive(false);
+		getBody().setTransform(-10, -10, 0);
 		bulletFactory.release(this);
 	}
 
@@ -100,10 +94,10 @@ public class Bullet extends Actor {
 	}
 
 	public void draw(SpriteBatch batch, float parentAlpha) {
-		if (body != null) {
-			setRotation(MathUtils.radDeg * body.getAngle());
-			setX(body.getPosition().x * SpaceGame.WORLD_SCALE - getWidth() / 2);
-			setY(body.getPosition().y * SpaceGame.WORLD_SCALE - getHeight() / 2);
+		if (getBody() != null) {
+			setRotation(MathUtils.radDeg * getBody().getAngle());
+			setX(getBody().getPosition().x * SpaceGame.WORLD_SCALE - getWidth() / 2);
+			setY(getBody().getPosition().y * SpaceGame.WORLD_SCALE - getHeight() / 2);
 		}
 
 		super.draw(batch, parentAlpha);
@@ -111,10 +105,10 @@ public class Bullet extends Actor {
 
 	@Override
 	public void act(float delta) {
-		super.act(delta);
 		if (touching) {
 			deactivate();
 		}
+		super.act(delta);
 	}
 
 	@Override
@@ -125,6 +119,6 @@ public class Bullet extends Actor {
 
 	@Override
 	public String toString() {
-		return super.toString() + " touching="+ isTouching() + ", awake=" + getBody().isAwake() + ", active=" + getBody().isActive();
+		return super.toString() + " touching="+ isTouching() + ", awake=" + getBody().isAwake() + ", active=" + getBody().isActive() + ", mass="+getBody().getMass();
 	}
 }

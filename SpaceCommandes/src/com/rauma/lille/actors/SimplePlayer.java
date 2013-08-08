@@ -16,7 +16,7 @@ import com.rauma.lille.armory.BulletFactory;
  *
  */
 public class SimplePlayer extends BodyImageActor {
-	private static final float FIRE_RATE = 0.1f;
+	private static final float FIRE_RATE = 0.2f;
 	private float lastFired;
 	private BulletFactory bulletFactory;
 	
