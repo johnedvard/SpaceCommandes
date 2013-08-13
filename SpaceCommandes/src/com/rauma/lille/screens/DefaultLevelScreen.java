@@ -70,7 +70,7 @@ public class DefaultLevelScreen extends AbstractScreen {
 		uiStage.draw();
 		controllerStage.draw();
 
-		CommandPosition p = new CommandPosition("1", player.getX(), player.getY());
+		CommandPosition p = new CommandPosition(player.getX(), player.getY());
 		game.writeToServer(new Command(p));
 	}
 }
