@@ -22,7 +22,8 @@ public class Bullet extends Actor {
 	private Body body = null;
 	private BulletFactory bulletFactory;
 	private boolean touching;
-	private float damage = 0.01f;
+	private float damage = 5.0f;
+	private int fireCount = 0;
 
 	public Bullet(String name, short categoryBits, short maskBits, World world,
 			BulletFactory bulletFactory) {
@@ -56,9 +57,11 @@ public class Bullet extends Actor {
 
 	public void fire(float x, float y, float angleRad) {
 		getBody().setTransform(Utils.Screen2World(new Vector2(x, y)), angleRad);
+//		getBody().setTransform(Utils.Screen2World(new Vector2(x, y)), 0);
 		getBody().setActive(true);
 		getBody().applyLinearImpulse(Utils.getVector(angleRad, 0.000004f),
 				getBody().getWorldCenter(), true);
+		fireCount++;
 	}
 
 	public void beginContact(Object other) {
@@ -95,7 +98,7 @@ public class Bullet extends Actor {
 
 	public void draw(SpriteBatch batch, float parentAlpha) {
 		if (getBody() != null) {
-			setRotation(MathUtils.radDeg * getBody().getAngle());
+//			setRotation(MathUtils.radDeg * getBody().getAngle());
 			setX(getBody().getPosition().x * SpaceGame.WORLD_SCALE - getWidth() / 2);
 			setY(getBody().getPosition().y * SpaceGame.WORLD_SCALE - getHeight() / 2);
 		}
@@ -119,6 +122,10 @@ public class Bullet extends Actor {
 
 	@Override
 	public String toString() {
-		return super.toString() + " touching="+ isTouching() + ", awake=" + getBody().isAwake() + ", active=" + getBody().isActive() + ", mass="+getBody().getMass();
+		return super.toString() + " touching="+ isTouching() + ", awake=" + getBody().isAwake() + ", active=" + getBody().isActive() + ", fireCount="+fireCount;
+	}
+
+	public float getDamage() {
+		return damage;
 	}
 }

@@ -1,5 +1,8 @@
 package com.rauma.lille.actors;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL11;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -16,9 +19,12 @@ import com.rauma.lille.armory.BulletFactory;
  *
  */
 public class SimplePlayer extends BodyImageActor {
-	private static final float FIRE_RATE = 0.2f;
+	private static final float FIRE_RATE = 0.1f;
 	private float lastFired;
 	private BulletFactory bulletFactory;
+	private int successfulShot = 0;
+	private int failedShot = 0;
+	private float health = 100;;
 	
 	public SimplePlayer(String name, short categoryBits, short maskBits, float x, float y, World world, BulletFactory bulletFactory) {
 		super(new TextureRegion(Resource.ballTexture, 0, 0, 64, 64));
@@ -59,6 +65,9 @@ public class SimplePlayer extends BodyImageActor {
 	@Override
 	public void act(float delta) {
 		super.act(delta);
+		if(health < 1) {
+			die();
+		}
 		lastFired += delta;
 	}
 
@@ -71,9 +80,32 @@ public class SimplePlayer extends BodyImageActor {
 				getStage().addActor(bullet);
 				bullet.fire(getX()+getWidth()+5, getY()+getHeight()/2, angleRad);
 				lastFired = 0f;
+				successfulShot++;
 			} else {
 				System.out.println("Out of ammo / Weapon needs cool down");
+				failedShot++;
 			}
 		}
+	}
+
+	public void applyDamage(float damage) {
+		this.health -= damage;
+		System.out.println("New health: " + health);
+	}
+	
+	private void die() {
+		destroyBody();
+	}
+
+	@Override
+	public void draw(SpriteBatch batch, float parentAlpha) {
+//		batch.end(); // actual drawing is done on end(); if we do not end, we contaminate previous rendering.
+//		batch.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE);
+//		batch.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+//		batch.begin();
+		Color newColor = getColor();
+		newColor.a = health/100;
+		setColor(newColor);
+		super.draw(batch, parentAlpha);
 	}
 }

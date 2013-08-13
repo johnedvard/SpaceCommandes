@@ -4,6 +4,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.rauma.lille.actors.Bullet;
 
@@ -24,15 +25,29 @@ public class SpaceGameContactListener implements ContactListener {
 		} else if (userDataB instanceof Bullet) {
 			bch.handleBulletBeginContact((Bullet) userDataB, userDataA);
 		}
+		
+		
+		
 	}
 
 	@Override
 	public void endContact(Contact contact) {
-		Body bodyA = contact.getFixtureA().getBody();
-		Body bodyB = contact.getFixtureB().getBody();
+		Fixture fixtureA = contact.getFixtureA();
+		Fixture fixtureB = contact.getFixtureB();
+		Body bodyA = null;
+		Body bodyB = null;
+		if(fixtureA != null)
+			bodyA = fixtureA.getBody();
+		if(fixtureB != null)
+			bodyB = fixtureB.getBody();
 
-		Object userDataA = bodyA.getUserData();
-		Object userDataB = bodyB.getUserData();
+		Object userDataA = null;
+		Object userDataB = null;
+		
+		if(bodyA != null)
+			userDataA = bodyA.getUserData();
+		if(bodyB != null)
+			userDataB = bodyB.getUserData();
 		
 		// Handle end bullet impact
 		if (userDataA instanceof Bullet) {

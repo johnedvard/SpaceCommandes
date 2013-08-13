@@ -62,6 +62,6 @@ public class BulletFactory {
 		busyBullets.remove(bullet);
 		freeBullets.add(bullet);
 		
-		System.out.println("free/busy: " + freeBullets.size() + "/" + busyBullets.size());
+		System.out.println("free/busy: " + freeBullets.size() + "/" + busyBullets.size() + ": " + bullet);
 	}
 }
