@@ -34,6 +34,10 @@ public class BodyImageActor extends Image {
 		body.setUserData(this);
 	}
 
+	public BodyImageActor(TextureRegion textureRegion) {
+		super(textureRegion);
+	}
+
 	public void destroyBody() {
 		if (body != null) {
 			World world = body.getWorld();
@@ -42,6 +46,13 @@ public class BodyImageActor extends Image {
 		}
 	}
 
+	public void setBody(Body body) {
+		if(body != null) {
+			destroyBody();
+		}
+		this.body = body;
+	}
+	
 	public Body getBody() {
 		return body;
 	}
