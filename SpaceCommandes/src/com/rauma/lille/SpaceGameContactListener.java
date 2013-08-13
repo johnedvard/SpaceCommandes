@@ -4,11 +4,13 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.rauma.lille.actors.Bullet;
 
 public class SpaceGameContactListener implements ContactListener {
-
+	private BulletContactHandler bch = new BulletContactHandler();
+	
 	@Override
 	public void beginContact(Contact contact) {
 		Body bodyA = contact.getFixtureA().getBody();
@@ -17,28 +19,44 @@ public class SpaceGameContactListener implements ContactListener {
 		Object userDataA = bodyA.getUserData();
 		Object userDataB = bodyB.getUserData();
 		
-		
-		// Handle bullet impact
+		// Handle begin bullet impact
 		if (userDataA instanceof Bullet) {
-			handleBulletContact((Bullet) userDataA, userDataB);
+			bch.handleBulletBeginContact((Bullet) userDataA, userDataB);
 		} else if (userDataB instanceof Bullet) {
-			handleBulletContact((Bullet) userDataB, userDataA);
+			bch.handleBulletBeginContact((Bullet) userDataB, userDataA);
 		}
 		
 		
-	}
-
-	private void handleBulletContact(Bullet bullet, Object userDataB) {
-		if (bullet != null) {
-			bullet.release();
-		}
+		
 	}
 
 	@Override
 	public void endContact(Contact contact) {
-		// TODO Auto-generated method stub
+		Fixture fixtureA = contact.getFixtureA();
+		Fixture fixtureB = contact.getFixtureB();
+		Body bodyA = null;
+		Body bodyB = null;
+		if(fixtureA != null)
+			bodyA = fixtureA.getBody();
+		if(fixtureB != null)
+			bodyB = fixtureB.getBody();
 
+		Object userDataA = null;
+		Object userDataB = null;
+		
+		if(bodyA != null)
+			userDataA = bodyA.getUserData();
+		if(bodyB != null)
+			userDataB = bodyB.getUserData();
+		
+		// Handle end bullet impact
+		if (userDataA instanceof Bullet) {
+			bch.handleBulletEndContact((Bullet) userDataA, userDataB);
+		} else if (userDataB instanceof Bullet) {
+			bch.handleBulletEndContact((Bullet) userDataB, userDataA);
+		}
 	}
+
 
 	@Override
 	public void preSolve(Contact contact, Manifold oldManifold) {
@@ -51,5 +69,4 @@ public class SpaceGameContactListener implements ContactListener {
 		// TODO Auto-generated method stub
 
 	}
-
 }

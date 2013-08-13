@@ -2,7 +2,6 @@ package com.rauma.lille.stages;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
@@ -16,34 +15,33 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.rauma.lille.SpaceGameContactListener;
-import com.rauma.lille.BulletFactory;
 import com.rauma.lille.Resource;
 import com.rauma.lille.SpaceGame;
+import com.rauma.lille.SpaceGameContactListener;
 import com.rauma.lille.Utils;
 import com.rauma.lille.actors.SimplePlayer;
+import com.rauma.lille.armory.BulletFactory;
 
 /**
  * @author frank
  * 
  */
 public class DefaultActorStage extends AbstractStage {
-	final short CATEGORY_PLAYER = 0x0001; // 0000000000000001 in binary
-	final short CATEGORY_MONSTER = 0x0002; // 0000000000000010 in binary
-	final short CATEGORY_SCENERY = 0x0004; // 0000000000000100 in binary
+	final short CATEGORY_PLAYER_1	=	0x0001; // 0000000000000001 in binary
+	final short CATEGORY_PLAYER_2	=	0x0002; // 0000000000000010 in binary
+	final short CATEGORY_SCENERY	=	0x1000; // 0001000000000000 in binary
 
-	final short MASK_PLAYER = CATEGORY_MONSTER | CATEGORY_SCENERY; // or
-																	// ~CATEGORY_PLAYER
-	final short MASK_MONSTER = CATEGORY_PLAYER | CATEGORY_SCENERY; // or
-																	// ~CATEGORY_MONSTER
+	final short MASK_PLAYER_1 = CATEGORY_PLAYER_2 | CATEGORY_SCENERY; // or ~CATEGORY_PLAYER
+	final short MASK_PLAYER_2 = CATEGORY_PLAYER_1 | CATEGORY_SCENERY; // or ~CATEGORY_MONSTER
 	final short MASK_SCENERY = -1;
 
 	private Box2DDebugRenderer debugRenderer;
@@ -53,7 +51,9 @@ public class DefaultActorStage extends AbstractStage {
 	private TiledMap map;
 	private OrthogonalTiledMapRenderer renderer;
 
-	private SimplePlayer player;
+	private SimplePlayer player1;
+	private SimplePlayer player2;
+	
 	private float currentX;
 	private float currentY;
 	private float angleRad;
@@ -69,9 +69,6 @@ public class DefaultActorStage extends AbstractStage {
 
 		int width = Gdx.graphics.getWidth();
 		int height = Gdx.graphics.getHeight();
-		float aspectRatio = (float) width / (float) height;
-
-		BulletFactory.init(world);
 
 		OrthographicCamera camera = (OrthographicCamera) getCamera();
 		// camera.setToOrtho(false, 10f*aspectRatio, 10f);
@@ -131,54 +128,23 @@ public class DefaultActorStage extends AbstractStage {
 
 			System.out.println(shape);
 			fixtureDef.shape = shape;
-			world.createBody(def).createFixture(fixtureDef);
+			Body body = world.createBody(def);
+			body.createFixture(fixtureDef);
+			body.setUserData(this);
 		}
 		shape.dispose();
 
-		spawnPlayer();
+		player1 = spawnPlayerAtPosition("Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100);
+		player2 = spawnPlayerAtPosition("Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, SpaceGame.SCREEN_WIDTH-200, 100);
 	}
 
-	private void spawnPlayer() {
+	private SimplePlayer spawnPlayerAtPosition(String name, short categoryBits, short maskBits, float x, float y) {
 
-		// player
-		float width = 64;
-		float height = 64;
-		float x = 100;
-		float y = 100;
+		BulletFactory bulletFactory = new BulletFactory(categoryBits, maskBits, world);
+		SimplePlayer simplePlayer = new SimplePlayer(name, categoryBits, maskBits, x, y, world, bulletFactory);
 
-		BodyDef def = new BodyDef();
-		def.type = BodyType.DynamicBody;
-		def.position.set(Utils.Screen2World(x), Utils.Screen2World(y));
-		CircleShape circle = new CircleShape();
-		circle.setRadius(Utils.Screen2World(width / 2));
-
-		FixtureDef fixtureDef = new FixtureDef();
-		fixtureDef.shape = circle;
-		fixtureDef.density = 0.0195f;
-		fixtureDef.friction = 1.0f;
-		fixtureDef.restitution = 0.3f; // Make it bounce a little bit
-		fixtureDef.filter.categoryBits = CATEGORY_PLAYER;
-		fixtureDef.filter.maskBits = MASK_PLAYER;
-
-		player = new SimplePlayer("player", new TextureRegion(
-				Resource.ballTexture, 0, 0, 64, 64), world, def, fixtureDef);
-		player.setOrigin(width / 2, height / 2);
-		player.setWidth(width);
-		player.setHeight(height);
-		// player.getBody().setFixedRotation(true);
-		player.getBody().setAngularDamping(10.0f);
-
-		addActor(player);
-
-		circle.setRadius(0.01f);
-		fixtureDef.shape = circle;
-		fixtureDef.density = 0.00001f;
-		fixtureDef.friction = 0.0f;
-		fixtureDef.restitution = 0.0f;
-		fixtureDef.filter.categoryBits = CATEGORY_PLAYER;
-		fixtureDef.filter.maskBits = MASK_PLAYER;
-
-		circle.dispose();
+		addActor(simplePlayer);
+		return simplePlayer;
 	}
 
 	public void playerMoved(float knobX, float knobY, float knobPercentX,
@@ -194,25 +160,25 @@ public class DefaultActorStage extends AbstractStage {
 	}
 
 	public void updatePlayer(float delta) {
-		Vector2 linearVelocity = player.getBody().getLinearVelocity();
+		Vector2 linearVelocity = player1.getBody().getLinearVelocity();
 
 		if (currentX != 0) {
 			// set speed to [0, 2>
-			player.getBody().setLinearVelocity(currentX * 2, linearVelocity.y);
+			player1.getBody().setLinearVelocity(currentX * 2, linearVelocity.y);
 		}
 
 		if (currentY > 0) {
-			player.getBody().applyForceToCenter(
+			player1.getBody().applyForceToCenter(
 					new Vector2(0, (float) (currentY * .1)), true);
 		}
 
-		if (angleRad != 0 && player.getRotation() != angleRad) {
-			player.fireWeapon(angleRad+MathUtils.PI/2); // adjusted +90 deg
+		if (angleRad != 0 && player1.getRotation() != angleRad) {
+			player1.fireWeapon(angleRad+MathUtils.PI/2); // adjusted +90 deg
 		}
 	}
 	
 	public Actor getPlayer(){
-		return player;
+		return player1;
 	}
 	@Override
 	public void act(float delta) {
@@ -226,7 +192,6 @@ public class DefaultActorStage extends AbstractStage {
 
 		getCamera().update();
 		renderer.render();
-		BulletFactory.deactivateFreeBullets();
 		debugRenderer.render(world, debugMatrix);
 		world.step(1 / 45f, 6, 2);
 	}
