@@ -16,8 +16,9 @@ public class DefaultLevelScreen extends AbstractScreen {
 	protected DefaultActorStage actorStage;
 	protected BackgroundStage bgStage;
 	protected UIStage uiStage;
+	private Actor player;
 
-	public DefaultLevelScreen(SpaceGame game, String mapName) {
+	public DefaultLevelScreen(final SpaceGame game, String mapName) {
 		super(game);
 		int width = Gdx.graphics.getWidth();
 		int height = Gdx.graphics.getWidth();
@@ -46,6 +47,7 @@ public class DefaultLevelScreen extends AbstractScreen {
 				}
 			}
 		});
+		player = (Actor) actorStage.getPlayer();
 	}
 
 	@Override
@@ -66,5 +68,6 @@ public class DefaultLevelScreen extends AbstractScreen {
 		uiStage.draw();
 		controllerStage.draw();
 
+		game.writeToServer((player.getX() +","+player.getY()).toString().getBytes());
 	}
 }

@@ -23,6 +23,7 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.rauma.lille.SpaceGameContactListener;
 import com.rauma.lille.BulletFactory;
 import com.rauma.lille.Resource;
@@ -209,7 +210,10 @@ public class DefaultActorStage extends AbstractStage {
 			player.fireWeapon(angleRad+MathUtils.PI/2); // adjusted +90 deg
 		}
 	}
-
+	
+	public Actor getPlayer(){
+		return player;
+	}
 	@Override
 	public void act(float delta) {
 		super.act(delta);
