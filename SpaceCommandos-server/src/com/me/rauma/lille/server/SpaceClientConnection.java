@@ -35,6 +35,7 @@ public class SpaceClientConnection {
 
 		outputStreamHandler = new OutputStreamHandler(outputStream);
 		outputStreamHandler.start();
+		
 	}
 	
 	public boolean stop() {

@@ -68,6 +68,6 @@ public class DefaultLevelScreen extends AbstractScreen {
 		uiStage.draw();
 		controllerStage.draw();
 
-		game.writeToServer((player.getX() +","+player.getY()).toString().getBytes());
+		game.writeToServer((player.getX() +","+player.getY()).toString());
 	}
 }
