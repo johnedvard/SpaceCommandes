@@ -23,8 +23,9 @@ public class SpaceClientConnection {
 	private OutputStreamHandler outputStreamHandler;
 
 	private Socket socket;
-
-	public SpaceClientConnection(Socket s) throws IOException {
+	private int id;
+	public SpaceClientConnection(Socket s, int id) throws IOException {
+		this.id = id;
 		LOG.info("Client connection created: " + s);
 		this.socket = s;
 		InputStream inputStream = socket.getInputStream();
@@ -37,7 +38,7 @@ public class SpaceClientConnection {
 		outputStreamHandler.start();
 		
 	}
-	
+
 	public boolean stop() {
 		running = false;
 		try {
