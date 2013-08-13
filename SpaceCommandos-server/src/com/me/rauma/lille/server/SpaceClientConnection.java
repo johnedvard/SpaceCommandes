@@ -65,13 +65,14 @@ public class SpaceClientConnection {
 			try {
 				while (running) {
 					LOG.info("Reading input");
-					while ((b = bis.read()) != -1) {
+					while (running && (b = bis.read()) != -1) {
 						sb.append((char)b);
 						if (b == 10 || b == 13) {
 							handleInput(sb.toString());
 							sb.delete(0, sb.length());
 						}
 					}
+					running = false;
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -109,6 +110,7 @@ public class SpaceClientConnection {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			running = false; 
 		}
 	}
 

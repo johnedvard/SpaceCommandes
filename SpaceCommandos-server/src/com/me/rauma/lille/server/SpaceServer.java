@@ -61,6 +61,10 @@ public class SpaceServer {
 	}
 
 	public static void main(String[] args) {
-		new SpaceServer(Integer.valueOf(args[0]));
+		int port = 1337;
+		if(args.length>0){
+			port = Integer.valueOf(args[0]);
+		}
+		new SpaceServer(port);
 	}
 }
