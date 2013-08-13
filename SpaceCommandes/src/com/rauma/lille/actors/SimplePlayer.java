@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL11;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -78,7 +79,10 @@ public class SimplePlayer extends BodyImageActor {
 			Bullet bullet = bulletFactory.getBullet();
 			if (bullet != null) {
 				getStage().addActor(bullet);
-				bullet.fire(getX()+getWidth()+5, getY()+getHeight()/2, angleRad);
+				float offsetX = getWidth()+5;
+				if(MathUtils.sin(angleRad) < 0)
+					offsetX = 0;
+				bullet.fire(getX() + offsetX, getY()+getHeight()/2, angleRad);
 				lastFired = 0f;
 				successfulShot++;
 			} else {
