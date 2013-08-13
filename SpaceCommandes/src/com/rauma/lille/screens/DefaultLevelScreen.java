@@ -5,6 +5,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.rauma.lille.SpaceGame;
+import com.rauma.lille.network.Command;
+import com.rauma.lille.network.CommandPosition;
 import com.rauma.lille.stages.BackgroundStage;
 import com.rauma.lille.stages.ControllerStage;
 import com.rauma.lille.stages.DefaultActorStage;
@@ -68,6 +70,7 @@ public class DefaultLevelScreen extends AbstractScreen {
 		uiStage.draw();
 		controllerStage.draw();
 
-		game.writeToServer((player.getX() +","+player.getY()).toString());
+		CommandPosition p = new CommandPosition("1", player.getX(), player.getY());
+		game.writeToServer(new Command(p));
 	}
 }

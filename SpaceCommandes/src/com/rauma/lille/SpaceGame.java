@@ -7,6 +7,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import com.rauma.lille.network.Command;
 import com.rauma.lille.network.SpaceServerConnection;
 import com.rauma.lille.screens.DefaultLevelScreen;
 
@@ -59,10 +60,10 @@ public class SpaceGame extends Game {
 		return mainMenuScreen;
 	}
 	
-	public void writeToServer(String message){
+	public void writeToServer(Command command){
 		if(client != null){
 			byte[] b;
-			b = (message + "\n").getBytes();
+			b = (command.toString() + "\n").getBytes();
 			client.writeToServer(b);
 		}
 	}
