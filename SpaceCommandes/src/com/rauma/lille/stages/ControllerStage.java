@@ -17,7 +17,7 @@ public class ControllerStage extends AbstractStage {
 	private Touchpad touchpadLeft;
 	private Touchpad touchpadRight;
 
-	public ControllerStage(int width, int height, boolean keepAspectRatio) {
+	public ControllerStage(float width, float height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
 		init();
 	}

@@ -10,7 +10,7 @@ package com.rauma.lille.stages;
  */
 public class UIStage extends AbstractStage {
 
-	public UIStage(int width, int height, boolean keepAspectRatio) {
+	public UIStage(float width, float height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
 	}
 

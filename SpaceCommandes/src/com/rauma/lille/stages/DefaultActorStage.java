@@ -1,5 +1,7 @@
 package com.rauma.lille.stages;
 
+import sun.security.action.GetBooleanAction;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.MapLayer;
@@ -15,6 +17,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -22,11 +25,13 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.rauma.lille.SpaceGame;
 import com.rauma.lille.SpaceGameContactListener;
 import com.rauma.lille.Utils;
 import com.rauma.lille.actors.SimplePlayer;
 import com.rauma.lille.armory.BulletFactory;
+import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
 /**
  * @author frank
@@ -64,14 +69,18 @@ public class DefaultActorStage extends AbstractStage {
 		world = new World(SpaceGame.WORLD_GRAVITY, true);
 		debugRenderer = new Box2DDebugRenderer();
 
-		int width = Gdx.graphics.getWidth();
-		int height = Gdx.graphics.getHeight();
 
-		OrthographicCamera camera = (OrthographicCamera) getCamera();
-		// camera.setToOrtho(false, 10f*aspectRatio, 10f);
-		camera.setToOrtho(false, width, height);
-		debugMatrix = camera.combined.cpy();
+//		int width = Gdx.graphics.getWidth();
+//		int height = Gdx.graphics.getHeight();
+//		OrthographicCamera camera = (OrthographicCamera) getCamera();
+
+//		float aspectRatio = width/height;
+//		float scale = 128f;
+//		camera.setToOrtho(false, scale*aspectRatio, scale);
+//		camera.setToOrtho(false, width, height);
+		debugMatrix = getCamera().combined.cpy();
 		debugMatrix.scale(SpaceGame.WORLD_SCALE, SpaceGame.WORLD_SCALE, 1f);
+//		debugMatrix.scale(SpaceGame.WORLD_SCALE*SCALE*aspectRatio, SpaceGame.WORLD_SCALE*SCALE, 1f);
 
 		world.setContactListener(new SpaceGameContactListener());
 	}
@@ -183,11 +192,13 @@ public class DefaultActorStage extends AbstractStage {
 	@Override
 	public void draw() {
 		super.draw();
-
-		getCamera().update();
 		renderer.render();
 		debugRenderer.render(world, debugMatrix);
 		world.step(1 / 45f, 6, 2);
 	}
 
+	public Vector3 getPlayerPosition() {
+		Vector2 screenCoordinates = toScreenCoordinates(new Vector2(player1.getX()+player1.getWidth()/2, player1.getY()+player1.getHeight()/2), getCamera().combined);
+		return new Vector3(screenCoordinates.x, screenCoordinates.y, 0);
+	}
 }

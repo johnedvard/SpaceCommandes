@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.rauma.lille.SpaceGame;
 
-public class SplashScreen extends AbstractScreen {
+public class SplashScreen extends DefaultScreen {
 	protected SpriteBatch batch;
 
 	private Texture splashTexture;

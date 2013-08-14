@@ -14,13 +14,9 @@ public class SpaceGame extends Game {
 
 	public static final float SCREEN_WIDTH = 800;
 	public static final float SCREEN_HEIGHT = 480;
-
+	
 	public static final float WORLD_SCALE = 100;
 	public static final Vector2 WORLD_GRAVITY = new Vector2(0f, -10f);
-
-	public static boolean DEBUG = false;
-	public static boolean COLLISION = true;
-	public static boolean ADDACTOR = false;
 
 	@Override
 	public void create() {
