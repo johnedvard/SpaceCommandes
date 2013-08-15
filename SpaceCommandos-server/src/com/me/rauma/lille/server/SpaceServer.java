@@ -18,7 +18,6 @@ public class SpaceServer {
 	private List<SpaceClientConnection> clients = new ArrayList<SpaceClientConnection>();
 
 	private boolean running = false;
-	private int id;
 
 	public SpaceServer(final int port) {
 		new Thread() {
@@ -53,7 +52,7 @@ public class SpaceServer {
 	}
 
 	private void createSpaceClient(Socket socket) throws IOException {
-		SpaceClientConnection client = new SpaceClientConnection(socket,id++);
+		SpaceClientConnection client = new SpaceClientConnection(socket);
 		clients.add(client);
 	}
 	

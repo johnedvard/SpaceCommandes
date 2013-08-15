@@ -7,6 +7,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Json;
 import com.rauma.lille.network.Command;
 import com.rauma.lille.network.SpaceServerConnection;
 import com.rauma.lille.screens.DefaultLevelScreen;
@@ -26,6 +27,7 @@ public class SpaceGame extends Game {
 	public static boolean COLLISION = true;
 	public static boolean ADDACTOR = false;
 	private SpaceServerConnection client;
+	private Json json = new Json();
 
 	@Override
 	public void create() {
@@ -63,7 +65,7 @@ public class SpaceGame extends Game {
 	public void writeToServer(Command command){
 		if(client != null){
 			byte[] b;
-			b = (command.toString() + "\n").getBytes();
+			b = (json.toJson(command)+ "\n").getBytes();
 			client.writeToServer(b);
 		}
 	}

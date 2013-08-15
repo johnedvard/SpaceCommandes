@@ -10,6 +10,7 @@ import java.util.Queue;
 import java.util.logging.Logger;
 
 import com.badlogic.gdx.net.Socket;
+import com.badlogic.gdx.utils.Json;
 
 
 public class SpaceServerConnection{
@@ -22,7 +23,7 @@ public class SpaceServerConnection{
 
 	private Socket socket;
 	private Queue<byte[]> outputQueue = new LinkedList<byte[]>();
-	private Queue<String> inputQueue = new LinkedList<String>();
+	private Json json;
 	
 	public SpaceServerConnection(Socket s) {
 		LOG.info("Client connection created: " + s);
@@ -34,6 +35,7 @@ public class SpaceServerConnection{
 		inputStreamHandler.start();
 		outputStreamHandler = new OutputStreamHandler(outputStream);
 		outputStreamHandler.start();
+		json = new Json();
 		
 	}
 	
@@ -47,7 +49,7 @@ public class SpaceServerConnection{
 			try {
 				while (running) {
 					while (outputQueue.size() > 0) {
-						LOG.info("Sending output");
+//						LOG.info("Sending output");
 						byte[] poll = outputQueue.poll();
 						if (poll == null)
 							continue;
@@ -82,9 +84,10 @@ public class SpaceServerConnection{
 		public InputStreamHandler(InputStream inputStream) {
 			this.bis = new BufferedInputStream(inputStream);
 		}
-		
+
 		@Override
 		public void run() {
+			System.out.println("ready to receive input");
 			int b = -1;
 			StringBuilder sb = new StringBuilder();
 			try {
@@ -103,7 +106,6 @@ public class SpaceServerConnection{
 				e.printStackTrace();
 			}
 		}
-
 	}
 
 	// add all bytes to a queue, which should be written to the server
@@ -112,8 +114,19 @@ public class SpaceServerConnection{
 		outputQueue.add(b);
 	}
 	
-	private synchronized void handleInput(String string) {
-		LOG.info("got message from server: " + string);
-		inputQueue.add(string);
+	private void handleInput(String string) {
+		LOG.info("\ngot message from server: " + string);
+		if(string.startsWith("{")){ //FIXME check if the message is a json message
+			CommandPosition c = (CommandPosition)json.fromJson(CommandPosition.class, string);
+			switch (c.type) {
+			case Command.POSITION:
+				System.out.println("got a position");
+				break;
+
+			default:
+				System.out.println("got something else");
+				break;
+			}
+		}
 	}
 }
