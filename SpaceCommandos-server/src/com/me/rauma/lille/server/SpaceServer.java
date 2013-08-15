@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 /**
  * @author frank
  * 
@@ -18,6 +19,8 @@ public class SpaceServer {
 	private List<SpaceClientConnection> clients = new ArrayList<SpaceClientConnection>();
 
 	private boolean running = false;
+
+	private int numPlayersPrGame = 2;
 
 	public SpaceServer(final int port) {
 		new Thread() {
@@ -31,7 +34,7 @@ public class SpaceServer {
 						try {
 							Socket socket = ss.accept();
 							LOG.log(Level.INFO, "Client accepted");
-							createSpaceClient(socket);
+							init(socket);
 						} catch (Exception e) {
 							e.printStackTrace();
 							LOG.log(Level.WARNING, "Failed to accept client", e);
@@ -51,7 +54,26 @@ public class SpaceServer {
 		}.start();
 	}
 
-	private void createSpaceClient(Socket socket) throws IOException {
+
+	private synchronized void init(Socket socket) throws IOException {
+		LOG.log(Level.INFO, "Creating client");
+		createSpaceClient(socket);
+		if(clients.size() % numPlayersPrGame == 0){
+			createGame();
+		}
+	}
+
+	private synchronized void createGame() {
+		LOG.log(Level.INFO, "Creating GAME!");
+		// get clients for the current game.
+		List<SpaceClientConnection> clientsToPlayTogether = new ArrayList<SpaceClientConnection>();
+		for(int i = 0; i<numPlayersPrGame; i++){
+			SpaceClientConnection spaceClientConnection = clients.get(clients.size()-(i+1));
+			clientsToPlayTogether.add(spaceClientConnection);
+		}
+		new GameState(clientsToPlayTogether);
+	}
+	private synchronized void createSpaceClient(Socket socket) throws IOException {
 		SpaceClientConnection client = new SpaceClientConnection(socket);
 		clients.add(client);
 	}

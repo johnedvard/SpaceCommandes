@@ -10,6 +10,9 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.logging.Logger;
 
+import com.badlogic.gdx.utils.Json;
+import com.rauma.lille.network.Command;
+
 /**
  * @author frank
  * 
@@ -23,6 +26,7 @@ public class SpaceClientConnection {
 	private OutputStreamHandler outputStreamHandler;
 
 	private Socket socket;
+	private Json json;
 	public SpaceClientConnection(Socket s) throws IOException {
 		LOG.info("Client connection created: " + s);
 		this.socket = s;
@@ -33,7 +37,7 @@ public class SpaceClientConnection {
 		inputStreamHandler.start();
 		outputStreamHandler = new OutputStreamHandler(outputStream);
 		outputStreamHandler.start();
-		
+		json = new Json();
 	}
 
 	public boolean stop() {
@@ -85,7 +89,6 @@ public class SpaceClientConnection {
 		
 		public OutputStreamHandler(OutputStream outputStream) {
 			this.bos = new BufferedOutputStream(outputStream);
-			queue.add("hello".getBytes());
 		}
 
 		public void sendMessage(byte[] msg) {
@@ -97,7 +100,7 @@ public class SpaceClientConnection {
 			try {
 				while (running) {
 					while (queue.size() > 0) {
-						LOG.info("Sending output");
+//						LOG.info("Sending output");
 						byte[] poll = queue.poll();
 						if (poll == null)
 							continue;
@@ -114,7 +117,13 @@ public class SpaceClientConnection {
 	}
 
 	private void handleInput(String string) {
-		LOG.info("Received '" + string + "'");
+//		LOG.info("Received '" + string + "'");
 		outputStreamHandler.sendMessage(string.getBytes());
+	}
+
+	public void sendMessage(Command c) {
+		byte[] b;
+		b = (json.toJson(c)+ "\n").getBytes();
+		outputStreamHandler.sendMessage(b);
 	}
 }

@@ -2,8 +2,6 @@ package com.rauma.lille.network;
 
 public class CommandPosition extends Command {
 
-	private float x;
-	private float y;
 	public CommandPosition(float x, float y) {
 		this();
 		type = Command.POSITION;
@@ -11,7 +9,7 @@ public class CommandPosition extends Command {
 		this.y = y;
 	}
 	
-	public CommandPosition(){
+	private CommandPosition(){
 		super();
 	}
 	

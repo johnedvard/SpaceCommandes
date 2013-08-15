@@ -28,6 +28,7 @@ public class SpaceServerConnection{
 	public SpaceServerConnection(Socket s) {
 		LOG.info("Client connection created: " + s);
 		this.socket = s;
+		json = new Json();
 		InputStream inputStream = socket.getInputStream();
 		OutputStream outputStream = socket.getOutputStream();
 		
@@ -35,7 +36,6 @@ public class SpaceServerConnection{
 		inputStreamHandler.start();
 		outputStreamHandler = new OutputStreamHandler(outputStream);
 		outputStreamHandler.start();
-		json = new Json();
 		
 	}
 	
@@ -115,18 +115,21 @@ public class SpaceServerConnection{
 	}
 	
 	private void handleInput(String string) {
-		LOG.info("\ngot message from server: " + string);
+//		LOG.info("\ngot message from server: " + string);
 		if(string.startsWith("{")){ //FIXME check if the message is a json message
-			CommandPosition c = (CommandPosition)json.fromJson(CommandPosition.class, string);
+			Command c = json.fromJson(Command.class, string);
 			switch (c.type) {
 			case Command.POSITION:
 				System.out.println("got a position");
 				break;
-
+			case Command.START_GAME:
+				System.out.println("switch to game-screen and play the game. set up the game with the state from the server");
+				break;
 			default:
-				System.out.println("got something else");
+				System.out.println("got something else: " + string);
 				break;
 			}
 		}
 	}
+	
 }

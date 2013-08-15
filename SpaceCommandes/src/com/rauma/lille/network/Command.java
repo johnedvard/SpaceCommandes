@@ -10,7 +10,10 @@ package com.rauma.lille.network;
  */
 public class Command {
 	public static final int POSITION = 0;
+	public static final int START_GAME = 1;
 	protected int type = -1;
+	protected float x= -1;
+	protected float y= -1;
 	
 	protected Command(){
 	}
