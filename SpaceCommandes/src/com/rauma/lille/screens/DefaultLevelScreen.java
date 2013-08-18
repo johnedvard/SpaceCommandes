@@ -83,6 +83,8 @@ public class DefaultLevelScreen extends DefaultScreen {
 		if(player != null && (player.getX() != prevX || player.getY() != prevX)){
 			Command p = new CommandPosition(player.getId(),player.getX(), player.getY());
 			game.writeToServer(p);
+			prevX = player.getX();
+			prevY = player.getY();
 		}
 	}
 

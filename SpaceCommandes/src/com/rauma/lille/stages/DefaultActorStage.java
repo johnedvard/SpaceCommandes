@@ -167,7 +167,7 @@ public class DefaultActorStage extends AbstractStage {
 	}
 
 	public void updatePlayer(float delta) {
-		if(player1 == null ){
+		if(player1 == null || player1.getBody() == null){
 			//TODO (john) Cast an error?
 			return;
 		}
