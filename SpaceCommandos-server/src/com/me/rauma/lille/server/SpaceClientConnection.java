@@ -6,9 +6,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.logging.Logger;
+
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Json;
+import com.me.rauma.lille.server.Game.CommandMessageListener;
+import com.rauma.lille.network.Command;
 
 /**
  * @author frank
@@ -22,8 +29,11 @@ public class SpaceClientConnection {
 	private InputStreamHandler inputStreamHandler;
 	private OutputStreamHandler outputStreamHandler;
 
+	private List<CommandMessageListener> commandListeners = new ArrayList<CommandMessageListener>();
 	private Socket socket;
+	private Json json = new Json();
 
+	private int playerId = -1;
 	public SpaceClientConnection(Socket s) throws IOException {
 		LOG.info("Client connection created: " + s);
 		this.socket = s;
@@ -32,11 +42,10 @@ public class SpaceClientConnection {
 
 		inputStreamHandler = new InputStreamHandler(inputStream);
 		inputStreamHandler.start();
-
 		outputStreamHandler = new OutputStreamHandler(outputStream);
 		outputStreamHandler.start();
 	}
-	
+
 	public boolean stop() {
 		running = false;
 		try {
@@ -65,13 +74,14 @@ public class SpaceClientConnection {
 			try {
 				while (running) {
 					LOG.info("Reading input");
-					while ((b = bis.read()) != -1) {
+					while (running && (b = bis.read()) != -1) {
 						sb.append((char)b);
 						if (b == 10 || b == 13) {
 							handleInput(sb.toString());
 							sb.delete(0, sb.length());
 						}
 					}
+					running = false;
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -85,7 +95,6 @@ public class SpaceClientConnection {
 		
 		public OutputStreamHandler(OutputStream outputStream) {
 			this.bos = new BufferedOutputStream(outputStream);
-			queue.add("hello".getBytes());
 		}
 
 		public void sendMessage(byte[] msg) {
@@ -97,7 +106,7 @@ public class SpaceClientConnection {
 			try {
 				while (running) {
 					while (queue.size() > 0) {
-						LOG.info("Sending output");
+//						LOG.info("Sending output");
 						byte[] poll = queue.poll();
 						if (poll == null)
 							continue;
@@ -109,11 +118,33 @@ public class SpaceClientConnection {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			running = false; 
 		}
 	}
 
 	private void handleInput(String string) {
-		LOG.info("Received '" + string + "'");
-		outputStreamHandler.sendMessage(string.getBytes());
+//		LOG.info("Received '" + string + "'");
+		//reply the client with the same message it sent
+//		outputStreamHandler.sendMessage(string.getBytes());
+		// send the input(command as a json) we get to all the listeners registered on this connection
+		for(CommandMessageListener cml : commandListeners){
+			cml.sendMessage(string);
+		}
 	}
+
+	public synchronized void sendMessage(Command c) {
+		byte[] b;
+		String string = (json.toJson(c,Command.class)+ "\n");
+		b = string.getBytes();
+		outputStreamHandler.sendMessage(b);
+	}
+
+	public void addCommandMessageListener(CommandMessageListener listener) {
+		commandListeners.add(listener);
+	}
+
+	public void setId(int yourId) {
+		this.playerId  = yourId;
+	}
+	
 }

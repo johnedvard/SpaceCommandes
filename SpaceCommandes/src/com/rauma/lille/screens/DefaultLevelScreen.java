@@ -6,6 +6,10 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.rauma.lille.SpaceGame;
+import com.rauma.lille.actors.SimplePlayer;
+import com.rauma.lille.network.Command;
+import com.rauma.lille.network.CommandPosition;
+import com.rauma.lille.network.CommandStartGame;
 import com.rauma.lille.stages.BackgroundStage;
 import com.rauma.lille.stages.ControllerStage;
 import com.rauma.lille.stages.DefaultActorStage;
@@ -18,7 +22,7 @@ public class DefaultLevelScreen extends DefaultScreen {
 	protected BackgroundStage bgStage;
 	protected UIStage uiStage;
 
-	public DefaultLevelScreen(SpaceGame game, String mapName) {
+	public DefaultLevelScreen(final SpaceGame game, String mapName) {
 		super(game);
 		
 		float width = SpaceGame.SCREEN_WIDTH;
@@ -56,6 +60,7 @@ public class DefaultLevelScreen extends DefaultScreen {
 		Gdx.input.setInputProcessor(controllerStage);
 	}
 
+	private float prevX, prevY = 0;
 	
 	@Override
 	public void render(float delta) {
@@ -73,5 +78,20 @@ public class DefaultLevelScreen extends DefaultScreen {
 		actorStage.draw();
 		uiStage.draw();
 		controllerStage.draw();
+
+		SimplePlayer player = actorStage.getPlayer();
+		if(player != null && (player.getX() != prevX || player.getY() != prevX)){
+			Command p = new CommandPosition(player.getId(),player.getX(), player.getY());
+			game.writeToServer(p);
+		}
 	}
+
+	public void createNewGame(CommandStartGame startGameCommand) {
+		actorStage.createNewGame(startGameCommand);
+	}
+
+	public void updatePlayerPos(CommandPosition commandPos) {
+		actorStage.updatePlayerPos(commandPos);
+	}
+	
 }
