@@ -13,7 +13,6 @@ import com.rauma.lille.network.CommandPosition;
 import com.rauma.lille.network.CommandStartGame;
 import com.rauma.lille.network.SpaceServerConnection;
 import com.rauma.lille.screens.DefaultLevelScreen;
-import com.rauma.lille.stages.ActorStage;
 
 public class SpaceGame extends Game {
 	private FPSLogger fpsLogger;

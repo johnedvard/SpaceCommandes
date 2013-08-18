@@ -1,6 +1,5 @@
 package com.rauma.lille.network;
 
-import com.badlogic.gdx.math.Vector2;
 
 public class CommandStartGame extends Command{
 	

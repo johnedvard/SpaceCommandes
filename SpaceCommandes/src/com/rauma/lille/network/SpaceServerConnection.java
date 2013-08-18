@@ -9,11 +9,9 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.logging.Logger;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.net.Socket;
 import com.badlogic.gdx.utils.Json;
 import com.rauma.lille.SpaceGame;
-import com.rauma.lille.screens.DefaultLevelScreen;
 
 
 public class SpaceServerConnection{
