@@ -25,18 +25,24 @@ public class SimplePlayer extends BodyImageActor {
 	private BulletFactory bulletFactory;
 	private int successfulShot = 0;
 	private int failedShot = 0;
-	private float health = 100;;
+	private float health = 100;
+	private int playerId = -1;
 	
-	public SimplePlayer(String name, short categoryBits, short maskBits, float x, float y, World world, BulletFactory bulletFactory) {
+	public SimplePlayer(int playerId, String name, short categoryBits, short maskBits, float x, float y, World world, BulletFactory bulletFactory, boolean isStaticBody) {
 		super(new TextureRegion(Resource.ballTexture, 0, 0, 64, 64));
 		this.bulletFactory = bulletFactory;
+		this.playerId = playerId;
 
 		// player
 		float width = 64;
 		float height = 64;
 
 		BodyDef def = new BodyDef();
-		def.type = BodyType.DynamicBody;
+		if(isStaticBody){
+			def.type = BodyType.StaticBody;
+		}else{
+			def.type = BodyType.DynamicBody;
+		}
 		def.position.set(Utils.Screen2World(x), Utils.Screen2World(y));
 		
 		CircleShape circle = new CircleShape();
@@ -56,7 +62,6 @@ public class SimplePlayer extends BodyImageActor {
 		// body.setFixedRotation(true);
 		body.setAngularDamping(10.0f);
 		setBody(body);
-		
 		setName(name);
 		setOrigin(width / 2, height / 2);
 		setWidth(width);
@@ -111,5 +116,9 @@ public class SimplePlayer extends BodyImageActor {
 		newColor.a = health/100;
 		setColor(newColor);
 		super.draw(batch, parentAlpha);
+	}
+
+	public int getId() {
+		return playerId;
 	}
 }

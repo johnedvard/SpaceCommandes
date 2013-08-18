@@ -68,10 +68,11 @@ public class SpaceServer {
 		// get clients for the current game.
 		List<SpaceClientConnection> clientsToPlayTogether = new ArrayList<SpaceClientConnection>();
 		for(int i = 0; i<numPlayersPrGame; i++){
-			SpaceClientConnection spaceClientConnection = clients.get(clients.size()-(i+1));
+			//TODO (john) Add a list with game states.
+			SpaceClientConnection spaceClientConnection = clients.remove(clients.size()-1);
 			clientsToPlayTogether.add(spaceClientConnection);
 		}
-		new GameState(clientsToPlayTogether);
+		new Game(clientsToPlayTogether);
 	}
 	private synchronized void createSpaceClient(Socket socket) throws IOException {
 		SpaceClientConnection client = new SpaceClientConnection(socket);

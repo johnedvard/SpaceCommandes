@@ -9,8 +9,11 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.logging.Logger;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.net.Socket;
 import com.badlogic.gdx.utils.Json;
+import com.rauma.lille.SpaceGame;
+import com.rauma.lille.screens.DefaultLevelScreen;
 
 
 public class SpaceServerConnection{
@@ -24,9 +27,10 @@ public class SpaceServerConnection{
 	private Socket socket;
 	private Queue<byte[]> outputQueue = new LinkedList<byte[]>();
 	private Json json;
-	
-	public SpaceServerConnection(Socket s) {
+	private SpaceGame game;
+	public SpaceServerConnection(Socket s, final SpaceGame spaceGame) {
 		LOG.info("Client connection created: " + s);
+		game = spaceGame;
 		this.socket = s;
 		json = new Json();
 		InputStream inputStream = socket.getInputStream();
@@ -117,17 +121,18 @@ public class SpaceServerConnection{
 	private void handleInput(String string) {
 //		LOG.info("\ngot message from server: " + string);
 		if(string.startsWith("{")){ //FIXME check if the message is a json message
-			Command c = json.fromJson(Command.class, string);
-			switch (c.type) {
-			case Command.POSITION:
-				System.out.println("got a position");
-				break;
-			case Command.START_GAME:
+			Object c = json.fromJson(null, string);
+			if (c instanceof CommandPosition) {
+				CommandPosition commandPos = (CommandPosition) c;
+				game.updatePlayerPos(commandPos);
+			}else if (c instanceof CommandStartGame) {
+				CommandStartGame cmdStarGame = (CommandStartGame) c;
+				LOG.info("\ngot start_game message from server: " + string);
 				System.out.println("switch to game-screen and play the game. set up the game with the state from the server");
-				break;
-			default:
+				System.out.println("start game? "+ cmdStarGame);
+				game.createNewGame(cmdStarGame);
+			}else {
 				System.out.println("got something else: " + string);
-				break;
 			}
 		}
 	}

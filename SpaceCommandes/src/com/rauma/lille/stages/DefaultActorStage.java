@@ -1,5 +1,8 @@
 package com.rauma.lille.stages;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.MapLayer;
@@ -23,13 +26,15 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.rauma.lille.SpaceGameContactListener;
-import com.rauma.lille.Resource;
 import com.rauma.lille.SpaceGame;
 import com.rauma.lille.SpaceGameContactListener;
 import com.rauma.lille.Utils;
+import com.rauma.lille.actors.BodyImageActor;
 import com.rauma.lille.actors.SimplePlayer;
 import com.rauma.lille.armory.BulletFactory;
+import com.rauma.lille.network.CommandPosition;
+import com.rauma.lille.network.CommandStartGame;
+import com.rauma.lille.screens.DefaultLevelScreen;
 
 /**
  * @author frank
@@ -57,14 +62,22 @@ public class DefaultActorStage extends AbstractStage {
 	private float currentX;
 	private float currentY;
 	private float angleRad;
+	private List<CommandPosition> updatePositions = new ArrayList<CommandPosition>();
+	private DefaultLevelScreen defaultLevelScreen = null;
 
-	public DefaultActorStage(float width, float height, boolean keepAspectRatio) {
+	public DefaultActorStage(float width, float height, boolean keepAspectRatio, DefaultLevelScreen defaultLevelScreen) {
 		super(width, height, keepAspectRatio);
+		this.defaultLevelScreen  = defaultLevelScreen;
 		init();
+	}
+	public DefaultActorStage(float width, float height, boolean keepAspectRatio) {
+		this(width,height,keepAspectRatio,null);
+		
 	}
 
 	private void init() {
 		world = new World(SpaceGame.WORLD_GRAVITY, true);
+		world.setContinuousPhysics(true);
 		debugRenderer = new Box2DDebugRenderer();
 
 		int width = Gdx.graphics.getWidth();
@@ -134,15 +147,12 @@ public class DefaultActorStage extends AbstractStage {
 		}
 		shape.dispose();
 
-		player1 = spawnPlayerAtPosition("Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100);
-		//player2 = spawnPlayerAtPosition("Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, SpaceGame.SCREEN_WIDTH-200, 100);
+		player1 = spawnPlayerAtPosition(-1,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,false);
 	}
 
-	private SimplePlayer spawnPlayerAtPosition(String name, short categoryBits, short maskBits, float x, float y) {
-
+	private SimplePlayer spawnPlayerAtPosition(int playerId, String name, short categoryBits, short maskBits, float x, float y,boolean isStaticBody) {
 		BulletFactory bulletFactory = new BulletFactory(categoryBits, maskBits, world);
-		SimplePlayer simplePlayer = new SimplePlayer(name, categoryBits, maskBits, x, y, world, bulletFactory);
-
+		SimplePlayer simplePlayer = new SimplePlayer(playerId, name, categoryBits, maskBits, x, y, world, bulletFactory, isStaticBody);
 		addActor(simplePlayer);
 		return simplePlayer;
 	}
@@ -160,6 +170,10 @@ public class DefaultActorStage extends AbstractStage {
 	}
 
 	public void updatePlayer(float delta) {
+		if(player1 == null ){
+			//TODO (john) Cast an error?
+			return;
+		}
 		Vector2 linearVelocity = player1.getBody().getLinearVelocity();
 
 		if (currentX != 0) {
@@ -184,6 +198,7 @@ public class DefaultActorStage extends AbstractStage {
 	public void act(float delta) {
 		super.act(delta);
 		updatePlayer(delta);
+		updatePlayerPosFromQueue();
 	}
 
 	@Override
@@ -196,4 +211,55 @@ public class DefaultActorStage extends AbstractStage {
 		world.step(1 / 45f, 6, 2);
 	}
 
+	public void createNewGame(CommandStartGame startGameCommand) {
+		for(Actor a : this.getActors()){
+			if (a instanceof BodyImageActor) {
+				BodyImageActor bodyActor = (BodyImageActor) a;
+				bodyActor.destroyBody();
+				bodyActor.remove();
+			}
+		}
+		//hardcoded for two players
+		if(startGameCommand.getPlayerId() == 1){
+			player1 = spawnPlayerAtPosition(startGameCommand.getPlayerId(),"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,false);
+			player2 = spawnPlayerAtPosition(2,"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,true);
+		}
+		else{
+			player1 = spawnPlayerAtPosition(startGameCommand.getPlayerId(),"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,false);
+			player2 = spawnPlayerAtPosition(1,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,true);
+		}
+		defaultLevelScreen.setPlayer(player1);
+	}
+
+	private void updatePlayerPosFromQueue(){
+		while(updatePositions.size()>0){
+			CommandPosition commandPos = updatePositions.remove(0);
+			if(commandPos == null){
+				//TODO (john)(cast and error?)
+				continue;
+			}
+			int id = commandPos.getId();
+			float x = commandPos.getX();
+			float y = commandPos.getY();
+			if(id == -1){
+				// can come into this state if the game isn't initialized yet
+				//TODO (john) cast an error?
+				return;
+			}
+			
+			//hardcoded for two players
+			if(player1.getId() == 1 && id == 2){
+				if(player2.getBody().getTransform().getPosition().x != x+player2.getWidth()/2 && player2.getBody().getTransform().getPosition().y != y+player2.getHeight()/2){
+					player2.getBody().setTransform(Utils.Screen2World(x+player2.getWidth()/2, y+player2.getHeight()/2),0);
+				}
+			}else if(player1.getId() == 2 && id == 1){
+				if(player2.getBody().getTransform().getPosition().x != x+player2.getWidth()/2 && player2.getBody().getTransform().getPosition().y != y+player2.getHeight()/2){
+					player2.getBody().setTransform(Utils.Screen2World(x+player2.getWidth()/2, y+player2.getHeight()/2),0);
+				}
+			}
+		}
+	}
+	public void updatePlayerPos(CommandPosition commandPos) {
+		updatePositions.add(commandPos);
+	}
 }

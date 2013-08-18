@@ -43,6 +43,7 @@ public class BodyImageActor extends Image {
 			World world = body.getWorld();
 			world.destroyBody(body);
 			body = null;
+			
 		}
 	}
 

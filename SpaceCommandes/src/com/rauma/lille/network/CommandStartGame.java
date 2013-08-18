@@ -1,13 +1,20 @@
 package com.rauma.lille.network;
 
+import com.badlogic.gdx.math.Vector2;
+
 public class CommandStartGame extends Command{
 	
+	protected int playerId = -1;  // used in CommandStartGame
+	
 	private CommandStartGame() {
-		super();
+	}
+	
+	public CommandStartGame(int playerId) {
+		this.playerId = playerId;
+	}
+	
+	public int getPlayerId() {
+		return playerId;
 	}
 
-	public CommandStartGame(int x){
-		this();
-		type = Command.START_GAME;
-	}
 }

@@ -6,11 +6,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.logging.Logger;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
+import com.me.rauma.lille.server.Game.CommandMessageListener;
 import com.rauma.lille.network.Command;
 
 /**
@@ -25,8 +29,11 @@ public class SpaceClientConnection {
 	private InputStreamHandler inputStreamHandler;
 	private OutputStreamHandler outputStreamHandler;
 
+	private List<CommandMessageListener> commandListeners = new ArrayList<CommandMessageListener>();
 	private Socket socket;
-	private Json json;
+	private Json json = new Json();
+
+	private int playerId = -1;
 	public SpaceClientConnection(Socket s) throws IOException {
 		LOG.info("Client connection created: " + s);
 		this.socket = s;
@@ -37,7 +44,6 @@ public class SpaceClientConnection {
 		inputStreamHandler.start();
 		outputStreamHandler = new OutputStreamHandler(outputStream);
 		outputStreamHandler.start();
-		json = new Json();
 	}
 
 	public boolean stop() {
@@ -118,12 +124,27 @@ public class SpaceClientConnection {
 
 	private void handleInput(String string) {
 //		LOG.info("Received '" + string + "'");
-		outputStreamHandler.sendMessage(string.getBytes());
+		//reply the client with the same message it sent
+//		outputStreamHandler.sendMessage(string.getBytes());
+		// send the input(command as a json) we get to all the listeners registered on this connection
+		for(CommandMessageListener cml : commandListeners){
+			cml.sendMessage(string);
+		}
 	}
 
-	public void sendMessage(Command c) {
+	public synchronized void sendMessage(Command c) {
 		byte[] b;
-		b = (json.toJson(c)+ "\n").getBytes();
+		String string = (json.toJson(c,Command.class)+ "\n");
+		b = string.getBytes();
 		outputStreamHandler.sendMessage(b);
 	}
+
+	public void addCommandMessageListener(CommandMessageListener listener) {
+		commandListeners.add(listener);
+	}
+
+	public void setId(int yourId) {
+		this.playerId  = yourId;
+	}
+	
 }

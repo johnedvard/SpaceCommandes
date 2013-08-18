@@ -5,8 +5,10 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.rauma.lille.SpaceGame;
+import com.rauma.lille.actors.SimplePlayer;
 import com.rauma.lille.network.Command;
 import com.rauma.lille.network.CommandPosition;
+import com.rauma.lille.network.CommandStartGame;
 import com.rauma.lille.stages.BackgroundStage;
 import com.rauma.lille.stages.ControllerStage;
 import com.rauma.lille.stages.DefaultActorStage;
@@ -18,14 +20,14 @@ public class DefaultLevelScreen extends AbstractScreen {
 	protected DefaultActorStage actorStage;
 	protected BackgroundStage bgStage;
 	protected UIStage uiStage;
-	private Actor player;
+	private SimplePlayer player = null;
 
 	public DefaultLevelScreen(final SpaceGame game, String mapName) {
 		super(game);
 		int width = Gdx.graphics.getWidth();
 		int height = Gdx.graphics.getWidth();
 		bgStage = new BackgroundStage(width, height, true);
-		actorStage = new DefaultActorStage(width, height, true);
+		actorStage = new DefaultActorStage(width, height, true, this);
 		actorStage.initMap(mapName);
 		
 		uiStage = new UIStage(width, height, true);
@@ -49,7 +51,6 @@ public class DefaultLevelScreen extends AbstractScreen {
 				}
 			}
 		});
-		player = (Actor) actorStage.getPlayer();
 	}
 
 	@Override
@@ -69,8 +70,22 @@ public class DefaultLevelScreen extends AbstractScreen {
 		actorStage.draw();
 		uiStage.draw();
 		controllerStage.draw();
+		
+		if(player != null){
+			Command p = new CommandPosition(player.getId(),player.getX(), player.getY());
+			game.writeToServer(p);
+		}
+	}
 
-		Command p = new CommandPosition(player.getX(), player.getY());
-		game.writeToServer(p);
+	public void createNewGame(CommandStartGame startGameCommand) {
+		actorStage.createNewGame(startGameCommand);
+	}
+
+	public void updatePlayerPos(CommandPosition commandPos) {
+		actorStage.updatePlayerPos(commandPos);
+	}
+	
+	public void setPlayer(SimplePlayer player) {
+		this.player = player;
 	}
 }

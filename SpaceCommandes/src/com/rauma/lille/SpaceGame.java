@@ -9,8 +9,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
 import com.rauma.lille.network.Command;
+import com.rauma.lille.network.CommandPosition;
+import com.rauma.lille.network.CommandStartGame;
 import com.rauma.lille.network.SpaceServerConnection;
 import com.rauma.lille.screens.DefaultLevelScreen;
+import com.rauma.lille.stages.ActorStage;
 
 public class SpaceGame extends Game {
 	private FPSLogger fpsLogger;
@@ -28,6 +31,7 @@ public class SpaceGame extends Game {
 	public static boolean ADDACTOR = false;
 	private SpaceServerConnection client;
 	private Json json = new Json();
+	private DefaultLevelScreen defaultLevelScreen;
 
 	@Override
 	public void create() {
@@ -36,15 +40,14 @@ public class SpaceGame extends Game {
 		Texture.setEnforcePotImages(false);
 		Resource.initalize();
 		
-//		splashScreen = new SplashScreen(this);
-//		mainMenuScreen = new MainMenuScreen(this);
-		setScreen(new DefaultLevelScreen(this, "data/test.tmx"));
+		defaultLevelScreen = new DefaultLevelScreen(this, "data/test.tmx");
+		setScreen(defaultLevelScreen);
 		establishConnection();
 		
 	}
 	
 	private void establishConnection() {
-		client = new SpaceServerConnection(Gdx.net.newClientSocket(Protocol.TCP, "localhost", 1337, null));
+		client = new SpaceServerConnection(Gdx.net.newClientSocket(Protocol.TCP, "localhost", 1337, null),this);
 	}
 
 	public void startMap(String mapName) {
@@ -65,8 +68,16 @@ public class SpaceGame extends Game {
 	public void writeToServer(Command command){
 		if(client != null){
 			byte[] b;
-			b = (json.toJson(command)+ "\n").getBytes();
+			b = (json.toJson(command,Command.class)+ "\n").getBytes();
 			client.writeToServer(b);
 		}
+	}
+
+	public void createNewGame(CommandStartGame startGameCommand) {
+		defaultLevelScreen.createNewGame(startGameCommand);
+	}
+
+	public void updatePlayerPos(CommandPosition commandPos) {
+		defaultLevelScreen.updatePlayerPos(commandPos);
 	}
 }
