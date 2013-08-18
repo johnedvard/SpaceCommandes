@@ -35,12 +35,16 @@ public final class Utils {
 //		return vector2s;
 //	}
 
-	public static float[] Screen2World(float[] vertices) {
+	public static float[] Screen2World(float[] vertices, float scale) {
 		float[] vector2s = new float[vertices.length];
 		for (int j = 0; j < vector2s.length; j++) {
-			vector2s[j] = vertices[j] / SpaceGame.WORLD_SCALE;
+			vector2s[j] = vertices[j] / SpaceGame.WORLD_SCALE * scale;
 		}
 		return vector2s;
+	}
+	
+	public static float[] Screen2World(float[] vertices) {
+		return Screen2World(vertices, 1f);
 	}
 	
 	/**

@@ -1,7 +1,6 @@
 package com.rauma.lille.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
@@ -21,6 +20,7 @@ public class DefaultLevelScreen extends DefaultScreen {
 
 	public DefaultLevelScreen(SpaceGame game, String mapName) {
 		super(game);
+		
 		float width = SpaceGame.SCREEN_WIDTH;
 		float height = SpaceGame.SCREEN_HEIGHT;
 		bgStage = new BackgroundStage(width, height, true);
@@ -48,6 +48,7 @@ public class DefaultLevelScreen extends DefaultScreen {
 				}
 			}
 		});
+		
 	}
 
 	@Override
@@ -55,11 +56,9 @@ public class DefaultLevelScreen extends DefaultScreen {
 		Gdx.input.setInputProcessor(controllerStage);
 	}
 
+	
 	@Override
 	public void render(float delta) {
-        Camera camera = actorStage.getCamera();
-		camera.position.set(actorStage.getPlayerPosition());
-        
 		 // the following code clears the screen with the given RGB color (green)
         Gdx.gl.glClearColor( 0.0f, 0.5f, 0.0f, 1f );
         Gdx.gl.glClear( GL10.GL_COLOR_BUFFER_BIT );

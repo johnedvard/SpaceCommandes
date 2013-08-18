@@ -18,7 +18,7 @@ public class ControllerStage extends AbstractStage {
 	private Touchpad touchpadRight;
 
 	public ControllerStage(float width, float height, boolean keepAspectRatio) {
-		super(width, height, keepAspectRatio);
+		super(width*4f, height*4f, keepAspectRatio);
 		init();
 	}
 
@@ -45,12 +45,12 @@ public class ControllerStage extends AbstractStage {
 		touchpadSkin.add("touchBackground", background);
 		touchpadSkin.add("touchKnob", knob);
 
-		// Create TouchPad Style
-		TouchpadStyle touchpadStyle = new Touchpad.TouchpadStyle();
 		// Create Drawable's from TouchPad skin
 		Drawable touchBackground = touchpadSkin.getDrawable("touchBackground");
 		Drawable touchKnob = touchpadSkin.getDrawable("touchKnob");
 
+		// Create TouchPad Style
+		TouchpadStyle touchpadStyle = new Touchpad.TouchpadStyle();
 		// Apply the drawables to the TouchPad Style
 		touchpadStyle.background = touchBackground;
 		touchpadStyle.knob = touchKnob;

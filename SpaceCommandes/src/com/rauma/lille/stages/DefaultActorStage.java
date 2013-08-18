@@ -1,8 +1,5 @@
 package com.rauma.lille.stages;
 
-import sun.security.action.GetBooleanAction;
-
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
@@ -25,13 +22,11 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.rauma.lille.SpaceGame;
 import com.rauma.lille.SpaceGameContactListener;
 import com.rauma.lille.Utils;
 import com.rauma.lille.actors.SimplePlayer;
 import com.rauma.lille.armory.BulletFactory;
-import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
 /**
  * @author frank
@@ -62,6 +57,7 @@ public class DefaultActorStage extends AbstractStage {
 
 	public DefaultActorStage(float width, float height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
+//		setViewport(width, height, keepAspectRatio, 0, 0, width/2, height/2);
 		init();
 	}
 
@@ -70,16 +66,13 @@ public class DefaultActorStage extends AbstractStage {
 		debugRenderer = new Box2DDebugRenderer();
 
 
-//		int width = Gdx.graphics.getWidth();
-//		int height = Gdx.graphics.getHeight();
-//		OrthographicCamera camera = (OrthographicCamera) getCamera();
-
+		OrthographicCamera camera = (OrthographicCamera) getCamera();
+		float width = getWidth();
+		float height = getHeight();
 //		float aspectRatio = width/height;
 //		float scale = 128f;
 //		camera.setToOrtho(false, scale*aspectRatio, scale);
-//		camera.setToOrtho(false, width, height);
-		debugMatrix = getCamera().combined.cpy();
-		debugMatrix.scale(SpaceGame.WORLD_SCALE, SpaceGame.WORLD_SCALE, 1f);
+		camera.setToOrtho(false, width/2, height/2);
 //		debugMatrix.scale(SpaceGame.WORLD_SCALE*SCALE*aspectRatio, SpaceGame.WORLD_SCALE*SCALE, 1f);
 
 		world.setContactListener(new SpaceGameContactListener());
@@ -96,7 +89,8 @@ public class DefaultActorStage extends AbstractStage {
 		// map = assetManager.get("data/myFirstMap.tmx");
 
 		map = new TmxMapLoader().load(mapName);
-		renderer = new OrthogonalTiledMapRenderer(map, 1f);
+		float unitScale = 1/2f;
+		renderer = new OrthogonalTiledMapRenderer(map, unitScale);
 
 		renderer.setView((OrthographicCamera) getCamera());
 
@@ -118,20 +112,18 @@ public class DefaultActorStage extends AbstractStage {
 			if (mapObject instanceof PolygonMapObject) {
 				PolygonMapObject polyObj = (PolygonMapObject) mapObject;
 				Polygon moShape = polyObj.getPolygon();
-				def.position.set(Utils.Screen2World(moShape.getX(),
-						moShape.getY()));
-				shape.set(Utils.Screen2World(moShape.getVertices()));
+				def.position.set(Utils.Screen2World(moShape.getX(),	moShape.getY()).scl(unitScale));
+				float[] vertices = moShape.getVertices();
+				shape.set(Utils.Screen2World(vertices, unitScale));
 			} else if (mapObject instanceof RectangleMapObject) {
 				RectangleMapObject rectObj = (RectangleMapObject) mapObject;
 				Rectangle moShape = rectObj.getRectangle();
 				def.position.set(Utils.getWorldBoxCenter(
-						Utils.Screen2World(moShape.getX(), moShape.getY()),
-						Utils.Screen2World(moShape.getWidth(),
-								moShape.getHeight())));
-				shape.setAsBox(Utils.Screen2World(moShape.width) / 2,
-						Utils.Screen2World(moShape.height) / 2);
+						Utils.Screen2World(moShape.getX(), moShape.getY()).scl(unitScale),
+						Utils.Screen2World(moShape.getWidth(), moShape.getHeight()).scl(unitScale)));
+				shape.setAsBox(Utils.Screen2World(moShape.width) / 2 * unitScale,
+						Utils.Screen2World(moShape.height) / 2 * unitScale);
 			}
-
 			System.out.println(shape);
 			fixtureDef.shape = shape;
 			Body body = world.createBody(def);
@@ -182,11 +174,16 @@ public class DefaultActorStage extends AbstractStage {
 			player1.fireWeapon(angleRad+MathUtils.PI/2); // adjusted +90 deg
 		}
 	}
-
+	
 	@Override
 	public void act(float delta) {
 		super.act(delta);
 		updatePlayer(delta);
+		getCamera().position.set(getPlayerPosition());
+		getCamera().update();
+		debugMatrix = getCamera().combined.cpy();
+		debugMatrix.scale(SpaceGame.WORLD_SCALE, SpaceGame.WORLD_SCALE, 1f);
+		renderer.setView((OrthographicCamera) getCamera());
 	}
 
 	@Override
@@ -198,7 +195,25 @@ public class DefaultActorStage extends AbstractStage {
 	}
 
 	public Vector3 getPlayerPosition() {
-		Vector2 screenCoordinates = toScreenCoordinates(new Vector2(player1.getX()+player1.getWidth()/2, player1.getY()+player1.getHeight()/2), getCamera().combined);
-		return new Vector3(screenCoordinates.x, screenCoordinates.y, 0);
+		float centerX = player1.getX()+player1.getWidth()/2;
+		float centerY = player1.getY()+player1.getHeight()/2;
+		float minWidth = getWidth()/4;
+		float maxWidth = getWidth() - minWidth;
+		float minHeight = getHeight()/4;
+		float maxHeight = getHeight() - minHeight;
+
+		if(centerX < minWidth) {
+			centerX = minWidth;
+		} else if(centerX > maxWidth) {
+			centerX = maxWidth;
+		}
+			
+		if(centerY < minHeight) {
+			centerY = minHeight;
+		} else if(centerY > maxHeight) {
+			centerY = maxHeight;
+		}
+		Vector2 coords = new Vector2(centerX, centerY);
+		return new Vector3(coords.x, coords.y, 0);
 	}
 }
