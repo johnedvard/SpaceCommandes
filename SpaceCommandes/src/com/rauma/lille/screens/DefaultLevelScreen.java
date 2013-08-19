@@ -2,11 +2,13 @@ package com.rauma.lille.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.rauma.lille.SpaceGame;
 import com.rauma.lille.actors.SimplePlayer;
+import com.rauma.lille.network.ApplyDamageCommand;
 import com.rauma.lille.network.Command;
 import com.rauma.lille.network.PlayerAimedCommand;
 import com.rauma.lille.network.PositionCommand;
@@ -29,7 +31,7 @@ public class DefaultLevelScreen extends DefaultScreen {
 		float width = SpaceGame.SCREEN_WIDTH;
 		float height = SpaceGame.SCREEN_HEIGHT;
 		bgStage = new BackgroundStage(width, height, true);
-		actorStage = new DefaultActorStage(width, height, true);
+		actorStage = new DefaultActorStage(game, width, height, true);
 		actorStage.initMap(mapName);
 		
 		uiStage = new UIStage(width, height, true);
@@ -87,10 +89,13 @@ public class DefaultLevelScreen extends DefaultScreen {
 
 		SimplePlayer player = actorStage.getPlayer();
 		if(player != null && (player.getX() != prevX || player.getY() != prevX)){
-			Command p = new PositionCommand(player.getId(),player.getX(), player.getY(),player.getBody().getAngle());
-			game.writeToServer(p);
-			prevX = player.getX();
-			prevY = player.getY();
+			Body body = player.getBody();
+			if(body != null){
+				Command p = new PositionCommand(player.getId(),player.getX(), player.getY(),body.getAngle());
+				game.writeToServer(p);
+				prevX = player.getX();
+				prevY = player.getY();
+			}
 		}
 	}
 
@@ -110,6 +115,14 @@ public class DefaultLevelScreen extends DefaultScreen {
 		int playerId = playerAimedCommand.getPlayerId();
 		actorStage.playerAimed(playerId, knobX, knobY, knobPercentX, knobPercentY);
 		
+	}
+
+	public SpaceGame getGame() {
+		return game;
+	}
+
+	public void applyDamageCommand(ApplyDamageCommand applyDmgCommand) {
+		actorStage.applyDamageCommand(applyDmgCommand);
 	}
 	
 }

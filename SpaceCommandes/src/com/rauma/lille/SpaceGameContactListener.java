@@ -25,9 +25,6 @@ public class SpaceGameContactListener implements ContactListener {
 		} else if (userDataB instanceof Bullet) {
 			bch.handleBulletBeginContact((Bullet) userDataB, userDataA);
 		}
-		
-		
-		
 	}
 
 	@Override

@@ -11,8 +11,11 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.rauma.lille.Resource;
+import com.rauma.lille.SpaceGame;
 import com.rauma.lille.Utils;
 import com.rauma.lille.armory.BulletFactory;
+import com.rauma.lille.network.ApplyDamageCommand;
+import com.rauma.lille.network.Command;
 
 /**
  * @author frank
@@ -27,11 +30,15 @@ public class SimplePlayer extends BodyImageActor {
 	private float health = 100;
 	private int playerId = -1;
 	private float angleRad;
+	private SpaceGame game;
+	private boolean me;
 	
-	public SimplePlayer(int playerId, String name, short categoryBits, short maskBits, float x, float y, World world, BulletFactory bulletFactory, boolean isStaticBody) {
+	public SimplePlayer(int playerId, String name, short categoryBits, short maskBits, float x, float y, World world, BulletFactory bulletFactory, boolean isStaticBody, SpaceGame game, boolean me) {
 		super(new TextureRegion(Resource.ballTexture, 0, 0, 64, 64));
 		this.bulletFactory = bulletFactory;
 		this.playerId = playerId;
+		this.game = game;
+		this.me = me;
 
 		// player
 		float width = 64;
@@ -127,5 +134,14 @@ public class SimplePlayer extends BodyImageActor {
 	}
 	public float getAngleRad(){
 		return angleRad;
+	}
+
+	public void registerHit(float damage) {
+		Command c = new ApplyDamageCommand(playerId, damage);
+		game.writeToServer(c);
+	}
+
+	public boolean isMe() {
+		return me;
 	}
 }
