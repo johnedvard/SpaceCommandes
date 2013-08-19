@@ -33,6 +33,7 @@ import com.rauma.lille.Utils;
 import com.rauma.lille.actors.BodyImageActor;
 import com.rauma.lille.actors.SimplePlayer;
 import com.rauma.lille.armory.BulletFactory;
+import com.rauma.lille.network.ApplyDamageCommand;
 import com.rauma.lille.network.PositionCommand;
 import com.rauma.lille.network.StartGameCommand;
 import com.rauma.lille.screens.DefaultLevelScreen;
@@ -63,10 +64,11 @@ public class DefaultActorStage extends AbstractStage {
 	private float currentX;
 	private float currentY;
 	private List<PositionCommand> updatePositions = new ArrayList<PositionCommand>();
-	private DefaultLevelScreen defaultLevelScreen = null;
+	private SpaceGame game;
 
-	public DefaultActorStage(float width, float height, boolean keepAspectRatio) {
+	public DefaultActorStage(SpaceGame game, float width, float height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
+		this.game = game;
 		init();
 	}
 
@@ -142,12 +144,12 @@ public class DefaultActorStage extends AbstractStage {
 		}
 		shape.dispose();
 
-		player1 = spawnPlayerAtPosition(-1,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,false);
+		player1 = spawnPlayerAtPosition(-1,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,false,true);
 	}
 
-	private SimplePlayer spawnPlayerAtPosition(int playerId, String name, short categoryBits, short maskBits, float x, float y,boolean isStaticBody) {
+	private SimplePlayer spawnPlayerAtPosition(int playerId, String name, short categoryBits, short maskBits, float x, float y,boolean isStaticBody, boolean isMe) {
 		BulletFactory bulletFactory = new BulletFactory(categoryBits, maskBits, world);
-		SimplePlayer simplePlayer = new SimplePlayer(playerId, name, categoryBits, maskBits, x, y, world, bulletFactory, isStaticBody);
+		SimplePlayer simplePlayer = new SimplePlayer(playerId, name, categoryBits, maskBits, x, y, world, bulletFactory, isStaticBody, game, isMe);
 		addActor(simplePlayer);
 		return simplePlayer;
 	}
@@ -248,12 +250,12 @@ public class DefaultActorStage extends AbstractStage {
 		}
 		//hardcoded for two players
 		if(startGameCommand.getPlayerId() == 1){
-			player1 = spawnPlayerAtPosition(startGameCommand.getPlayerId(),"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,false);
-			player2 = spawnPlayerAtPosition(2,"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,true);
+			player1 = spawnPlayerAtPosition(startGameCommand.getPlayerId(),"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,false,true);
+			player2 = spawnPlayerAtPosition(2,"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,true,false);
 		}
 		else{
-			player1 = spawnPlayerAtPosition(startGameCommand.getPlayerId(),"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,false);
-			player2 = spawnPlayerAtPosition(1,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,true);
+			player1 = spawnPlayerAtPosition(startGameCommand.getPlayerId(),"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,false,true);
+			player2 = spawnPlayerAtPosition(1,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,true,false);
 		}
 	}
 
@@ -295,9 +297,18 @@ public class DefaultActorStage extends AbstractStage {
 				body.setTransform(Utils.Screen2World(newX, newY), angle);
 			}
 		}
-			
 	}
 	public void updatePlayerPos(PositionCommand commandPos) {
 		updatePositions.add(commandPos);
+	}
+
+	public void applyDamageCommand(ApplyDamageCommand applyDmgCommand) {
+		int id = applyDmgCommand.getId();
+		float dmg = applyDmgCommand.getDamage();
+		if(id == player1.getId()){
+			player1.applyDamage(dmg);
+		}else if(id == player2.getId()){
+			player2.applyDamage(dmg);
+		}
 	}
 }

@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
+import com.rauma.lille.network.ApplyDamageCommand;
 import com.rauma.lille.network.Command;
 import com.rauma.lille.network.PlayerAimedCommand;
 import com.rauma.lille.network.PositionCommand;
@@ -80,6 +81,9 @@ public class SpaceGame extends Game {
 
 	public void playerAimedCommand(PlayerAimedCommand playerAimedCommand) {
 		defaultLevelScreen.playerAimedCommand(playerAimedCommand);
-		
+	}
+
+	public void applyDamageCommand(ApplyDamageCommand applyDmgCommand) {
+		defaultLevelScreen.applyDamageCommand(applyDmgCommand);
 	}
 }

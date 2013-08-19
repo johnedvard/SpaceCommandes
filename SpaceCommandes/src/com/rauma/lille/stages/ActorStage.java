@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.rauma.lille.Resource;
+import com.rauma.lille.SpaceGame;
 import com.rauma.lille.Utils;
 import com.rauma.lille.actors.BodyImageActor;
 
@@ -20,9 +21,8 @@ public class ActorStage extends DefaultActorStage {
 
     private Group actorGroup = new Group();
 
-	public ActorStage(int width, int height, boolean keepAspectRatio) {
-		super(width, height, keepAspectRatio);
-
+	public ActorStage(SpaceGame game, int width, int height, boolean keepAspectRatio) {
+		super(game, width, height, keepAspectRatio);
 		initFrame();
 		
 		// init actors (scene2s) with bodies (box2d)
