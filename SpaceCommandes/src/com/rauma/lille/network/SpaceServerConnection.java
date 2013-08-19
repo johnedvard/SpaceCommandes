@@ -135,6 +135,9 @@ public class SpaceServerConnection{
 			}else if (c instanceof ApplyDamageCommand) {
 				ApplyDamageCommand applyDmgCommand = (ApplyDamageCommand) c;
 				game.applyDamageCommand(applyDmgCommand);
+			} else if (c instanceof KillCommand) {
+				KillCommand killCommand = (KillCommand) c;
+				game.killCommand(killCommand);
 			}
 			else {
 				System.out.println("got something else: " + string);
