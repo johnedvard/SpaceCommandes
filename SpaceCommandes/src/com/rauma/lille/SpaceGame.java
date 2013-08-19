@@ -7,6 +7,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.net.Socket;
 import com.badlogic.gdx.utils.Json;
 import com.rauma.lille.network.Command;
 import com.rauma.lille.network.CommandPosition;
@@ -45,7 +46,9 @@ public class SpaceGame extends Game {
 	private void establishConnection() {
 //		String host = "localhost";
 		String host = "10.254.9.140";
-		client = new SpaceServerConnection(Gdx.net.newClientSocket(Protocol.TCP, host, 1337, null),this);
+		int port = 1337;
+		Socket socket = Gdx.net.newClientSocket(Protocol.TCP, host, port, null);
+		client = new SpaceServerConnection(socket, this);
 	}
 
 	public void startMap(String mapName) {

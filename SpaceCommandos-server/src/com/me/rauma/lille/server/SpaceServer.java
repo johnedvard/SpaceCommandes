@@ -25,8 +25,9 @@ public class SpaceServer {
 	public SpaceServer(final int port) {
 		new Thread() {
 			public void run() {
+				ServerSocket ss = null;
 				try {
-					ServerSocket ss = new ServerSocket(port);
+					ss = new ServerSocket(port);
 					LOG.log(Level.INFO, "Started server");
 					running = true;
 					while (running) {
@@ -40,6 +41,7 @@ public class SpaceServer {
 							LOG.log(Level.WARNING, "Failed to accept client", e);
 						}
 					}
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 					LOG.log(Level.SEVERE, "Failed to start server", e);
@@ -49,6 +51,11 @@ public class SpaceServer {
 					client.stop();
 				}
 
+				try {
+					if(ss != null) ss.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				LOG.log(Level.INFO, "Server stopped");
 			}
 		}.start();
