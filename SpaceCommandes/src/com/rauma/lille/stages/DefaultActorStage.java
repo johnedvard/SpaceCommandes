@@ -1,7 +1,9 @@
 package com.rauma.lille.stages;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.MapLayer;
@@ -64,6 +66,7 @@ public class DefaultActorStage extends AbstractStage {
 	private float currentX;
 	private float currentY;
 	private List<PositionCommand> updatePositions = new ArrayList<PositionCommand>();
+	private Map<String,Vector2> spawnpoints = new HashMap<String,Vector2>();
 	private SpaceGame game;
 
 	public DefaultActorStage(SpaceGame game, float width, float height, boolean keepAspectRatio) {
@@ -108,7 +111,9 @@ public class DefaultActorStage extends AbstractStage {
 
 		BodyDef def = new BodyDef();
 		MapLayer box2dLayer = map.getLayers().get("box2d");
+		MapLayer spawnLayer = map.getLayers().get("spawn");
 		MapObjects box2dObjects = box2dLayer.getObjects();
+		MapObjects spawnPoints = spawnLayer.getObjects();
 
 		PolygonShape shape = new PolygonShape();
 		def.type = BodyType.StaticBody;
@@ -142,6 +147,13 @@ public class DefaultActorStage extends AbstractStage {
 			body.createFixture(fixtureDef);
 			body.setUserData(this);
 		}
+		for(MapObject spawnPoint : spawnPoints){
+			if(spawnPoint instanceof RectangleMapObject){
+				Rectangle spawnRectangle = ((RectangleMapObject) spawnPoint).getRectangle();
+				spawnpoints.put(spawnPoint.getName(), Utils.Screen2World(spawnRectangle.getX(),spawnRectangle.getY()));
+			}
+		}
+		
 		shape.dispose();
 
 		player1 = spawnPlayerAtPosition(-1,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,false,true);
