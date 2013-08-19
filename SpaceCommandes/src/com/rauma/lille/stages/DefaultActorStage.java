@@ -35,7 +35,6 @@ import com.rauma.lille.actors.SimplePlayer;
 import com.rauma.lille.armory.BulletFactory;
 import com.rauma.lille.network.PositionCommand;
 import com.rauma.lille.network.StartGameCommand;
-import com.rauma.lille.screens.DefaultLevelScreen;
 
 /**
  * @author frank
