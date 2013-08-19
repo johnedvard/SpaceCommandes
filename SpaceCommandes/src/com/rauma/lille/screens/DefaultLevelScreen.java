@@ -87,7 +87,7 @@ public class DefaultLevelScreen extends DefaultScreen {
 
 		SimplePlayer player = actorStage.getPlayer();
 		if(player != null && (player.getX() != prevX || player.getY() != prevX)){
-			Command p = new PositionCommand(player.getId(),player.getX(), player.getY());
+			Command p = new PositionCommand(player.getId(),player.getX(), player.getY(),player.getBody().getAngle());
 			game.writeToServer(p);
 			prevX = player.getX();
 			prevY = player.getY();

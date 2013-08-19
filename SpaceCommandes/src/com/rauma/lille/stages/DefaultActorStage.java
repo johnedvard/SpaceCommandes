@@ -267,6 +267,7 @@ public class DefaultActorStage extends AbstractStage {
 			int id = commandPos.getId();
 			float x = commandPos.getX();
 			float y = commandPos.getY();
+			float angle = commandPos.getAngle();
 			if(id == -1){
 				// can come into this state if the game isn't initialized yet
 				//TODO (john) cast an error?
@@ -275,14 +276,14 @@ public class DefaultActorStage extends AbstractStage {
 			
 			//hardcoded for two players
 			if (player1.getId() == 1 && id == 2) {
-				movePlayer2(x, y);
+				movePlayer2(x, y, angle);
 			} else if (player1.getId() == 2 && id == 1) {
-				movePlayer2(x, y);
+				movePlayer2(x, y, angle);
 			}
 		}
 	}
 	
-	private void movePlayer2(float x, float y) {
+	private void movePlayer2(float x, float y, float angle) {
 
 		if (player2 != null && player2.getBody() != null) {
 			Body body = player2.getBody();
@@ -291,7 +292,7 @@ public class DefaultActorStage extends AbstractStage {
 			float newX = x + player2.getWidth() / 2;
 			float newY = y + player2.getHeight() / 2;
 			if (position.x != newX && position.y != newY) {
-				body.setTransform(Utils.Screen2World(newX, newY), 0);
+				body.setTransform(Utils.Screen2World(newX, newY), angle);
 			}
 		}
 			

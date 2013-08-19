@@ -5,14 +5,15 @@ public class PositionCommand extends Command {
 	private float x= -1;
 	private float y= -1;
 	private int id = -1; //player id
-	
+	private float angle = -1;
 	private PositionCommand() {
 	}
 	
-	public PositionCommand(int id, float x, float y) {
+	public PositionCommand(int id, float x, float y, float angle) {
 		this.id = id;
 		this.x = x;
 		this.y = y;
+		this.angle = angle;
 	}
 	
 	public int getId() {
@@ -23,5 +24,9 @@ public class PositionCommand extends Command {
 	}
 	public float getY() {
 		return y;
+	}
+
+	public float getAngle() {
+		return angle;
 	}
 }
