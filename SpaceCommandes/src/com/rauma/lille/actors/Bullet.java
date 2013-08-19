@@ -32,10 +32,8 @@ public class Bullet extends Actor {
 		BodyDef def = new BodyDef();
 		def.type = BodyType.DynamicBody;
 		def.bullet = true;
-		def.position.x = Utils.Screen2World(MathUtils
-				.random(SpaceGame.SCREEN_WIDTH) * 1000);
-		def.position.y = Utils.Screen2World(MathUtils
-				.random(SpaceGame.SCREEN_HEIGHT) * 1000);
+		def.position.x = Utils.Screen2World(MathUtils.random(SpaceGame.VIRTUAL_WIDTH) * 1000);
+		def.position.y = Utils.Screen2World(MathUtils.random(SpaceGame.VIRTUAL_HEIGHT) * 1000);
 		def.active = false;
 		// def.awake = false;
 

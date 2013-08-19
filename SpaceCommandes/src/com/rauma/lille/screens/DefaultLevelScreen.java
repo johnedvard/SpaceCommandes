@@ -29,8 +29,8 @@ public class DefaultLevelScreen extends DefaultScreen {
 	public DefaultLevelScreen(final SpaceGame game, String mapName) {
 		super(game);
 		
-		float width = SpaceGame.SCREEN_WIDTH;
-		float height = SpaceGame.SCREEN_HEIGHT;
+		float width = SpaceGame.VIRTUAL_WIDTH;
+		float height = SpaceGame.VIRTUAL_HEIGHT;
 		bgStage = new BackgroundStage(width, height, true);
 		actorStage = new DefaultActorStage(game, width, height, true);
 		actorStage.initMap(mapName);
@@ -76,7 +76,7 @@ public class DefaultLevelScreen extends DefaultScreen {
 		 // the following code clears the screen with the given RGB color (green)
         Gdx.gl.glClearColor( 0.0f, 0.5f, 0.0f, 1f );
         Gdx.gl.glClear( GL10.GL_COLOR_BUFFER_BIT );
-        
+        Gdx.graphics.setVSync(false);
 		
 		bgStage.act(delta);
 		actorStage.act(delta);
@@ -89,10 +89,10 @@ public class DefaultLevelScreen extends DefaultScreen {
 		controllerStage.draw();
 
 		SimplePlayer player = actorStage.getPlayer();
-		if(player != null && (player.getX() != prevX || player.getY() != prevX)){
+		if(player != null && (Math.abs(player.getX() - prevX) > 1 || (Math.abs(player.getY() - prevY) > 1))){
 			Body body = player.getBody();
 			if(body != null){
-				Command p = new PositionCommand(player.getId(),player.getX(), player.getY(),body.getAngle());
+				PositionCommand p = new PositionCommand(player.getId(),player.getX(), player.getY(),body.getAngle());
 				game.writeToServer(p);
 				prevX = player.getX();
 				prevY = player.getY();

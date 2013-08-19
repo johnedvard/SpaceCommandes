@@ -40,7 +40,6 @@ import com.rauma.lille.network.Command;
 import com.rauma.lille.network.KillCommand;
 import com.rauma.lille.network.PositionCommand;
 import com.rauma.lille.network.StartGameCommand;
-import com.rauma.lille.screens.DefaultLevelScreen;
 
 /**
  * @author frank
@@ -70,6 +69,10 @@ public class DefaultActorStage extends AbstractStage {
 	private List<Command> commands = new ArrayList<Command>();
 	private Map<String,Vector2> spawnpoints = new HashMap<String,Vector2>();
 	private SpaceGame game;
+	private List<PositionCommand> updatePositions = new ArrayList<PositionCommand>();
+
+	private int playerId = -1;
+	private boolean newGame = false;
 
 	public DefaultActorStage(SpaceGame game, float width, float height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
@@ -122,7 +125,7 @@ public class DefaultActorStage extends AbstractStage {
 
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.density = 0.0f;
-		fixtureDef.friction = 1.0f;
+		fixtureDef.friction = 0.1f;
 		fixtureDef.restitution = 0.3f; // Make it bounce a little bit
 		fixtureDef.filter.categoryBits = CATEGORY_SCENERY;
 		fixtureDef.filter.maskBits = MASK_SCENERY;
@@ -197,6 +200,9 @@ public class DefaultActorStage extends AbstractStage {
 		}
 
 		if (currentY > 0) {
+			float minPower = 0.8f;
+			if(currentY < minPower)
+				currentY = minPower;
 			player.getBody().applyForceToCenter(
 					new Vector2(0, (float) (currentY * .1)), true);
 		}
@@ -212,6 +218,27 @@ public class DefaultActorStage extends AbstractStage {
 
 	@Override
 	public void act(float delta) {
+		if(newGame) {
+
+			for(Actor a : this.getActors()){
+				if (a instanceof BodyImageActor) {
+					BodyImageActor bodyActor = (BodyImageActor) a;
+					bodyActor.destroyBody();
+					bodyActor.remove();
+				}
+			}
+			
+			//hardcoded for two players
+			if(playerId == 1){
+				player1 = spawnPlayerAtPosition(playerId,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,false,true);
+				player2 = spawnPlayerAtPosition(2,"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,true,false);
+			}
+			else{
+				player1 = spawnPlayerAtPosition(playerId,"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,false,true);
+				player2 = spawnPlayerAtPosition(1,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,true,false);
+			}
+			newGame = false;
+		}
 		super.act(delta);
 		updatePlayer(player1, delta);
 		updatePlayer(player2, delta);
@@ -255,23 +282,8 @@ public class DefaultActorStage extends AbstractStage {
 	}
 
 	public void createNewGame(StartGameCommand startGameCommand) {
-		for(Actor a : this.getActors()){
-			if (a instanceof BodyImageActor) {
-				BodyImageActor bodyActor = (BodyImageActor) a;
-				bodyActor.destroyBody();
-				bodyActor.remove();
-			}
-		}
-		
-		//hardcoded for two players
-		if(startGameCommand.getPlayerId() == 1){
-			player1 = spawnPlayerAtPosition(startGameCommand.getPlayerId(),"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,false,true);
-			player2 = spawnPlayerAtPosition(2,"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,true,false);
-		}
-		else{
-			player1 = spawnPlayerAtPosition(startGameCommand.getPlayerId(),"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,false,true);
-			player2 = spawnPlayerAtPosition(1,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,true,false);
-		}
+		playerId = startGameCommand.getPlayerId();
+		newGame = true;
 	}
 
 	private void executeCommandQueue(){

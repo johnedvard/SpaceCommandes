@@ -23,9 +23,10 @@ public class SpaceGame extends Game {
 	private Screen splashScreen;
 	private Screen mainMenuScreen;
 
-	public static final float SCREEN_WIDTH = 800;
-	public static final float SCREEN_HEIGHT = 480;
-	
+	public static final float VIRTUAL_WIDTH = 800;
+	public static final float VIRTUAL_HEIGHT = 480;
+	public static final float ASPECT_RATIO = VIRTUAL_WIDTH/VIRTUAL_HEIGHT;
+
 	public static final float WORLD_SCALE = 100;
 	public static final Vector2 WORLD_GRAVITY = new Vector2(0f, -10f);
 

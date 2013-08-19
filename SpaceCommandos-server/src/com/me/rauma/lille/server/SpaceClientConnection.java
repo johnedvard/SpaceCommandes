@@ -105,7 +105,7 @@ public class SpaceClientConnection {
 		public void run() {
 			try {
 				while (running) {
-					while (queue.size() > 0) {
+					while (queue.peek() != null) {
 //						LOG.info("Sending output");
 						byte[] poll = queue.poll();
 						if (poll == null)
@@ -113,9 +113,13 @@ public class SpaceClientConnection {
 
 						bos.write(poll);
 					}
+					queue.clear();
 					bos.flush();
+					Thread.sleep(10);
 				}
 			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			running = false; 

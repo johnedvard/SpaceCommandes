@@ -23,7 +23,7 @@ public final class Utils {
 	}
 
 	public static Vector2 Frame2Screen(final int x, final int y) {
-		return new Vector2(x, SpaceGame.SCREEN_HEIGHT - y);
+		return new Vector2(x, SpaceGame.VIRTUAL_HEIGHT - y);
 	}
 
 //	public static Vector2[] Screen2World(float[] vertices) {
