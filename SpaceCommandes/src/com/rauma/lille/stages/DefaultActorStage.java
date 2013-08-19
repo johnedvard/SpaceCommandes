@@ -3,6 +3,7 @@ package com.rauma.lille.stages;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
@@ -65,6 +66,7 @@ public class DefaultActorStage extends AbstractStage {
 
 	private int playerId = -1;
 	private boolean newGame = false;
+	private Rectangle viewport;
 
 	public DefaultActorStage(float width, float height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
@@ -78,12 +80,12 @@ public class DefaultActorStage extends AbstractStage {
 
 
 		OrthographicCamera camera = (OrthographicCamera) getCamera();
-		float width = getWidth();
-		float height = getHeight();
+		float width = getWidth()/2;
+		float height = getHeight()/2;
 //		float aspectRatio = width/height;
 //		float scale = 128f;
 //		camera.setToOrtho(false, scale*aspectRatio, scale);
-		camera.setToOrtho(false, width/2, height/2);
+		camera.setToOrtho(false, width, height);
 //		debugMatrix.scale(SpaceGame.WORLD_SCALE*SCALE*aspectRatio, SpaceGame.WORLD_SCALE*SCALE, 1f);
 
 		world.setContactListener(new SpaceGameContactListener());
@@ -224,28 +226,36 @@ public class DefaultActorStage extends AbstractStage {
 		updatePlayer(player1, delta);
 		updatePlayer(player2, delta);
 		updatePlayerPosFromQueue();
-		getCamera().position.set(getPlayerPosition());
-		getCamera().update();
-		debugMatrix = getCamera().combined.cpy();
-		debugMatrix.scale(SpaceGame.WORLD_SCALE, SpaceGame.WORLD_SCALE, 1f);
-		renderer.setView((OrthographicCamera) getCamera());
 	}
 
 	@Override
 	public void draw() {
+		getCamera().position.set(getPlayerPosition());
+		getCamera().update();
+        getCamera().apply(Gdx.gl10);
+ 
+        // set viewport
+        Gdx.gl.glViewport((int) viewport.x, (int) viewport.y,
+                          (int) viewport.width, (int) viewport.height);
+        
+        debugMatrix = getCamera().combined.cpy();
+		debugMatrix.scale(SpaceGame.WORLD_SCALE, SpaceGame.WORLD_SCALE, 1f);
+		renderer.setView((OrthographicCamera) getCamera());
 		super.draw();
 		renderer.render();
 		debugRenderer.render(world, debugMatrix);
 		world.step(1 / 45f, 6, 2);
 	}
 
-	public Vector3 getPlayerPosition() {
+	private Vector3 getPlayerPosition() {
 		float centerX = player1.getX()+player1.getWidth()/2;
 		float centerY = player1.getY()+player1.getHeight()/2;
-		float minWidth = getWidth()/4;
-		float maxWidth = getWidth() - minWidth;
-		float minHeight = getHeight()/4;
-		float maxHeight = getHeight() - minHeight;
+		float screenWidth = getWidth();
+		float screenHeight = getHeight();
+		float minWidth = screenWidth/4;
+		float maxWidth = screenWidth - minWidth;
+		float minHeight = screenHeight/4;
+		float maxHeight = screenHeight - minHeight;
 
 		if(centerX < minWidth) {
 			centerX = minWidth;
@@ -309,5 +319,30 @@ public class DefaultActorStage extends AbstractStage {
 	}
 	public void updatePlayerPos(PositionCommand commandPos) {
 		updatePositions.add(commandPos);
+	}
+
+	public void resize(int width, int height) {
+
+		float aspectRatio = (float)width/(float)height;
+		float scale = 1f;
+		Vector2 crop = new Vector2(0f, 0f);
+		if(aspectRatio > SpaceGame.ASPECT_RATIO)
+		{
+			scale = (float)height/SpaceGame.VIRTUAL_HEIGHT;
+			crop.x = (width - SpaceGame.VIRTUAL_WIDTH*scale)/2f;
+		}
+		else if(aspectRatio < SpaceGame.ASPECT_RATIO)
+		{
+			scale = (float)width/SpaceGame.VIRTUAL_WIDTH;
+			crop.y = (height - SpaceGame.VIRTUAL_HEIGHT*scale)/2f;
+		}
+		else
+		{
+			scale = (float)width/SpaceGame.VIRTUAL_WIDTH;
+		}
+
+		float w = SpaceGame.VIRTUAL_WIDTH*scale;
+		float h = SpaceGame.VIRTUAL_HEIGHT*scale;
+		viewport = new Rectangle(crop.x, crop.y, w, h);
 	}
 }

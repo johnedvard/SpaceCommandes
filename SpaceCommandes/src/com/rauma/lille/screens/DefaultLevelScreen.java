@@ -2,7 +2,6 @@ package com.rauma.lille.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -23,6 +22,9 @@ public class DefaultLevelScreen extends DefaultScreen {
 	protected DefaultActorStage actorStage;
 	protected BackgroundStage bgStage;
 	protected UIStage uiStage;
+
+	// used to limit number of position updates to server
+	private float prevX, prevY = 0;
 
 	public DefaultLevelScreen(final SpaceGame game, String mapName) {
 		super(game);
@@ -67,16 +69,14 @@ public class DefaultLevelScreen extends DefaultScreen {
 		Gdx.input.setInputProcessor(controllerStage);
 	}
 
-	private float prevX, prevY = 0;
-	
 	@Override
 	public void render(float delta) {
 		 // the following code clears the screen with the given RGB color (green)
         Gdx.gl.glClearColor( 0.0f, 0.5f, 0.0f, 1f );
         Gdx.gl.glClear( GL10.GL_COLOR_BUFFER_BIT );
         Gdx.graphics.setVSync(false);
-		
-		bgStage.act(delta);
+        
+        bgStage.act(delta);
 		actorStage.act(delta);
 		uiStage.act(delta);
 		controllerStage.act(delta);
@@ -112,5 +112,8 @@ public class DefaultLevelScreen extends DefaultScreen {
 		actorStage.playerAimed(playerId, knobX, knobY, knobPercentX, knobPercentY);
 		
 	}
-	
+	@Override
+	public void resize(int width, int height) {
+		actorStage.resize(width, height);
+	}
 }
