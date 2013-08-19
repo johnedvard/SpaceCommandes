@@ -8,8 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.rauma.lille.SpaceGame;
 import com.rauma.lille.actors.SimplePlayer;
 import com.rauma.lille.network.Command;
-import com.rauma.lille.network.CommandPosition;
-import com.rauma.lille.network.CommandStartGame;
+import com.rauma.lille.network.PositionCommand;
+import com.rauma.lille.network.StartGameCommand;
 import com.rauma.lille.stages.BackgroundStage;
 import com.rauma.lille.stages.ControllerStage;
 import com.rauma.lille.stages.DefaultActorStage;
@@ -81,18 +81,18 @@ public class DefaultLevelScreen extends DefaultScreen {
 
 		SimplePlayer player = actorStage.getPlayer();
 		if(player != null && (player.getX() != prevX || player.getY() != prevX)){
-			Command p = new CommandPosition(player.getId(),player.getX(), player.getY());
+			Command p = new PositionCommand(player.getId(),player.getX(), player.getY());
 			game.writeToServer(p);
 			prevX = player.getX();
 			prevY = player.getY();
 		}
 	}
 
-	public void createNewGame(CommandStartGame startGameCommand) {
+	public void createNewGame(StartGameCommand startGameCommand) {
 		actorStage.createNewGame(startGameCommand);
 	}
 
-	public void updatePlayerPos(CommandPosition commandPos) {
+	public void updatePlayerPos(PositionCommand commandPos) {
 		actorStage.updatePlayerPos(commandPos);
 	}
 	

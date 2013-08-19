@@ -33,8 +33,8 @@ import com.rauma.lille.Utils;
 import com.rauma.lille.actors.BodyImageActor;
 import com.rauma.lille.actors.SimplePlayer;
 import com.rauma.lille.armory.BulletFactory;
-import com.rauma.lille.network.CommandPosition;
-import com.rauma.lille.network.CommandStartGame;
+import com.rauma.lille.network.PositionCommand;
+import com.rauma.lille.network.StartGameCommand;
 import com.rauma.lille.screens.DefaultLevelScreen;
 
 /**
@@ -63,7 +63,7 @@ public class DefaultActorStage extends AbstractStage {
 	private float currentX;
 	private float currentY;
 	private float angleRad;
-	private List<CommandPosition> updatePositions = new ArrayList<CommandPosition>();
+	private List<PositionCommand> updatePositions = new ArrayList<PositionCommand>();
 	private DefaultLevelScreen defaultLevelScreen = null;
 
 	public DefaultActorStage(float width, float height, boolean keepAspectRatio) {
@@ -234,7 +234,7 @@ public class DefaultActorStage extends AbstractStage {
 		return new Vector3(coords.x, coords.y, 0);
 	}
 
-	public void createNewGame(CommandStartGame startGameCommand) {
+	public void createNewGame(StartGameCommand startGameCommand) {
 		for(Actor a : this.getActors()){
 			if (a instanceof BodyImageActor) {
 				BodyImageActor bodyActor = (BodyImageActor) a;
@@ -255,7 +255,7 @@ public class DefaultActorStage extends AbstractStage {
 
 	private void updatePlayerPosFromQueue(){
 		while(updatePositions.size()>0){
-			CommandPosition commandPos = updatePositions.remove(0);
+			PositionCommand commandPos = updatePositions.remove(0);
 			if(commandPos == null){
 				//TODO (john)(cast and error?)
 				continue;
@@ -292,7 +292,7 @@ public class DefaultActorStage extends AbstractStage {
 		}
 			
 	}
-	public void updatePlayerPos(CommandPosition commandPos) {
+	public void updatePlayerPos(PositionCommand commandPos) {
 		updatePositions.add(commandPos);
 	}
 }

@@ -1,15 +1,15 @@
 package com.rauma.lille.network;
 
-public class CommandPosition extends Command {
+public class PositionCommand extends Command {
 	
 	private float x= -1;
 	private float y= -1;
 	private int id = -1; //player id
 	
-	private CommandPosition() {
+	private PositionCommand() {
 	}
 	
-	public CommandPosition(int id, float x, float y) {
+	public PositionCommand(int id, float x, float y) {
 		this.id = id;
 		this.x = x;
 		this.y = y;
