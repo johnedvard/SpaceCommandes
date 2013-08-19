@@ -129,7 +129,11 @@ public class SpaceServerConnection{
 				System.out.println("switch to game-screen and play the game. set up the game with the state from the server");
 				System.out.println("start game? "+ cmdStarGame);
 				game.createNewGame(cmdStarGame);
-			}else {
+			}else if (c instanceof PlayerAimedCommand) {
+				PlayerAimedCommand playerAimedCommand = (PlayerAimedCommand) c;
+				game.playerAimedCommand(playerAimedCommand);
+			}
+			else {
 				System.out.println("got something else: " + string);
 			}
 		}

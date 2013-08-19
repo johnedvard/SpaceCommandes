@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.rauma.lille.SpaceGame;
 import com.rauma.lille.actors.SimplePlayer;
 import com.rauma.lille.network.Command;
+import com.rauma.lille.network.PlayerAimedCommand;
 import com.rauma.lille.network.PositionCommand;
 import com.rauma.lille.network.StartGameCommand;
 import com.rauma.lille.stages.BackgroundStage;
@@ -47,7 +48,12 @@ public class DefaultLevelScreen extends DefaultScreen {
 					if (actor.getName().equals("touchpadLeft")) {
 						actorStage.playerMoved(knobX, knobY, knobPercentX, knobPercentY);
 					} else if (actor.getName().equals("touchpadRight")) {
-						actorStage.playerAimed(knobX, knobY, knobPercentX, knobPercentY);
+						SimplePlayer player = actorStage.getPlayer();
+						actorStage.playerAimed(player.getId(),knobX, knobY, knobPercentX, knobPercentY);
+						if(player != null){
+							Command playerAimedCommand = new PlayerAimedCommand(player.getId(),knobX, knobY, knobPercentX, knobPercentY);
+							game.writeToServer(playerAimedCommand);
+						}
 					}
 				}
 			}
@@ -94,6 +100,16 @@ public class DefaultLevelScreen extends DefaultScreen {
 
 	public void updatePlayerPos(PositionCommand commandPos) {
 		actorStage.updatePlayerPos(commandPos);
+	}
+
+	public void playerAimedCommand(PlayerAimedCommand playerAimedCommand) {
+		float knobX = playerAimedCommand.getKnobX();
+		float knobY = playerAimedCommand.getKnobY();
+		float knobPercentX = playerAimedCommand.getKnobPercentX();
+		float knobPercentY = playerAimedCommand.getKnobPercentY();
+		int playerId = playerAimedCommand.getPlayerId();
+		actorStage.playerAimed(playerId, knobX, knobY, knobPercentX, knobPercentY);
+		
 	}
 	
 }

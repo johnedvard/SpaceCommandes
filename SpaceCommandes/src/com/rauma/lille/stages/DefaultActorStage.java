@@ -62,7 +62,6 @@ public class DefaultActorStage extends AbstractStage {
 	
 	private float currentX;
 	private float currentY;
-	private float angleRad;
 	private List<PositionCommand> updatePositions = new ArrayList<PositionCommand>();
 	private DefaultLevelScreen defaultLevelScreen = null;
 
@@ -159,31 +158,35 @@ public class DefaultActorStage extends AbstractStage {
 		currentY = knobPercentY;
 	}
 
-	public void playerAimed(float knobX, float knobY, float knobPercentX,
+	public void playerAimed(int playerId, float knobX, float knobY, float knobPercentX,
 			float knobPercentY) {
-
-		angleRad = (float) Math.atan2(-knobPercentY, knobPercentX);
+		float angleRad = (float) Math.atan2(-knobPercentY, knobPercentX);
+		if(player1.getId() == playerId){
+			player1.setAngleRad(angleRad);
+		}else if(player2.getId() == playerId){
+			player2.setAngleRad(angleRad);
+		}
 	}
 
-	public void updatePlayer(float delta) {
-		if(player1 == null || player1.getBody() == null){
+	public void updatePlayer(SimplePlayer player, float delta) {
+		if(player == null || player.getBody() == null){
 			//TODO (john) Cast an error?
 			return;
 		}
-		Vector2 linearVelocity = player1.getBody().getLinearVelocity();
+		Vector2 linearVelocity = player.getBody().getLinearVelocity();
 
 		if (currentX != 0) {
 			// set speed to [0, 2>
-			player1.getBody().setLinearVelocity(currentX * 2, linearVelocity.y);
+			player.getBody().setLinearVelocity(currentX * 2, linearVelocity.y);
 		}
 
 		if (currentY > 0) {
-			player1.getBody().applyForceToCenter(
+			player.getBody().applyForceToCenter(
 					new Vector2(0, (float) (currentY * .1)), true);
 		}
 
-		if (angleRad != 0 && player1.getRotation() != angleRad) {
-			player1.fireWeapon(angleRad+MathUtils.PI/2); // adjusted +90 deg
+		if (player.getAngleRad() != 0 && player.getRotation() != player.getAngleRad()) {
+			player.fireWeapon(player.getAngleRad()+MathUtils.PI/2); // adjusted +90 deg
 		}
 	}
 	
@@ -194,7 +197,8 @@ public class DefaultActorStage extends AbstractStage {
 	@Override
 	public void act(float delta) {
 		super.act(delta);
-		updatePlayer(delta);
+		updatePlayer(player1, delta);
+		updatePlayer(player2, delta);
 		updatePlayerPosFromQueue();
 		getCamera().position.set(getPlayerPosition());
 		getCamera().update();

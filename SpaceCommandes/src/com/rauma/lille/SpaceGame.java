@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
 import com.rauma.lille.network.Command;
+import com.rauma.lille.network.PlayerAimedCommand;
 import com.rauma.lille.network.PositionCommand;
 import com.rauma.lille.network.StartGameCommand;
 import com.rauma.lille.network.SpaceServerConnection;
@@ -75,5 +76,10 @@ public class SpaceGame extends Game {
 
 	public void updatePlayerPos(PositionCommand commandPos) {
 		defaultLevelScreen.updatePlayerPos(commandPos);
+	}
+
+	public void playerAimedCommand(PlayerAimedCommand playerAimedCommand) {
+		defaultLevelScreen.playerAimedCommand(playerAimedCommand);
+		
 	}
 }

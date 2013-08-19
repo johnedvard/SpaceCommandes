@@ -6,6 +6,7 @@ import java.util.List;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
 import com.rauma.lille.network.Command;
+import com.rauma.lille.network.PlayerAimedCommand;
 import com.rauma.lille.network.PositionCommand;
 import com.rauma.lille.network.StartGameCommand;
 
@@ -40,7 +41,12 @@ public class Game {
 						scc.sendMessage(commandPos);
 					}
 				}else if (c instanceof StartGameCommand) {
-					
+				}else if (c instanceof PlayerAimedCommand) {
+					PlayerAimedCommand playerAimedCommand = (PlayerAimedCommand) c;
+					// send the position to all the clients
+					for(SpaceClientConnection scc : clientsInGame){
+						scc.sendMessage(playerAimedCommand);
+					}
 				}else {
 					System.out.println("got something else: " + string);
 				}
