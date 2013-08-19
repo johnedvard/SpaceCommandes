@@ -2,6 +2,7 @@ package com.rauma.lille.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -26,8 +27,8 @@ public class DefaultLevelScreen extends DefaultScreen {
 	public DefaultLevelScreen(final SpaceGame game, String mapName) {
 		super(game);
 		
-		float width = SpaceGame.SCREEN_WIDTH;
-		float height = SpaceGame.SCREEN_HEIGHT;
+		float width = SpaceGame.VIRTUAL_WIDTH;
+		float height = SpaceGame.VIRTUAL_HEIGHT;
 		bgStage = new BackgroundStage(width, height, true);
 		actorStage = new DefaultActorStage(width, height, true);
 		actorStage.initMap(mapName);
@@ -86,8 +87,8 @@ public class DefaultLevelScreen extends DefaultScreen {
 		controllerStage.draw();
 
 		SimplePlayer player = actorStage.getPlayer();
-		if(player != null && (player.getX() != prevX || player.getY() != prevX)){
-			Command p = new PositionCommand(player.getId(),player.getX(), player.getY(),player.getBody().getAngle());
+		if(player != null && (Math.abs(player.getX() - prevX) > 1 || (Math.abs(player.getY() - prevY) > 1))){
+			PositionCommand p = new PositionCommand(player.getId(),player.getX(), player.getY(),player.getBody().getAngle());
 			game.writeToServer(p);
 			prevX = player.getX();
 			prevY = player.getY();

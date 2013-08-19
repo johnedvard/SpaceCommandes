@@ -117,25 +117,20 @@ public class SpaceServerConnection{
 	}
 	
 	private void handleInput(String string) {
-//		LOG.info("\ngot message from server: " + string);
-		if(string.startsWith("{")){ //FIXME check if the message is a json message
-			Object c = json.fromJson(null, string);
-			if (c instanceof PositionCommand) {
-				PositionCommand commandPos = (PositionCommand) c;
-				game.updatePlayerPos(commandPos);
-			}else if (c instanceof StartGameCommand) {
-				StartGameCommand cmdStarGame = (StartGameCommand) c;
-				LOG.info("\ngot start_game message from server: " + string);
-				System.out.println("switch to game-screen and play the game. set up the game with the state from the server");
-				System.out.println("start game? "+ cmdStarGame);
-				game.createNewGame(cmdStarGame);
-			}else if (c instanceof PlayerAimedCommand) {
-				PlayerAimedCommand playerAimedCommand = (PlayerAimedCommand) c;
-				game.playerAimedCommand(playerAimedCommand);
-			}
-			else {
-				System.out.println("got something else: " + string);
-			}
+		System.out.println("Received " + string);
+		Object c = json.fromJson(null, string);
+		if (c instanceof PositionCommand) {
+			PositionCommand commandPos = (PositionCommand) c;
+			game.updatePlayerPos(commandPos);
+		}else if (c instanceof StartGameCommand) {
+			StartGameCommand cmdStarGame = (StartGameCommand) c;
+			game.createNewGame(cmdStarGame);
+		}else if (c instanceof PlayerAimedCommand) {
+			PlayerAimedCommand playerAimedCommand = (PlayerAimedCommand) c;
+			game.playerAimedCommand(playerAimedCommand);
+		}
+		else {
+			System.out.println("got something else: " + string + " - " + c);
 		}
 	}
 	

@@ -63,7 +63,9 @@ public class DefaultActorStage extends AbstractStage {
 	private float currentX;
 	private float currentY;
 	private List<PositionCommand> updatePositions = new ArrayList<PositionCommand>();
-	private DefaultLevelScreen defaultLevelScreen = null;
+
+	private int playerId = -1;
+	private boolean newGame = false;
 
 	public DefaultActorStage(float width, float height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
@@ -196,6 +198,26 @@ public class DefaultActorStage extends AbstractStage {
 
 	@Override
 	public void act(float delta) {
+		if(newGame) {
+
+			for(Actor a : this.getActors()){
+				if (a instanceof BodyImageActor) {
+					BodyImageActor bodyActor = (BodyImageActor) a;
+					bodyActor.destroyBody();
+					bodyActor.remove();
+				}
+			}
+			//hardcoded for two players
+			if(playerId == 1){
+				player1 = spawnPlayerAtPosition(playerId,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,false);
+				player2 = spawnPlayerAtPosition(2,"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,true);
+			}
+			else{
+				player1 = spawnPlayerAtPosition(playerId,"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,false);
+				player2 = spawnPlayerAtPosition(1,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,true);
+			}
+			newGame = false;
+		}
 		super.act(delta);
 		updatePlayer(player1, delta);
 		updatePlayer(player2, delta);
@@ -209,6 +231,7 @@ public class DefaultActorStage extends AbstractStage {
 
 	@Override
 	public void draw() {
+		getSpriteBatch().disableBlending();
 		super.draw();
 		renderer.render();
 		debugRenderer.render(world, debugMatrix);
@@ -239,22 +262,8 @@ public class DefaultActorStage extends AbstractStage {
 	}
 
 	public void createNewGame(StartGameCommand startGameCommand) {
-		for(Actor a : this.getActors()){
-			if (a instanceof BodyImageActor) {
-				BodyImageActor bodyActor = (BodyImageActor) a;
-				bodyActor.destroyBody();
-				bodyActor.remove();
-			}
-		}
-		//hardcoded for two players
-		if(startGameCommand.getPlayerId() == 1){
-			player1 = spawnPlayerAtPosition(startGameCommand.getPlayerId(),"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,false);
-			player2 = spawnPlayerAtPosition(2,"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,true);
-		}
-		else{
-			player1 = spawnPlayerAtPosition(startGameCommand.getPlayerId(),"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,false);
-			player2 = spawnPlayerAtPosition(1,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,true);
-		}
+		playerId = startGameCommand.getPlayerId();
+		newGame = true;
 	}
 
 	private void updatePlayerPosFromQueue(){
