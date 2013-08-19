@@ -115,7 +115,7 @@ public class DefaultActorStage extends AbstractStage {
 
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.density = 0.0f;
-		fixtureDef.friction = 1.0f;
+		fixtureDef.friction = 0.1f;
 		fixtureDef.restitution = 0.3f; // Make it bounce a little bit
 		fixtureDef.filter.categoryBits = CATEGORY_SCENERY;
 		fixtureDef.filter.maskBits = MASK_SCENERY;
@@ -183,6 +183,9 @@ public class DefaultActorStage extends AbstractStage {
 		}
 
 		if (currentY > 0) {
+			float minPower = 0.8f;
+			if(currentY < minPower)
+				currentY = minPower;
 			player.getBody().applyForceToCenter(
 					new Vector2(0, (float) (currentY * .1)), true);
 		}
@@ -231,7 +234,6 @@ public class DefaultActorStage extends AbstractStage {
 
 	@Override
 	public void draw() {
-		getSpriteBatch().disableBlending();
 		super.draw();
 		renderer.render();
 		debugRenderer.render(world, debugMatrix);

@@ -74,7 +74,7 @@ public class DefaultLevelScreen extends DefaultScreen {
 		 // the following code clears the screen with the given RGB color (green)
         Gdx.gl.glClearColor( 0.0f, 0.5f, 0.0f, 1f );
         Gdx.gl.glClear( GL10.GL_COLOR_BUFFER_BIT );
-        
+        Gdx.graphics.setVSync(false);
 		
 		bgStage.act(delta);
 		actorStage.act(delta);
