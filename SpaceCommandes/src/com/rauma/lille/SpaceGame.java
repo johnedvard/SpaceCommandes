@@ -43,7 +43,9 @@ public class SpaceGame extends Game {
 	}
 	
 	private void establishConnection() {
-		client = new SpaceServerConnection(Gdx.net.newClientSocket(Protocol.TCP, "localhost", 1337, null),this);
+//		String host = "localhost";
+		String host = "10.254.9.140";
+		client = new SpaceServerConnection(Gdx.net.newClientSocket(Protocol.TCP, host, 1337, null),this);
 	}
 
 	public void startMap(String mapName) {
