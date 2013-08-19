@@ -10,8 +10,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.net.Socket;
 import com.badlogic.gdx.utils.Json;
 import com.rauma.lille.network.Command;
-import com.rauma.lille.network.CommandPosition;
-import com.rauma.lille.network.CommandStartGame;
+import com.rauma.lille.network.PlayerAimedCommand;
+import com.rauma.lille.network.PositionCommand;
+import com.rauma.lille.network.StartGameCommand;
 import com.rauma.lille.network.SpaceServerConnection;
 import com.rauma.lille.screens.DefaultLevelScreen;
 
@@ -74,11 +75,16 @@ public class SpaceGame extends Game {
 		}
 	}
 
-	public void createNewGame(CommandStartGame startGameCommand) {
+	public void createNewGame(StartGameCommand startGameCommand) {
 		defaultLevelScreen.createNewGame(startGameCommand);
 	}
 
-	public void updatePlayerPos(CommandPosition commandPos) {
+	public void updatePlayerPos(PositionCommand commandPos) {
 		defaultLevelScreen.updatePlayerPos(commandPos);
+	}
+
+	public void playerAimedCommand(PlayerAimedCommand playerAimedCommand) {
+		defaultLevelScreen.playerAimedCommand(playerAimedCommand);
+		
 	}
 }

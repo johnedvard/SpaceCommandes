@@ -33,8 +33,8 @@ import com.rauma.lille.Utils;
 import com.rauma.lille.actors.BodyImageActor;
 import com.rauma.lille.actors.SimplePlayer;
 import com.rauma.lille.armory.BulletFactory;
-import com.rauma.lille.network.CommandPosition;
-import com.rauma.lille.network.CommandStartGame;
+import com.rauma.lille.network.PositionCommand;
+import com.rauma.lille.network.StartGameCommand;
 import com.rauma.lille.screens.DefaultLevelScreen;
 
 /**
@@ -62,8 +62,7 @@ public class DefaultActorStage extends AbstractStage {
 	
 	private float currentX;
 	private float currentY;
-	private float angleRad;
-	private List<CommandPosition> updatePositions = new ArrayList<CommandPosition>();
+	private List<PositionCommand> updatePositions = new ArrayList<PositionCommand>();
 	private DefaultLevelScreen defaultLevelScreen = null;
 
 	public DefaultActorStage(float width, float height, boolean keepAspectRatio) {
@@ -159,31 +158,35 @@ public class DefaultActorStage extends AbstractStage {
 		currentY = knobPercentY;
 	}
 
-	public void playerAimed(float knobX, float knobY, float knobPercentX,
+	public void playerAimed(int playerId, float knobX, float knobY, float knobPercentX,
 			float knobPercentY) {
-
-		angleRad = (float) Math.atan2(-knobPercentY, knobPercentX);
+		float angleRad = (float) Math.atan2(-knobPercentY, knobPercentX);
+		if(player1.getId() == playerId){
+			player1.setAngleRad(angleRad);
+		}else if(player2.getId() == playerId){
+			player2.setAngleRad(angleRad);
+		}
 	}
 
-	public void updatePlayer(float delta) {
-		if(player1 == null || player1.getBody() == null){
+	public void updatePlayer(SimplePlayer player, float delta) {
+		if(player == null || player.getBody() == null){
 			//TODO (john) Cast an error?
 			return;
 		}
-		Vector2 linearVelocity = player1.getBody().getLinearVelocity();
+		Vector2 linearVelocity = player.getBody().getLinearVelocity();
 
 		if (currentX != 0) {
 			// set speed to [0, 2>
-			player1.getBody().setLinearVelocity(currentX * 2, linearVelocity.y);
+			player.getBody().setLinearVelocity(currentX * 2, linearVelocity.y);
 		}
 
 		if (currentY > 0) {
-			player1.getBody().applyForceToCenter(
+			player.getBody().applyForceToCenter(
 					new Vector2(0, (float) (currentY * .1)), true);
 		}
 
-		if (angleRad != 0 && player1.getRotation() != angleRad) {
-			player1.fireWeapon(angleRad+MathUtils.PI/2); // adjusted +90 deg
+		if (player.getAngleRad() != 0 && player.getRotation() != player.getAngleRad()) {
+			player.fireWeapon(player.getAngleRad()+MathUtils.PI/2); // adjusted +90 deg
 		}
 	}
 	
@@ -194,7 +197,8 @@ public class DefaultActorStage extends AbstractStage {
 	@Override
 	public void act(float delta) {
 		super.act(delta);
-		updatePlayer(delta);
+		updatePlayer(player1, delta);
+		updatePlayer(player2, delta);
 		updatePlayerPosFromQueue();
 		getCamera().position.set(getPlayerPosition());
 		getCamera().update();
@@ -234,7 +238,7 @@ public class DefaultActorStage extends AbstractStage {
 		return new Vector3(coords.x, coords.y, 0);
 	}
 
-	public void createNewGame(CommandStartGame startGameCommand) {
+	public void createNewGame(StartGameCommand startGameCommand) {
 		for(Actor a : this.getActors()){
 			if (a instanceof BodyImageActor) {
 				BodyImageActor bodyActor = (BodyImageActor) a;
@@ -255,7 +259,7 @@ public class DefaultActorStage extends AbstractStage {
 
 	private void updatePlayerPosFromQueue(){
 		while(updatePositions.size()>0){
-			CommandPosition commandPos = updatePositions.remove(0);
+			PositionCommand commandPos = updatePositions.remove(0);
 			if(commandPos == null){
 				//TODO (john)(cast and error?)
 				continue;
@@ -263,6 +267,7 @@ public class DefaultActorStage extends AbstractStage {
 			int id = commandPos.getId();
 			float x = commandPos.getX();
 			float y = commandPos.getY();
+			float angle = commandPos.getAngle();
 			if(id == -1){
 				// can come into this state if the game isn't initialized yet
 				//TODO (john) cast an error?
@@ -271,14 +276,14 @@ public class DefaultActorStage extends AbstractStage {
 			
 			//hardcoded for two players
 			if (player1.getId() == 1 && id == 2) {
-				movePlayer2(x, y);
+				movePlayer2(x, y, angle);
 			} else if (player1.getId() == 2 && id == 1) {
-				movePlayer2(x, y);
+				movePlayer2(x, y, angle);
 			}
 		}
 	}
 	
-	private void movePlayer2(float x, float y) {
+	private void movePlayer2(float x, float y, float angle) {
 
 		if (player2 != null && player2.getBody() != null) {
 			Body body = player2.getBody();
@@ -287,12 +292,12 @@ public class DefaultActorStage extends AbstractStage {
 			float newX = x + player2.getWidth() / 2;
 			float newY = y + player2.getHeight() / 2;
 			if (position.x != newX && position.y != newY) {
-				body.setTransform(Utils.Screen2World(newX, newY), 0);
+				body.setTransform(Utils.Screen2World(newX, newY), angle);
 			}
 		}
 			
 	}
-	public void updatePlayerPos(CommandPosition commandPos) {
+	public void updatePlayerPos(PositionCommand commandPos) {
 		updatePositions.add(commandPos);
 	}
 }

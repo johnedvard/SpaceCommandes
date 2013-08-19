@@ -1,14 +1,14 @@
 package com.rauma.lille.network;
 
 
-public class CommandStartGame extends Command{
+public class StartGameCommand extends Command{
 	
 	protected int playerId = -1;  // used in CommandStartGame
 	
-	private CommandStartGame() {
+	private StartGameCommand() {
 	}
 	
-	public CommandStartGame(int playerId) {
+	public StartGameCommand(int playerId) {
 		this.playerId = playerId;
 	}
 	

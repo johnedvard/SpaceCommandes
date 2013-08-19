@@ -26,6 +26,7 @@ public class SimplePlayer extends BodyImageActor {
 	private int failedShot = 0;
 	private float health = 100;
 	private int playerId = -1;
+	private float angleRad;
 	
 	public SimplePlayer(int playerId, String name, short categoryBits, short maskBits, float x, float y, World world, BulletFactory bulletFactory, boolean isStaticBody) {
 		super(new TextureRegion(Resource.ballTexture, 0, 0, 64, 64));
@@ -119,5 +120,12 @@ public class SimplePlayer extends BodyImageActor {
 
 	public int getId() {
 		return playerId;
+	}
+
+	public void setAngleRad(float angleRad) {
+		this.angleRad = angleRad;
+	}
+	public float getAngleRad(){
+		return angleRad;
 	}
 }
