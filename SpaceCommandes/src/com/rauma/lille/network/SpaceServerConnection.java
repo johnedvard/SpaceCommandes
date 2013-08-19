@@ -50,7 +50,7 @@ public class SpaceServerConnection{
 		public void run() {
 			try {
 				while (running) {
-					while (outputQueue.size() > 0) {
+					while (outputQueue.peek() != null) {
 //						LOG.info("Sending output");
 						byte[] poll = outputQueue.poll();
 						if (poll == null)
@@ -58,9 +58,13 @@ public class SpaceServerConnection{
 
 						bos.write(poll);
 					}
+					outputQueue.clear();
 					bos.flush();
+					Thread.sleep(10);
 				}
 			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			running = false; 
