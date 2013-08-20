@@ -259,7 +259,7 @@ public class SimplePlayer extends BodyImageActor {
 		boxPoly.setAsBox(Utils.Screen2World(attachment.getWidth() * attachment.getScaleX())/2,
 				Utils.Screen2World(attachment.getHeight() * attachment.getScaleY())/2,
 				Utils.Screen2World(attachment.getX(), attachment.getY()),
-				attachment.getRotation());
+				attachment.getRotation()*MathUtils.degRad);
 	}
 
 	
