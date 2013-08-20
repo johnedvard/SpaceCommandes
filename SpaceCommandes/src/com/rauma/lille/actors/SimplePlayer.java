@@ -92,15 +92,15 @@ public class SimplePlayer extends BodyImageActor {
 		skeleton.setY(y);
 		skeleton.updateWorldTransform();
 		
-		// player
-		float width = 64;
-		float height = 64;
 		
 		PolygonShape boxPoly = new PolygonShape();
 		
 		// body attachment
 		bodyAttachment = (Box2dAttachment)skeleton.getAttachment("body","body");
 		createShapeOnAttachment(bodyAttachment,boxPoly);
+		// player
+		float width = bodyAttachment.getWidth();
+		float height = bodyAttachment.getHeight();
 
 		BodyType type;
 		if(isStaticBody){
@@ -133,9 +133,10 @@ public class SimplePlayer extends BodyImageActor {
 			if (bullet != null) {
 				getStage().addActor(bullet);
 				float offsetX = getWidth()+5;
+				float offsetY = 14;
 				if(MathUtils.sin(angleRad) < 0)
 					offsetX = 0;
-				bullet.fire(getX() + offsetX, getY()+getHeight()/2, angleRad);
+				bullet.fire(getX() + offsetX, getY()+getHeight()/2 + offsetY, angleRad);
 				lastFired = 0f;
 				successfulShot++;
 			} else {
