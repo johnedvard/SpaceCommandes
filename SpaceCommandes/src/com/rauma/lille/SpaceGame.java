@@ -9,7 +9,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.net.Socket;
 import com.badlogic.gdx.utils.Json;
+import com.rauma.lille.network.ApplyDamageCommand;
 import com.rauma.lille.network.Command;
+import com.rauma.lille.network.KillCommand;
 import com.rauma.lille.network.PlayerAimedCommand;
 import com.rauma.lille.network.PositionCommand;
 import com.rauma.lille.network.StartGameCommand;
@@ -46,8 +48,8 @@ public class SpaceGame extends Game {
 	}
 	
 	private void establishConnection() {
-//		String host = "localhost";
-		String host = "10.254.9.140";
+		String host = "localhost";
+//		String host = "10.254.9.140";
 		int port = 1337;
 		Socket socket = Gdx.net.newClientSocket(Protocol.TCP, host, port, null);
 		client = new SpaceServerConnection(socket, this);
@@ -86,6 +88,14 @@ public class SpaceGame extends Game {
 
 	public void playerAimedCommand(PlayerAimedCommand playerAimedCommand) {
 		defaultLevelScreen.playerAimedCommand(playerAimedCommand);
+	}
+
+	public void applyDamageCommand(ApplyDamageCommand applyDmgCommand) {
+		defaultLevelScreen.applyDamageCommand(applyDmgCommand);
+	}
+
+	public void killCommand(KillCommand killCommand) {
+		defaultLevelScreen.killCommand(killCommand);
 		
 	}
 }

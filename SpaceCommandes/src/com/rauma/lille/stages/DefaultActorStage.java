@@ -1,7 +1,9 @@
 package com.rauma.lille.stages;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -34,6 +36,9 @@ import com.rauma.lille.Utils;
 import com.rauma.lille.actors.BodyImageActor;
 import com.rauma.lille.actors.SimplePlayer;
 import com.rauma.lille.armory.BulletFactory;
+import com.rauma.lille.network.ApplyDamageCommand;
+import com.rauma.lille.network.Command;
+import com.rauma.lille.network.KillCommand;
 import com.rauma.lille.network.PositionCommand;
 import com.rauma.lille.network.StartGameCommand;
 
@@ -62,14 +67,18 @@ public class DefaultActorStage extends AbstractStage {
 	
 	private float currentX;
 	private float currentY;
+	private List<Command> commands = new ArrayList<Command>();
+	private Map<String,Vector2> spawnpoints = new HashMap<String,Vector2>();
+	private SpaceGame game;
 	private List<PositionCommand> updatePositions = new ArrayList<PositionCommand>();
 
 	private int playerId = -1;
 	private boolean newGame = false;
 	private Rectangle viewport;
 
-	public DefaultActorStage(float width, float height, boolean keepAspectRatio) {
+	public DefaultActorStage(SpaceGame game, float width, float height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
+		this.game = game;
 		init();
 	}
 
@@ -109,7 +118,9 @@ public class DefaultActorStage extends AbstractStage {
 
 		BodyDef def = new BodyDef();
 		MapLayer box2dLayer = map.getLayers().get("box2d");
+		MapLayer spawnLayer = map.getLayers().get("spawn");
 		MapObjects box2dObjects = box2dLayer.getObjects();
+		MapObjects spawnPoints = spawnLayer.getObjects();
 
 		PolygonShape shape = new PolygonShape();
 		def.type = BodyType.StaticBody;
@@ -143,14 +154,21 @@ public class DefaultActorStage extends AbstractStage {
 			body.createFixture(fixtureDef);
 			body.setUserData(this);
 		}
+		for(MapObject spawnPoint : spawnPoints){
+			if(spawnPoint instanceof RectangleMapObject){
+				Rectangle spawnRectangle = ((RectangleMapObject) spawnPoint).getRectangle();
+				spawnpoints.put(spawnPoint.getName(), new Vector2(spawnRectangle.getX(),spawnRectangle.getY()).scl(unitScale));
+			}
+		}
+		
 		shape.dispose();
 
-		player1 = spawnPlayerAtPosition(-1,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,false);
+		player1 = spawnPlayerAtPosition(-1,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,false,true);
 	}
 
-	private SimplePlayer spawnPlayerAtPosition(int playerId, String name, short categoryBits, short maskBits, float x, float y,boolean isStaticBody) {
+	private SimplePlayer spawnPlayerAtPosition(int playerId, String name, short categoryBits, short maskBits, float x, float y,boolean isStaticBody, boolean isMe) {
 		BulletFactory bulletFactory = new BulletFactory(categoryBits, maskBits, world);
-		SimplePlayer simplePlayer = new SimplePlayer(playerId, name, categoryBits, maskBits, x, y, world, bulletFactory, isStaticBody);
+		SimplePlayer simplePlayer = new SimplePlayer(playerId, name, categoryBits, maskBits, x, y, world, bulletFactory, isStaticBody, game, isMe);
 		addActor(simplePlayer);
 		return simplePlayer;
 	}
@@ -211,21 +229,28 @@ public class DefaultActorStage extends AbstractStage {
 					bodyActor.remove();
 				}
 			}
+			
 			//hardcoded for two players
 			if(playerId == 1){
-				player1 = spawnPlayerAtPosition(playerId,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,false);
-				player2 = spawnPlayerAtPosition(2,"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,true);
+				player1 = spawnPlayerAtPosition(playerId,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,false,true);
+				player2 = spawnPlayerAtPosition(2,"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,true,false);
 			}
 			else{
-				player1 = spawnPlayerAtPosition(playerId,"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,false);
-				player2 = spawnPlayerAtPosition(1,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,true);
+				player1 = spawnPlayerAtPosition(playerId,"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,false,true);
+				player2 = spawnPlayerAtPosition(1,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,true,false);
 			}
 			newGame = false;
 		}
 		super.act(delta);
 		updatePlayer(player1, delta);
 		updatePlayer(player2, delta);
-		updatePlayerPosFromQueue();
+
+		executeCommandQueue();
+		getCamera().position.set(getPlayerPosition());
+		getCamera().update();
+		debugMatrix = getCamera().combined.cpy();
+		debugMatrix.scale(SpaceGame.WORLD_SCALE, SpaceGame.WORLD_SCALE, 1f);
+		renderer.setView((OrthographicCamera) getCamera());
 	}
 
 	@Override
@@ -277,32 +302,71 @@ public class DefaultActorStage extends AbstractStage {
 		newGame = true;
 	}
 
-	private void updatePlayerPosFromQueue(){
-		while(updatePositions.size()>0){
-			PositionCommand commandPos = updatePositions.remove(0);
-			if(commandPos == null){
-				//TODO (john)(cast and error?)
-				continue;
-			}
-			int id = commandPos.getId();
-			float x = commandPos.getX();
-			float y = commandPos.getY();
-			float angle = commandPos.getAngle();
-			if(id == -1){
-				// can come into this state if the game isn't initialized yet
-				//TODO (john) cast an error?
-				return;
-			}
-			
-			//hardcoded for two players
-			if (player1.getId() == 1 && id == 2) {
-				movePlayer2(x, y, angle);
-			} else if (player1.getId() == 2 && id == 1) {
-				movePlayer2(x, y, angle);
+	private void executeCommandQueue(){
+		while(commands.size()>0){
+			Command command = commands.remove(0);
+			if (command instanceof PositionCommand) {
+				PositionCommand commandPos = (PositionCommand) command;
+				
+				int id = commandPos.getId();
+				float x = commandPos.getX();
+				float y = commandPos.getY();
+				float angle = commandPos.getAngle();
+				if(id == -1){
+					// can come into this state if the game isn't initialized yet
+					//TODO (john) cast an error?
+					return;
+				}
+				
+				//hardcoded for two players
+				if (player1.getId() == 1 && id == 2) {
+					movePlayer2(x, y, angle);
+				} else if (player1.getId() == 2 && id == 1) {
+					movePlayer2(x, y, angle);
+				}
+			} else if (command instanceof KillCommand) {
+				KillCommand killCommand = (KillCommand) command;
+				killPlayer(killCommand);
 			}
 		}
 	}
 	
+	private void killPlayer(KillCommand killCommand) {
+		int id = killCommand.getPlayerId();
+		if(player1.getId() == id) {
+			String name = player1.getName();
+			short maskBits = player1.getMaskBits();
+			short categoryBits = player1.getCategoryBits();
+			boolean isStaticBody = player1.isStaticBody();
+			boolean isMe = player1.isMe();
+			player1.destroyBody();
+			player1.remove();
+			Vector2 spawnPoint = null;
+			if(id==1){
+				spawnPoint = spawnpoints.get("sp1");
+			}else if(id==2){
+				spawnPoint = spawnpoints.get("sp2");
+			}
+			player1 = spawnPlayerAtPosition(id, name, categoryBits, maskBits, spawnPoint.x, spawnPoint.y, isStaticBody, isMe);
+		}
+		else if(player2.getId() == id) {
+			String name = player2.getName();
+			short maskBits = player2.getMaskBits();
+			short categoryBits = player2.getCategoryBits();
+			boolean isStaticBody = player2.isStaticBody();
+			boolean isMe = player2.isMe();
+			player2.destroyBody();
+			player2.remove();
+			Vector2 spawnPoint = null;
+			if(id==1){
+				spawnPoint = spawnpoints.get("sp1");
+			}else if(id==2){
+				spawnPoint = spawnpoints.get("sp2");
+			}
+			player2 = spawnPlayerAtPosition(id, name, categoryBits, maskBits, spawnPoint.x, spawnPoint.y, isStaticBody, isMe);
+		}
+	}
+
 	private void movePlayer2(float x, float y, float angle) {
 
 		if (player2 != null && player2.getBody() != null) {
@@ -315,10 +379,23 @@ public class DefaultActorStage extends AbstractStage {
 				body.setTransform(Utils.Screen2World(newX, newY), angle);
 			}
 		}
-			
 	}
 	public void updatePlayerPos(PositionCommand commandPos) {
-		updatePositions.add(commandPos);
+		commands.add(commandPos);
+	}
+
+	public void applyDamageCommand(ApplyDamageCommand applyDmgCommand) {
+		int id = applyDmgCommand.getId();
+		float dmg = applyDmgCommand.getDamage();
+		if(id == player1.getId()){
+			player1.applyDamage(dmg);
+		}else if(id == player2.getId()){
+			player2.applyDamage(dmg);
+		}
+	}
+
+	public void killCommand(KillCommand killCommand) {
+		commands.add(killCommand);
 	}
 
 	public void resize(int width, int height) {

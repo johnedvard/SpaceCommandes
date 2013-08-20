@@ -5,7 +5,9 @@ import java.util.List;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
+import com.rauma.lille.network.ApplyDamageCommand;
 import com.rauma.lille.network.Command;
+import com.rauma.lille.network.KillCommand;
 import com.rauma.lille.network.PlayerAimedCommand;
 import com.rauma.lille.network.PositionCommand;
 import com.rauma.lille.network.StartGameCommand;
@@ -47,7 +49,19 @@ public class Game {
 					for(SpaceClientConnection scc : clientsInGame){
 						scc.sendMessage(playerAimedCommand);
 					}
-				}else {
+				}else if (c instanceof ApplyDamageCommand) {
+					ApplyDamageCommand applyDmgCommand = (ApplyDamageCommand) c;
+					for(SpaceClientConnection scc : clientsInGame){
+						scc.sendMessage(applyDmgCommand);
+					}
+				} else if (c instanceof KillCommand) {
+					KillCommand deathCommand = (KillCommand) c;
+					System.out.println("Got death command");
+					for(SpaceClientConnection scc : clientsInGame){
+						scc.sendMessage(deathCommand);
+					}
+				} 
+				else {
 					System.out.println("got something else: " + string);
 				}
 			}

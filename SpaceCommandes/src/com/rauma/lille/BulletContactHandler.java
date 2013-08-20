@@ -18,7 +18,9 @@ public class BulletContactHandler {
 				name2 = actor.getName();
 				if (other instanceof SimplePlayer) {
 					SimplePlayer player = (SimplePlayer) other;
-					player.applyDamage(bullet.getDamage());
+					if(player.isMe()){
+						player.registerHit(bullet.getDamage());
+					}
 				}
 			}
 //			System.out.println(bullet + " started contact with " + name2);
