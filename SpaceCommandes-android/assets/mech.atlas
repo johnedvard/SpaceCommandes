@@ -1,0 +1,40 @@
+
+mech.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+body
+  rotate: false
+  xy: 2, 5
+  size: 268, 244
+  orig: 276, 252
+  offset: 4, 4
+  index: -1
+bolt
+  rotate: false
+  xy: 394, 151
+  size: 99, 98
+  orig: 107, 106
+  offset: 4, 4
+  index: -1
+foot
+  rotate: false
+  xy: 394, 100
+  size: 113, 49
+  orig: 119, 56
+  offset: 3, 3
+  index: -1
+lower-leg
+  rotate: true
+  xy: 272, 2
+  size: 83, 98
+  orig: 89, 104
+  offset: 3, 3
+  index: -1
+upper-leg
+  rotate: false
+  xy: 272, 87
+  size: 120, 162
+  orig: 128, 170
+  offset: 4, 4
+  index: -1
