@@ -125,9 +125,10 @@ public class SimplePlayer extends BodyImageActor {
 		lastFired += delta;
 	}
 
-	public void fireWeapon(float angleRad) {
+	public boolean fireWeapon(float angleRad) {
 		// player.getBody().setTransform(player.getBody().getPosition(),
 		// angleRad);
+		boolean shotFired = false;
 		if (lastFired >= FIRE_RATE) {
 			Bullet bullet = bulletFactory.getBullet();
 			if (bullet != null) {
@@ -140,11 +141,13 @@ public class SimplePlayer extends BodyImageActor {
 				bullet.fire(getX() + offsetX, getY()+getHeight()/2 + offsetY, angleRad);
 				lastFired = 0f;
 				successfulShot++;
+				shotFired = true;
 			} else {
 				System.out.println("Out of ammo / Weapon needs cool down");
 				failedShot++;
 			}
 		}
+		return shotFired;
 	}
 
 	public void applyDamage(float damage) {

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
@@ -70,14 +72,23 @@ public class DefaultActorStage extends AbstractStage {
 	private List<Command> commands = new ArrayList<Command>();
 	private Map<String,Vector2> spawnpoints = new HashMap<String,Vector2>();
 	private SpaceGame game;
-	private List<PositionCommand> updatePositions = new ArrayList<PositionCommand>();
 
 	private int playerId = -1;
-	private boolean newGame = false;
+	private boolean newGame = true;
 	private Rectangle viewport;
 	private int numberOfPlayers = -1;
 	private String spawnPointName = null;
 	private List<SimplePlayer> otherPlayers = new ArrayList<SimplePlayer>();
+	
+	private Sound dieSound = Gdx.audio.newSound(Gdx.files.internal("sound/die.wav"));
+	private Sound hitSound = Gdx.audio.newSound(Gdx.files.internal("sound/hit.wav"));
+	private Sound jumpSound = Gdx.audio.newSound(Gdx.files.internal("sound/jump2.wav"));
+	private Sound shootSound = Gdx.audio.newSound(Gdx.files.internal("sound/shoot2.wav"));
+	private Sound flySound = Gdx.audio.newSound(Gdx.files.internal("sound/fly.wav"));
+
+//	private Music music = Gdx.audio.newMusic(Gdx.files.internal("music/Nintendo Freak Time's-up.mp3"));
+	private Music intro = Gdx.audio.newMusic(Gdx.files.internal("music/01 HHavok-intro.mp3"));
+	private Music main = Gdx.audio.newMusic(Gdx.files.internal("music/02 HHavok-main.mp3"));
 
 	public DefaultActorStage(SpaceGame game, float width, float height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
@@ -166,7 +177,6 @@ public class DefaultActorStage extends AbstractStage {
 		
 		shape.dispose();
 
-		player1 = spawnPlayerAtPosition(-1,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,false,true);
 	}
 
 	private SimplePlayer spawnPlayerAtPosition(int playerId, String name, short categoryBits, short maskBits, float x, float y,boolean isStaticBody, boolean isMe) {
@@ -196,6 +206,9 @@ public class DefaultActorStage extends AbstractStage {
 			}
 		}
 	}
+	
+	private float flyPlayedDuration = 0;
+	private float jumpPlayedDuration = 0;
 
 	public void updatePlayer(SimplePlayer player, float delta) {
 		if(player == null || player.getBody() == null){
@@ -215,10 +228,25 @@ public class DefaultActorStage extends AbstractStage {
 				currentY = minPower;
 			player.getBody().applyForceToCenter(
 					new Vector2(0, (float) (currentY * .1)), true);
+			if(player.getBody().getLinearVelocity().y < 0.5) {
+				if((jumpPlayedDuration -= delta) < 0) {
+					jumpSound.play();
+					jumpPlayedDuration = 2;
+				}
+			} else {
+				if((flyPlayedDuration -= delta) < 0) {
+					flySound.play();
+					flyPlayedDuration = 0.5f;
+				}
+			}
 		}
 
 		if (player.getAngleRad() != 0 && player.getRotation() != player.getAngleRad()) {
-			player.fireWeapon(player.getAngleRad()+MathUtils.PI/2); // adjusted +90 deg
+			
+			boolean fireWeapon = player.fireWeapon(player.getAngleRad()+MathUtils.PI/2); // adjusted +90 deg
+			if(fireWeapon) {
+				shootSound.play();
+			}
 		}
 	}
 	
@@ -236,16 +264,29 @@ public class DefaultActorStage extends AbstractStage {
 					bodyActor.remove();
 				}
 			}
-			
-			for(int i = 0; i<numberOfPlayers; i++){
-				if(i == playerId){
-					Vector2 s = spawnpoints.get(spawnPointName);
-					System.out.println("vector2: with name: " + spawnPointName);
-					System.out.println(s);
-					player1 = spawnPlayerAtPosition(playerId,"Player "+playerId, CATEGORY_PLAYER_1, MASK_PLAYER_1, s.x, s.y, false,true);
-				}else{
-					otherPlayers.add(spawnPlayerAtPosition(i, "Player "+i, CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150, true, false));
+			if(playerId == -1) {
+				Vector2 s = spawnpoints.get("sp1");
+				player1 = spawnPlayerAtPosition(playerId,"Player "+playerId, CATEGORY_PLAYER_1, MASK_PLAYER_1, s.x, s.y, false,true);
+
+				if(intro.isPlaying()) intro.stop();
+				if(main.isPlaying()) main.stop();
+				intro.play();
+				intro.setLooping(true);
+			} else {
+				for(int i = 0; i<numberOfPlayers; i++){
+					if(i == playerId){
+						Vector2 s = spawnpoints.get(spawnPointName);
+						System.out.println("vector2: with name: " + spawnPointName);
+						System.out.println(s);
+						player1 = spawnPlayerAtPosition(playerId,"Player "+playerId, CATEGORY_PLAYER_1, MASK_PLAYER_1, s.x, s.y, false,true);
+					}else{
+						otherPlayers.add(spawnPlayerAtPosition(i, "Player "+i, CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150, true, false));
+					}
 				}
+				
+				if(intro.isPlaying()) intro.stop();
+				if(main.isPlaying()) main.stop();
+				main.play();
 			}
 			newGame = false;
 		}
@@ -361,6 +402,7 @@ public class DefaultActorStage extends AbstractStage {
 
 	private void killPlayer(KillCommand killCommand) {
 		int id = killCommand.getPlayerId();
+		dieSound.play();
 		if(player1.getId() == id){
 			String name = player1.getName();
 			short maskBits = player1.getMaskBits();
@@ -396,6 +438,7 @@ public class DefaultActorStage extends AbstractStage {
 	public void applyDamageCommand(ApplyDamageCommand applyDmgCommand) {
 		int id = applyDmgCommand.getId();
 		float dmg = applyDmgCommand.getDamage();
+		hitSound.play();
 		if(id == player1.getId()){
 			player1.applyDamage(dmg);
 		}
