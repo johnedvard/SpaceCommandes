@@ -142,6 +142,9 @@ public class SpaceServerConnection{
 			} else if (c instanceof KillCommand) {
 				KillCommand killCommand = (KillCommand) c;
 				game.killCommand(killCommand);
+			} else if (c instanceof EndGameCommand) {
+				EndGameCommand endCommand = (EndGameCommand) c;
+				game.end(endCommand);
 			}
 			else {
 				System.out.println("got something else: " + string);

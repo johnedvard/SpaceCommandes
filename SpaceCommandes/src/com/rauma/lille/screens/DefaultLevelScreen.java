@@ -10,6 +10,7 @@ import com.rauma.lille.SpaceGame;
 import com.rauma.lille.actors.SimplePlayer;
 import com.rauma.lille.network.ApplyDamageCommand;
 import com.rauma.lille.network.Command;
+import com.rauma.lille.network.EndGameCommand;
 import com.rauma.lille.network.KillCommand;
 import com.rauma.lille.network.PlayerAimedCommand;
 import com.rauma.lille.network.PositionCommand;
@@ -123,10 +124,6 @@ public class DefaultLevelScreen extends DefaultScreen {
 		actorStage.resize(width, height);
 	}
 
-	public SpaceGame getGame() {
-		return game;
-	}
-
 	public void applyDamageCommand(ApplyDamageCommand applyDmgCommand) {
 		actorStage.applyDamageCommand(applyDmgCommand);
 	}
@@ -134,6 +131,10 @@ public class DefaultLevelScreen extends DefaultScreen {
 	public void killCommand(KillCommand killCommand) {
 		actorStage.killCommand(killCommand);
 		
+	}
+
+	public void endGame(EndGameCommand endCommand) {
+		actorStage.endGame(endCommand);
 	}
 	
 }

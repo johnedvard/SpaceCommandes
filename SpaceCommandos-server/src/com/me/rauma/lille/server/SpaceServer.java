@@ -17,7 +17,8 @@ public class SpaceServer {
 	private static final Logger LOG = Logger.getLogger("SpaceServer");
 
 	private List<SpaceClientConnection> clients = new ArrayList<SpaceClientConnection>();
-
+	private List<Game> games = new ArrayList<Game>();
+	
 	private boolean running = false;
 
 	private int numPlayersPrGame = 2;
@@ -75,12 +76,19 @@ public class SpaceServer {
 		// get clients for the current game.
 		List<SpaceClientConnection> clientsToPlayTogether = new ArrayList<SpaceClientConnection>();
 		for(int i = 0; i<numPlayersPrGame; i++){
-			//TODO (john) Add a list with game states.
 			SpaceClientConnection spaceClientConnection = clients.remove(clients.size()-1);
 			clientsToPlayTogether.add(spaceClientConnection);
 		}
-		new Game(clientsToPlayTogether);
+		Game game = new Game(clientsToPlayTogether, this);
+		games.add(game);
 	}
+	
+	public void endGame(Game game) {
+		games.remove(game);
+		List<SpaceClientConnection> clientsInGame = game.getClientsInGame();
+		clients.addAll(clientsInGame);
+	}
+
 	private synchronized void createSpaceClient(Socket socket) throws IOException {
 		SpaceClientConnection client = new SpaceClientConnection(socket);
 		clients.add(client);

@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.logging.Logger;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
 import com.me.rauma.lille.server.Game.CommandMessageListener;
 import com.rauma.lille.network.Command;
@@ -31,9 +30,9 @@ public class SpaceClientConnection {
 
 	private List<CommandMessageListener> commandListeners = new ArrayList<CommandMessageListener>();
 	private Socket socket;
+
 	private Json json = new Json();
 
-	private int playerId = -1;
 	public SpaceClientConnection(Socket s) throws IOException {
 		LOG.info("Client connection created: " + s);
 		this.socket = s;
@@ -45,7 +44,11 @@ public class SpaceClientConnection {
 		outputStreamHandler = new OutputStreamHandler(outputStream);
 		outputStreamHandler.start();
 	}
-
+	
+	public boolean isRunning() {
+		return running;
+	}
+	
 	public boolean stop() {
 		running = false;
 		try {
@@ -146,9 +149,4 @@ public class SpaceClientConnection {
 	public void addCommandMessageListener(CommandMessageListener listener) {
 		commandListeners.add(listener);
 	}
-
-	public void setId(int yourId) {
-		this.playerId  = yourId;
-	}
-	
 }

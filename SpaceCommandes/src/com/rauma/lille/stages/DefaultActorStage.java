@@ -38,6 +38,7 @@ import com.rauma.lille.actors.SimplePlayer;
 import com.rauma.lille.armory.BulletFactory;
 import com.rauma.lille.network.ApplyDamageCommand;
 import com.rauma.lille.network.Command;
+import com.rauma.lille.network.EndGameCommand;
 import com.rauma.lille.network.KillCommand;
 import com.rauma.lille.network.PositionCommand;
 import com.rauma.lille.network.StartGameCommand;
@@ -221,7 +222,6 @@ public class DefaultActorStage extends AbstractStage {
 	@Override
 	public void act(float delta) {
 		if(newGame) {
-
 			for(Actor a : this.getActors()){
 				if (a instanceof BodyImageActor) {
 					BodyImageActor bodyActor = (BodyImageActor) a;
@@ -231,7 +231,10 @@ public class DefaultActorStage extends AbstractStage {
 			}
 			
 			//hardcoded for two players
-			if(playerId == 1){
+			if(playerId == -1){
+				player1 = spawnPlayerAtPosition(playerId,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,false,true);
+			}
+			else if(playerId == 1){
 				player1 = spawnPlayerAtPosition(playerId,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,false,true);
 				player2 = spawnPlayerAtPosition(2,"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,true,false);
 			}
@@ -421,5 +424,10 @@ public class DefaultActorStage extends AbstractStage {
 		float w = SpaceGame.VIRTUAL_WIDTH*scale;
 		float h = SpaceGame.VIRTUAL_HEIGHT*scale;
 		viewport = new Rectangle(crop.x, crop.y, w, h);
+	}
+
+	public void endGame(EndGameCommand endCommand) {
+		playerId = -1;
+		newGame = true;
 	}
 }

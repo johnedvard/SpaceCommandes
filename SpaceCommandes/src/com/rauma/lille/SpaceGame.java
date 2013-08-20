@@ -11,11 +11,12 @@ import com.badlogic.gdx.net.Socket;
 import com.badlogic.gdx.utils.Json;
 import com.rauma.lille.network.ApplyDamageCommand;
 import com.rauma.lille.network.Command;
+import com.rauma.lille.network.EndGameCommand;
 import com.rauma.lille.network.KillCommand;
 import com.rauma.lille.network.PlayerAimedCommand;
 import com.rauma.lille.network.PositionCommand;
-import com.rauma.lille.network.StartGameCommand;
 import com.rauma.lille.network.SpaceServerConnection;
+import com.rauma.lille.network.StartGameCommand;
 import com.rauma.lille.screens.DefaultLevelScreen;
 
 public class SpaceGame extends Game {
@@ -97,5 +98,9 @@ public class SpaceGame extends Game {
 	public void killCommand(KillCommand killCommand) {
 		defaultLevelScreen.killCommand(killCommand);
 		
+	}
+
+	public void end(EndGameCommand endCommand) {
+		defaultLevelScreen.endGame(endCommand);
 	}
 }
