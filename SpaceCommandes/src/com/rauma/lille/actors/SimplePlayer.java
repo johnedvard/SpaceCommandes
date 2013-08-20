@@ -134,8 +134,9 @@ public class SimplePlayer extends BodyImageActor {
 				getStage().addActor(bullet);
 				float offsetX = getWidth()+5;
 				float offsetY = 14;
-				if(MathUtils.sin(angleRad) < 0)
+				if(MathUtils.sin(angleRad) < 0){
 					offsetX = 0;
+				}
 				bullet.fire(getX() + offsetX, getY()+getHeight()/2 + offsetY, angleRad);
 				lastFired = 0f;
 				successfulShot++;

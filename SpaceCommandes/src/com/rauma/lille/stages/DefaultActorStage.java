@@ -62,7 +62,6 @@ public class DefaultActorStage extends AbstractStage {
 	private OrthogonalTiledMapRenderer renderer;
 
 	private SimplePlayer player1;
-	private SimplePlayer player2;
 	
 	private float currentX;
 	private float currentY;
@@ -73,6 +72,9 @@ public class DefaultActorStage extends AbstractStage {
 
 	private int playerId = -1;
 	private boolean newGame = false;
+	private int numberOfPlayers = -1;
+	private String spawnPointName = null;
+	private List<SimplePlayer> otherPlayers = new ArrayList<SimplePlayer>();
 
 	public DefaultActorStage(SpaceGame game, float width, float height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
@@ -182,8 +184,13 @@ public class DefaultActorStage extends AbstractStage {
 		float angleRad = (float) Math.atan2(-knobPercentY, knobPercentX);
 		if(player1.getId() == playerId){
 			player1.setAngleRad(angleRad);
-		}else if(player2.getId() == playerId){
-			player2.setAngleRad(angleRad);
+		}
+		else{
+			for(SimplePlayer sp : otherPlayers){
+				if(sp.getId() == playerId){
+					sp.setAngleRad(angleRad);
+				}
+			}
 		}
 	}
 
@@ -228,26 +235,33 @@ public class DefaultActorStage extends AbstractStage {
 				}
 			}
 			
-			//hardcoded for two players
-			if(playerId == 1){
-				player1 = spawnPlayerAtPosition(playerId,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,false,true);
-				player2 = spawnPlayerAtPosition(2,"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,true,false);
-			}
-			else{
-				player1 = spawnPlayerAtPosition(playerId,"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,false,true);
-				player2 = spawnPlayerAtPosition(1,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,true,false);
+			for(int i = 0; i<numberOfPlayers; i++){
+				if(i == playerId){
+					Vector2 s = spawnpoints.get(spawnPointName);
+					System.out.println("vector2: with name: " + spawnPointName);
+					System.out.println(s);
+					player1 = spawnPlayerAtPosition(playerId,"Player "+playerId, CATEGORY_PLAYER_1, MASK_PLAYER_1, s.x, s.y, false,true);
+				}else{
+					otherPlayers.add(spawnPlayerAtPosition(i, "Player "+i, CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150, true, false));
+				}
 			}
 			newGame = false;
 		}
 		super.act(delta);
 		updatePlayer(player1, delta);
-		updatePlayer(player2, delta);
+		updateOtherPlayers(delta);
 		executeCommandQueue();
 		getCamera().position.set(getPlayerPosition());
 		getCamera().update();
 		debugMatrix = getCamera().combined.cpy();
 		debugMatrix.scale(SpaceGame.WORLD_SCALE, SpaceGame.WORLD_SCALE, 1f);
 		renderer.setView((OrthographicCamera) getCamera());
+	}
+
+	private void updateOtherPlayers(float delta) {
+		for(SimplePlayer sp : otherPlayers){
+			updatePlayer(sp, delta);
+		}
 	}
 
 	@Override
@@ -283,6 +297,8 @@ public class DefaultActorStage extends AbstractStage {
 
 	public void createNewGame(StartGameCommand startGameCommand) {
 		playerId = startGameCommand.getPlayerId();
+		numberOfPlayers = startGameCommand.getNumPlayers();
+		spawnPointName = startGameCommand.getSpawnPointName();
 		newGame = true;
 	}
 
@@ -306,12 +322,10 @@ public class DefaultActorStage extends AbstractStage {
 					return;
 				}
 				
-				//hardcoded for two players
-				if (player1.getId() == 1 && id == 2) {
-					movePlayer2(x, y, angle);
-				} else if (player1.getId() == 2 && id == 1) {
-					movePlayer2(x, y, angle);
+				if(player1.getId() != id){
+					moveOtherPlayers(x, y, angle);
 				}
+				
 			}else if (command instanceof KillCommand) {
 				KillCommand killCommand = (KillCommand) command;
 				killPlayer(killCommand);
@@ -319,9 +333,24 @@ public class DefaultActorStage extends AbstractStage {
 		}
 	}
 	
+	private void moveOtherPlayers(float x, float y, float angle) {
+		for(SimplePlayer sp : otherPlayers){
+			if (sp != null && sp.getBody() != null) {
+				Body body = sp.getBody();
+				Transform transform = body.getTransform();
+				Vector2 position = transform.getPosition();
+				float newX = x + sp.getWidth() / 2;
+				float newY = y + sp.getHeight() / 2;
+				if (position.x != newX && position.y != newY) {
+					body.setTransform(Utils.Screen2World(newX, newY), angle);
+				}
+			}
+		}
+	}
+
 	private void killPlayer(KillCommand killCommand) {
 		int id = killCommand.getPlayerId();
-		if(player1.getId() == id) {
+		if(player1.getId() == id){
 			String name = player1.getName();
 			short maskBits = player1.getMaskBits();
 			short categoryBits = player1.getCategoryBits();
@@ -329,46 +358,26 @@ public class DefaultActorStage extends AbstractStage {
 			boolean isMe = player1.isMe();
 			player1.destroyBody();
 			player1.remove();
-			Vector2 spawnPoint = null;
-			if(id==1){
-				spawnPoint = spawnpoints.get("sp1");
-			}else if(id==2){
-				spawnPoint = spawnpoints.get("sp2");
-			}
+			Vector2 spawnPoint = spawnpoints.get("sp"+(id+1));
 			player1 = spawnPlayerAtPosition(id, name, categoryBits, maskBits, spawnPoint.x, spawnPoint.y, isStaticBody, isMe);
 		}
-		else if(player2.getId() == id) {
-			String name = player2.getName();
-			short maskBits = player2.getMaskBits();
-			short categoryBits = player2.getCategoryBits();
-			boolean isStaticBody = player2.isStaticBody();
-			boolean isMe = player2.isMe();
-			player2.destroyBody();
-			player2.remove();
-			Vector2 spawnPoint = null;
-			if(id==1){
-				spawnPoint = spawnpoints.get("sp1");
-			}else if(id==2){
-				spawnPoint = spawnpoints.get("sp2");
-			}
-			player2 = spawnPlayerAtPosition(id, name, categoryBits, maskBits, spawnPoint.x, spawnPoint.y, isStaticBody, isMe);
-		}
-		
-	}
-
-	private void movePlayer2(float x, float y, float angle) {
-
-		if (player2 != null && player2.getBody() != null) {
-			Body body = player2.getBody();
-			Transform transform = body.getTransform();
-			Vector2 position = transform.getPosition();
-			float newX = x + player2.getWidth() / 2;
-			float newY = y + player2.getHeight() / 2;
-			if (position.x != newX && position.y != newY) {
-				body.setTransform(Utils.Screen2World(newX, newY), angle);
+		else {
+			for(SimplePlayer sp : otherPlayers){
+				if(sp.getId() == playerId){
+					String name = sp.getName();
+					short maskBits = sp.getMaskBits();
+					short categoryBits = sp.getCategoryBits();
+					boolean isStaticBody = sp.isStaticBody();
+					boolean isMe = sp.isMe();
+					sp.destroyBody();
+					sp.remove();
+					Vector2 spawnPoint = spawnpoints.get("sp2");
+					sp = spawnPlayerAtPosition(id, name, categoryBits, maskBits, spawnPoint.x, spawnPoint.y, isStaticBody, isMe);
+				}
 			}
 		}
 	}
+
 	public void updatePlayerPos(PositionCommand commandPos) {
 		commands.add(commandPos);
 	}
@@ -378,8 +387,13 @@ public class DefaultActorStage extends AbstractStage {
 		float dmg = applyDmgCommand.getDamage();
 		if(id == player1.getId()){
 			player1.applyDamage(dmg);
-		}else if(id == player2.getId()){
-			player2.applyDamage(dmg);
+		}
+		else {
+			for(SimplePlayer sp : otherPlayers){
+				if(sp.getId() == playerId){
+					sp.applyDamage(dmg);
+				}
+			}
 		}
 	}
 

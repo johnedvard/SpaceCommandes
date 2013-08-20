@@ -129,9 +129,6 @@ public class SpaceServerConnection{
 				game.updatePlayerPos(commandPos);
 			}else if (c instanceof StartGameCommand) {
 				StartGameCommand cmdStarGame = (StartGameCommand) c;
-				LOG.info("\ngot start_game message from server: " + string);
-				System.out.println("switch to game-screen and play the game. set up the game with the state from the server");
-				System.out.println("start game? "+ cmdStarGame);
 				game.createNewGame(cmdStarGame);
 			}else if (c instanceof PlayerAimedCommand) {
 				PlayerAimedCommand playerAimedCommand = (PlayerAimedCommand) c;
