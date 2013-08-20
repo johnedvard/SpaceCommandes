@@ -19,13 +19,13 @@ public class Game {
 	public Game(final List<SpaceClientConnection> clientsToPlayTogether, SpaceServer server) {
 		this.server = server;
 		int startPos = 10;
-		int numPlayers = clientsToPlayTogether.size();
-		int yourId = 1;
+		int numPlayers= clientsToPlayTogether.size();
+		int yourId = 0;
 		CommandMessageListener listener = new CommandMessageListener();
 		for(SpaceClientConnection scc : clientsToPlayTogether){
 			System.out.println("sending start game info to client: ");
 			scc.addCommandMessageListener(listener);
-			scc.sendMessage(new StartGameCommand(yourId++));
+			scc.sendMessage(new StartGameCommand(yourId,numPlayers,"sp"+(++yourId)));
 			clientsInGame.add(scc);
 		}
 		new Thread() {
