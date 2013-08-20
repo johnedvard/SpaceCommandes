@@ -264,14 +264,14 @@ public class SimplePlayer extends BodyImageActor {
 
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = boxPoly;
-		fixtureDef.density = 0.0225f*attachment.getWidth()/10;
+		fixtureDef.density = 0.0275f*attachment.getWidth()/10;
 		fixtureDef.restitution = 0.1f*attachment.getWidth()/10;
-		fixtureDef.friction= 0.19f*attachment.getWidth()/10;
+		fixtureDef.friction= 0.15f*attachment.getWidth()/10;
 		fixtureDef.filter.categoryBits = categoryBits;
 		fixtureDef.filter.maskBits = maskBits;
 		attachment.body.createFixture(fixtureDef);
 		attachment.body.setUserData(this);
-		attachment.body.setAngularDamping(10.0f);
+//		attachment.body.setAngularDamping(10.0f);
 		setBody(attachment.body);
 	}
 	
