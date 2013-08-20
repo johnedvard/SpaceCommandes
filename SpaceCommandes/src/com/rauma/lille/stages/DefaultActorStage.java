@@ -74,7 +74,7 @@ public class DefaultActorStage extends AbstractStage {
 	private SpaceGame game;
 
 	private int playerId = -1;
-	private boolean newGame = true;
+	private boolean newGame = false;
 	private Rectangle viewport;
 	private int numberOfPlayers = -1;
 	private String spawnPointName = null;
@@ -176,7 +176,8 @@ public class DefaultActorStage extends AbstractStage {
 		}
 		
 		shape.dispose();
-
+		
+		endGame = true;
 	}
 
 	private SimplePlayer spawnPlayerAtPosition(int playerId, String name, short categoryBits, short maskBits, float x, float y,boolean isStaticBody, boolean isMe) {
@@ -209,6 +210,7 @@ public class DefaultActorStage extends AbstractStage {
 	
 	private float flyPlayedDuration = 0;
 	private float jumpPlayedDuration = 0;
+	private boolean endGame;
 
 	public void updatePlayer(SimplePlayer player, float delta) {
 		if(player == null || player.getBody() == null){
@@ -226,7 +228,7 @@ public class DefaultActorStage extends AbstractStage {
 			float minPower = 0.8f;
 			if(currentY < minPower)
 				currentY = minPower;
-			//
+
 			if(player.getBody().getLinearVelocity().y == 0){
 				player1.setAnimation("fly-in");
 			}else{
@@ -265,7 +267,7 @@ public class DefaultActorStage extends AbstractStage {
 
 	@Override
 	public void act(float delta) {
-		if(newGame) {
+		if(endGame) {
 			for(Actor a : this.getActors()){
 				if (a instanceof BodyImageActor) {
 					BodyImageActor bodyActor = (BodyImageActor) a;
@@ -273,7 +275,28 @@ public class DefaultActorStage extends AbstractStage {
 					bodyActor.remove();
 				}
 			}
-			if(playerId == -1) {
+
+			endGame = false;
+		} else if(newGame) {
+			otherPlayers.clear();
+			for(int i = 0; i<numberOfPlayers; i++){
+				if(i == playerId){
+					System.out.println("spawning me: " + i);
+					Vector2 s = spawnpoints.get(spawnPointName);
+					System.out.println("vector2: with name: " + spawnPointName + " - " + s);
+					player1 = spawnPlayerAtPosition(playerId,"Player "+playerId, CATEGORY_PLAYER_1, MASK_PLAYER_1, s.x, s.y, false,true);
+				}else{
+					System.out.println("spawning other player: " + i);
+					otherPlayers.add(spawnPlayerAtPosition(i, "Player "+i, CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150, true, false));
+				}
+			}
+			
+			if(intro.isPlaying()) intro.stop();
+			if(main.isPlaying()) main.stop();
+			main.play();
+			newGame = false;
+		} else {
+			if(player1 == null || player1.getBody() == null) {
 				Vector2 s = spawnpoints.get("sp1");
 				player1 = spawnPlayerAtPosition(playerId,"Player "+playerId, CATEGORY_PLAYER_1, MASK_PLAYER_1, s.x, s.y, false,true);
 
@@ -281,31 +304,19 @@ public class DefaultActorStage extends AbstractStage {
 				if(main.isPlaying()) main.stop();
 				intro.play();
 				intro.setLooping(true);
-			} else {
-				for(int i = 0; i<numberOfPlayers; i++){
-					if(i == playerId){
-						Vector2 s = spawnpoints.get(spawnPointName);
-						System.out.println("vector2: with name: " + spawnPointName);
-						System.out.println(s);
-						player1 = spawnPlayerAtPosition(playerId,"Player "+playerId, CATEGORY_PLAYER_1, MASK_PLAYER_1, s.x, s.y, false,true);
-					}else{
-						otherPlayers.add(spawnPlayerAtPosition(i, "Player "+i, CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150, true, false));
-					}
-				}
-				
-				if(intro.isPlaying()) intro.stop();
-				if(main.isPlaying()) main.stop();
-				main.play();
 			}
-			newGame = false;
 		}
 		super.act(delta);
 		updatePlayer(player1, delta);
 		updateOtherPlayers(delta);
 
 		executeCommandQueue();
-		getCamera().position.set(getPlayerPosition());
+
+		if(player1 != null) {
+			getCamera().position.set(getPlayerPosition());
+		}
 		getCamera().update();
+        getCamera().apply(Gdx.gl10);
 		debugMatrix = getCamera().combined.cpy();
 		debugMatrix.scale(SpaceGame.WORLD_SCALE, SpaceGame.WORLD_SCALE, 1f);
 		renderer.setView((OrthographicCamera) getCamera());
@@ -319,9 +330,6 @@ public class DefaultActorStage extends AbstractStage {
 
 	@Override
 	public void draw() {
-		getCamera().position.set(getPlayerPosition());
-		getCamera().update();
-        getCamera().apply(Gdx.gl10);
  
         // set viewport
         Gdx.gl.glViewport((int) viewport.x, (int) viewport.y,
@@ -365,6 +373,7 @@ public class DefaultActorStage extends AbstractStage {
 		playerId = startGameCommand.getPlayerId();
 		numberOfPlayers = startGameCommand.getNumPlayers();
 		spawnPointName = startGameCommand.getSpawnPointName();
+		endGame = true;
 		newGame = true;
 	}
 
@@ -489,6 +498,6 @@ public class DefaultActorStage extends AbstractStage {
 
 	public void endGame(EndGameCommand endCommand) {
 		playerId = -1;
-		newGame = true;
+		endGame = true;
 	}
 }

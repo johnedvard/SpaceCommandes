@@ -23,7 +23,7 @@ public class Game {
 		int yourId = 0;
 		CommandMessageListener listener = new CommandMessageListener();
 		for(SpaceClientConnection scc : clientsToPlayTogether){
-			System.out.println("sending start game info to client: ");
+			System.out.println("sending start game info to client: " + yourId);
 			scc.addCommandMessageListener(listener);
 			scc.sendMessage(new StartGameCommand(yourId,numPlayers,"sp"+(++yourId)));
 			clientsInGame.add(scc);
@@ -40,7 +40,6 @@ public class Game {
 								players++;
 							}
 						}
-						System.out.println("game has " + players + " players");
 						sleep(1000);
 					} catch (Exception e) {
 						e.printStackTrace();

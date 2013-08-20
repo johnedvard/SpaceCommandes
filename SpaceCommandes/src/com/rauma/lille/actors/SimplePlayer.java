@@ -283,7 +283,7 @@ public class SimplePlayer extends BodyImageActor {
 				Utils.Screen2World(attachment.getX()* attachment.getScaleX(), attachment.getY()*attachment.getScaleY()),
 				attachment.getRotation()*MathUtils.degRad);
 	}
-
+	
 	public void setAnimation(String string) {
 		if(!animation.getName().equals(string)){
 			animation = skeletonData.findAnimation(string);
