@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad.TouchpadStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.sun.org.apache.bcel.internal.generic.ACONST_NULL;
 
 /**
  * This stage should handle controllers, such as Touchpad and keyboard input.
@@ -83,7 +84,6 @@ public class ControllerStage extends AbstractStage {
 		boolean b = super.touchUp(screenX, screenY, pointer, button);
 		touchpadLeft.setVisible(touchpadLeft.isTouched());
 		touchpadRight.setVisible(touchpadRight.isTouched());
-
 		return b;
 	}
 
