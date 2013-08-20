@@ -226,8 +226,15 @@ public class DefaultActorStage extends AbstractStage {
 			float minPower = 0.8f;
 			if(currentY < minPower)
 				currentY = minPower;
+			//
+			if(player.getBody().getLinearVelocity().y == 0){
+				player1.setAnimation("fly-in");
+			}else{
+				player1.setAnimation("fly");
+			}
 			player.getBody().applyForceToCenter(
 					new Vector2(0, (float) (currentY * .1)), true);
+
 			if(player.getBody().getLinearVelocity().y < 0.5) {
 				if((jumpPlayedDuration -= delta) < 0) {
 					jumpSound.play();
@@ -239,6 +246,8 @@ public class DefaultActorStage extends AbstractStage {
 					flyPlayedDuration = 0.5f;
 				}
 			}
+		} else if(player.getBody().getLinearVelocity().y == 0){
+			player1.setAnimation("idle");
 		}
 
 		if (player.getAngleRad() != 0 && player.getRotation() != player.getAngleRad()) {
@@ -416,16 +425,14 @@ public class DefaultActorStage extends AbstractStage {
 		}
 		else {
 			for(SimplePlayer sp : otherPlayers){
-				if(sp.getId() == playerId){
-					String name = sp.getName();
-					short maskBits = sp.getMaskBits();
-					short categoryBits = sp.getCategoryBits();
-					boolean isStaticBody = sp.isStaticBody();
-					boolean isMe = sp.isMe();
-					sp.destroyBody();
-					sp.remove();
-					Vector2 spawnPoint = spawnpoints.get("sp2");
-					sp = spawnPlayerAtPosition(id, name, categoryBits, maskBits, spawnPoint.x, spawnPoint.y, isStaticBody, isMe);
+				if(sp.getId() == id){
+//					String name = sp.getName();
+//					sp.destroyBody();
+//					sp.remove();
+//					Vector2 spawnPoint = spawnpoints.get("sp"+(sp.getId()+1));
+//					System.out.println("spawingn other player");
+//					sp = spawnPlayerAtPosition(sp.getId(), name, CATEGORY_PLAYER_2, MASK_PLAYER_2, spawnPoint.x, spawnPoint.y, true, false);
+					sp.setHealth(100);
 				}
 			}
 		}
@@ -444,7 +451,7 @@ public class DefaultActorStage extends AbstractStage {
 		}
 		else {
 			for(SimplePlayer sp : otherPlayers){
-				if(sp.getId() == playerId){
+				if(sp.getId() == id){
 					sp.applyDamage(dmg);
 				}
 			}

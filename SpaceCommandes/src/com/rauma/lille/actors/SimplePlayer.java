@@ -13,13 +13,16 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.Animation;
 import com.esotericsoftware.spine.Bone;
+import com.esotericsoftware.spine.Event;
 import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.SkeletonData;
 import com.esotericsoftware.spine.SkeletonJson;
 import com.esotericsoftware.spine.SkeletonRenderer;
 import com.esotericsoftware.spine.Skin;
+import com.esotericsoftware.spine.Slot;
 import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.AttachmentType;
@@ -84,7 +87,7 @@ public class SimplePlayer extends BodyImageActor {
 			}
 		};
 		SkeletonJson json = new SkeletonJson(atlasLoader);
-		json.setScale(0.15f);
+		json.setScale(0.10f);
 		skeletonData = json.readSkeletonData(Gdx.files.internal("mech.json"));
 		animation = skeletonData.findAnimation("idle");
 		skeleton = new Skeleton(skeletonData);
@@ -134,9 +137,16 @@ public class SimplePlayer extends BodyImageActor {
 			if (bullet != null) {
 				getStage().addActor(bullet);
 				float offsetX = getWidth()+5;
-				float offsetY = 14;
+				float offsetY = 12;
 				if(MathUtils.sin(angleRad) < 0){
-					offsetX = 0;
+					offsetX = -10;
+					if(!skeleton.getFlipX()){
+						skeleton.setFlipX(true);
+					}
+				}else{
+					if(skeleton.getFlipX()){
+						skeleton.setFlipX(false);
+					}
 				}
 				bullet.fire(getX() + offsetX, getY()+getHeight()/2 + offsetY, angleRad);
 				lastFired = 0f;
@@ -152,7 +162,6 @@ public class SimplePlayer extends BodyImageActor {
 
 	public void applyDamage(float damage) {
 		this.health -= damage;
-		System.out.println("New health: " + health);
 	}
 	
 	private void die() {
@@ -168,25 +177,33 @@ public class SimplePlayer extends BodyImageActor {
 //		batch.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE);
 //		batch.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 //		batch.begin();
-		Color newColor = getColor();
-		newColor.a = health/100;
-		setColor(newColor);
-
+		Array<Slot> slots = skeleton.getSlots();
+		for(Slot s : slots){
+			Color newColor = s.getColor();
+			newColor.a = health/100;
+		}
+		//TODO (john) set transparency to the attachment on the skeleton maybe?
 		float delta = Gdx.graphics.getDeltaTime();
 		float remaining = delta;
+		float lastTime = time;
 		while (remaining > 0) {
-			float d = Math.min(0.016f, remaining);
+			float d = Math.min(1/60f, remaining);
 			time += d;
 			remaining -= d;
 		}
 		skeleton.setX(bodyAttachment.getWorldX()*SpaceGame.WORLD_SCALE);
 		skeleton.setY(bodyAttachment.getWorldY()*SpaceGame.WORLD_SCALE-bodyAttachment.getY()-bodyAttachment.getHeight()*bodyAttachment.getScaleY()/2);
 		Bone bodyBone = skeleton.findBone("body");
-		animation.apply(skeleton, time, true);
+		Array<Event> events = new Array<Event>();
+		animation.apply(skeleton, lastTime, time, true, events);
+		for(Event e : events){
+			String name = e.getString();
+			System.out.println(e);
+			System.out.println(name);
+		}
 		bodyBone.setRotation(bodyBone.getRotation());
 		skeleton.updateWorldTransform();
 		skeletonRenderer.draw(batch, skeleton);
-	
 		super.draw(batch, parentAlpha);
 	}
 
@@ -248,14 +265,14 @@ public class SimplePlayer extends BodyImageActor {
 
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = boxPoly;
-		fixtureDef.density = 0.0395f;
-		fixtureDef.restitution = 0.1f;
-		fixtureDef.friction= 0.05f;
+		fixtureDef.density = 0.0275f*attachment.getWidth()/10;
+		fixtureDef.restitution = 0.1f*attachment.getWidth()/10;
+		fixtureDef.friction= 0.15f*attachment.getWidth()/10;
 		fixtureDef.filter.categoryBits = categoryBits;
 		fixtureDef.filter.maskBits = maskBits;
 		attachment.body.createFixture(fixtureDef);
 		attachment.body.setUserData(this);
-		attachment.body.setAngularDamping(10.0f);
+//		attachment.body.setAngularDamping(10.0f);
 		setBody(attachment.body);
 	}
 	
@@ -263,14 +280,17 @@ public class SimplePlayer extends BodyImageActor {
 			PolygonShape boxPoly) {
 		boxPoly.setAsBox(Utils.Screen2World(attachment.getWidth() * attachment.getScaleX())/2,
 				Utils.Screen2World(attachment.getHeight() * attachment.getScaleY())/2,
-				Utils.Screen2World(attachment.getX(), attachment.getY()),
+				Utils.Screen2World(attachment.getX()* attachment.getScaleX(), attachment.getY()*attachment.getScaleY()),
 				attachment.getRotation()*MathUtils.degRad);
 	}
 
-	
 	public void setAnimation(String string) {
 		if(!animation.getName().equals(string)){
 			animation = skeletonData.findAnimation(string);
 		}
+	}
+
+	public void setHealth(int health) {
+		this.health = health;
 	}
 }
