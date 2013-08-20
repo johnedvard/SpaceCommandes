@@ -64,9 +64,13 @@ public class SpaceServer {
 
 
 	private synchronized void init(Socket socket) throws IOException {
-		LOG.log(Level.INFO, "Creating client");
 		createSpaceClient(socket);
-		if(clients.size() % numPlayersPrGame == 0){
+		checkForGames();
+	}
+
+
+	private void checkForGames() {
+		while(clients.size() >= numPlayersPrGame && clients.size() % numPlayersPrGame == 0){
 			createGame();
 		}
 	}
@@ -83,14 +87,20 @@ public class SpaceServer {
 		games.add(game);
 	}
 	
-	public void endGame(Game game) {
+	public void gameEnded(Game game) {
+		System.out.println("game ended");
 		games.remove(game);
 		List<SpaceClientConnection> clientsInGame = game.getClientsInGame();
-		clients.addAll(clientsInGame);
+		for (SpaceClientConnection spaceClientConnection : clientsInGame) {
+			if(spaceClientConnection.isRunning())
+				clients.add(spaceClientConnection);
+		}
+		checkForGames();
 	}
 
 	private synchronized void createSpaceClient(Socket socket) throws IOException {
-		SpaceClientConnection client = new SpaceClientConnection(socket);
+		LOG.log(Level.INFO, "Creating client");
+		SpaceClientConnection client = new SpaceClientConnection(socket, this);
 		clients.add(client);
 	}
 	
@@ -108,5 +118,10 @@ public class SpaceServer {
 			port = Integer.valueOf(args[0]);
 		}
 		new SpaceServer(port);
+	}
+
+
+	public void clientDisconnected(SpaceClientConnection spaceClientConnection) {
+		clients.remove(spaceClientConnection);
 	}
 }

@@ -40,6 +40,7 @@ public class Game {
 								players++;
 							}
 						}
+						System.out.println("game has " + players + " players");
 						sleep(1000);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -52,10 +53,11 @@ public class Game {
 	}
 	
 	protected void endGame() {
+		System.out.println("ending game");
 		for (SpaceClientConnection spaceClientConnection : clientsInGame) {
 			spaceClientConnection.sendMessage(new EndGameCommand());
 		}
-		server.endGame(this);
+		server.gameEnded(this);
 	}
 	
 	public List<SpaceClientConnection> getClientsInGame() {

@@ -33,8 +33,11 @@ public class SpaceClientConnection {
 
 	private Json json = new Json();
 
-	public SpaceClientConnection(Socket s) throws IOException {
+	private SpaceServer spaceServer;
+
+	public SpaceClientConnection(Socket s, SpaceServer spaceServer) throws IOException {
 		LOG.info("Client connection created: " + s);
+		this.spaceServer = spaceServer;
 		this.socket = s;
 		InputStream inputStream = socket.getInputStream();
 		OutputStream outputStream = socket.getOutputStream();
@@ -45,6 +48,10 @@ public class SpaceClientConnection {
 		outputStreamHandler.start();
 	}
 	
+	protected void disconnect() {
+		spaceServer.clientDisconnected(this);		
+	}
+
 	public boolean isRunning() {
 		return running;
 	}
@@ -89,6 +96,7 @@ public class SpaceClientConnection {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			disconnect();
 		}
 	}
 
@@ -125,7 +133,8 @@ public class SpaceClientConnection {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			running = false; 
+			running = false;
+			disconnect();
 		}
 	}
 
