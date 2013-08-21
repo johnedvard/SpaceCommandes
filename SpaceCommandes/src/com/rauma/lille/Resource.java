@@ -14,6 +14,7 @@ public final class Resource {
 	public static Texture ballTexture;
 	public static Texture boxTexture;
 	public static Texture emptyTexture;
+	public static Texture emptySquareTexture;
 
 	public static Music bgMusic;
 	public static Sound actorSound1;
@@ -27,6 +28,7 @@ public final class Resource {
 		ballTexture = new Texture(Gdx.files.internal("data/ball-64.png"));
 		boxTexture = new Texture(Gdx.files.internal("data/box-64.png"));
 		emptyTexture = new Texture(Gdx.files.internal("data/empty.png"));
+		emptySquareTexture = new Texture(Gdx.files.internal("data/empty.png"));
 	}
 
 	protected void finalize() {
@@ -38,5 +40,6 @@ public final class Resource {
 		ballTexture.dispose();
 		boxTexture.dispose();
 		emptyTexture.dispose();
+		emptySquareTexture.dispose();
 	}
 }

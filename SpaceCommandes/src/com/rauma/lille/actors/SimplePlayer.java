@@ -64,7 +64,7 @@ public class SimplePlayer extends BodyImageActor {
 	float time;
 	
 	public SimplePlayer(int playerId, String name, short categoryBits, short maskBits, float x, float y, World world, BulletFactory bulletFactory, boolean isStaticBody, SpaceGame game, boolean me) {
-		super(new TextureRegion(Resource.emptyTexture, 0, 0, 0, 0));
+		super(new TextureRegion(Resource.ballTexture, 0, 0, 10, 10));
 		this.categoryBits = categoryBits;
 		this.maskBits = maskBits;
 		this.world = world;
