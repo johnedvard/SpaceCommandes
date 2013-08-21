@@ -1,5 +1,6 @@
 package com.rauma.lille;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
@@ -12,7 +13,17 @@ public class MainActivity extends AndroidApplication {
         
         AndroidApplicationConfiguration cfg = new AndroidApplicationConfiguration();
         cfg.useGL20 = false;
-        
         initialize(new SpaceGame(), cfg);
     }
+    
+    @Override
+    protected void onDestroy() {
+    	super.onDestroy();
+    }
+    
+    @Override
+    protected void onPause() {
+    	super.onPause();
+    }
+    
 }
