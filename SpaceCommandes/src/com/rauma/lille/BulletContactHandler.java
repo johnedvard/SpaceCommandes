@@ -19,7 +19,7 @@ public class BulletContactHandler {
 				if (other instanceof SimplePlayer) {
 					SimplePlayer player = (SimplePlayer) other;
 					if(player.isMe()){
-						player.registerHit(bullet.getDamage());
+						player.registerHit(bullet.getFiredByPlayerId(), bullet.getDamage());
 					}
 				}
 			}

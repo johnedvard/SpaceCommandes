@@ -24,10 +24,12 @@ public class Bullet extends Actor {
 	private boolean touching;
 	private float damage = 5.0f;
 	private int fireCount = 0;
+	private int firedByPlayerId = -1;
 
 	public Bullet(String name, short categoryBits, short maskBits, World world,
-			BulletFactory bulletFactory) {
+			BulletFactory bulletFactory, int firedByPlayerId) {
 		this.bulletFactory = bulletFactory;
+		this.firedByPlayerId = firedByPlayerId;
 
 		BodyDef def = new BodyDef();
 		def.type = BodyType.DynamicBody;
@@ -125,5 +127,9 @@ public class Bullet extends Actor {
 
 	public float getDamage() {
 		return damage;
+	}
+
+	public int getFiredByPlayerId() {
+		return firedByPlayerId;
 	}
 }

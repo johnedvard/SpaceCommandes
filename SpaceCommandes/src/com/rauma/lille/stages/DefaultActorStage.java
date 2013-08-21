@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
@@ -29,6 +31,9 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Transform;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.rauma.lille.SpaceGame;
 import com.rauma.lille.SpaceGameContactListener;
 import com.rauma.lille.Utils;
@@ -38,6 +43,7 @@ import com.rauma.lille.armory.BulletFactory;
 import com.rauma.lille.network.ApplyDamageCommand;
 import com.rauma.lille.network.Command;
 import com.rauma.lille.network.KillCommand;
+import com.rauma.lille.network.KillDeathRatioCommand;
 import com.rauma.lille.network.PositionCommand;
 import com.rauma.lille.network.StartGameCommand;
 
@@ -165,7 +171,7 @@ public class DefaultActorStage extends AbstractStage {
 	}
 
 	private SimplePlayer spawnPlayerAtPosition(int playerId, String name, short categoryBits, short maskBits, float x, float y,boolean isStaticBody, boolean isMe) {
-		BulletFactory bulletFactory = new BulletFactory(categoryBits, maskBits, world);
+		BulletFactory bulletFactory = new BulletFactory(categoryBits, maskBits, world, playerId);
 		SimplePlayer simplePlayer = new SimplePlayer(playerId, name, categoryBits, maskBits, x, y, world, bulletFactory, isStaticBody, game, isMe);
 		addActor(simplePlayer);
 		return simplePlayer;
@@ -203,6 +209,11 @@ public class DefaultActorStage extends AbstractStage {
 			float minPower = 0.8f;
 			if(currentY < minPower)
 				currentY = minPower;
+			if(player.getBody().getLinearVelocity().y == 0){
+				player1.setAnimation("fly-in");
+			}else{
+				player1.setAnimation("fly");
+			}
 			player.getBody().applyForceToCenter(
 					new Vector2(0, (float) (currentY * .1)), true);
 		}
@@ -243,11 +254,13 @@ public class DefaultActorStage extends AbstractStage {
 		updatePlayer(player1, delta);
 		updatePlayer(player2, delta);
 		executeCommandQueue();
+		
 		getCamera().position.set(getPlayerPosition());
 		getCamera().update();
 		debugMatrix = getCamera().combined.cpy();
 		debugMatrix.scale(SpaceGame.WORLD_SCALE, SpaceGame.WORLD_SCALE, 1f);
 		renderer.setView((OrthographicCamera) getCamera());
+		
 	}
 
 	@Override
@@ -312,7 +325,8 @@ public class DefaultActorStage extends AbstractStage {
 				} else if (player1.getId() == 2 && id == 1) {
 					movePlayer2(x, y, angle);
 				}
-			}else if (command instanceof KillCommand) {
+			}
+			else if (command instanceof KillCommand) {
 				KillCommand killCommand = (KillCommand) command;
 				killPlayer(killCommand);
 			}
@@ -376,14 +390,21 @@ public class DefaultActorStage extends AbstractStage {
 	public void applyDamageCommand(ApplyDamageCommand applyDmgCommand) {
 		int id = applyDmgCommand.getId();
 		float dmg = applyDmgCommand.getDamage();
+		int bulletFiredByPlayerId = applyDmgCommand.getFiredByOtherPlayerId();
 		if(id == player1.getId()){
-			player1.applyDamage(dmg);
-		}else if(id == player2.getId()){
-			player2.applyDamage(dmg);
+			player1.applyDamage(dmg, bulletFiredByPlayerId);
+		}
+		else {
+			for(SimplePlayer sp : otherPlayers){
+				if(sp.getId() == id){
+					sp.applyDamage(dmg, bulletFiredByPlayerId);
+				}
+			}
 		}
 	}
 
 	public void killCommand(KillCommand killCommand) {
 		commands.add(killCommand);
 	}
+
 }

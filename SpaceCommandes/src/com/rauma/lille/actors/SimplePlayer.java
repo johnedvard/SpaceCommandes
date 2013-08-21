@@ -1,7 +1,10 @@
 package com.rauma.lille.actors;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -10,6 +13,9 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.esotericsoftware.spine.Skeleton;
+import com.esotericsoftware.spine.SkeletonData;
+import com.esotericsoftware.spine.SkeletonRenderer;
 import com.rauma.lille.Resource;
 import com.rauma.lille.SpaceGame;
 import com.rauma.lille.Utils;
@@ -36,6 +42,17 @@ public class SimplePlayer extends BodyImageActor {
 	private short categoryBits;
 	private short maskBits;
 	private boolean isStaticBody;
+	private World world;
+	
+	private TextureAtlas atlas; // The information used to find the correct texture
+	private SkeletonData skeletonData; //The json file from Spine
+	private Skeleton skeleton; // The skeleton containing the json data (skeletonData) from Spine
+	private Animation animation; //The object used to store an animation found in the SkeletonData and to be applied later
+	private SkeletonRenderer skeletonRenderer = new SkeletonRenderer(); // The object used to draw the skeleton
+	private Box2dAttachment bodyAttachment;
+	private float time;
+	private int lastHitByPlayerId = -1;
+	private boolean isDead = false;
 	
 	public SimplePlayer(int playerId, String name, short categoryBits, short maskBits, float x, float y, World world, BulletFactory bulletFactory, boolean isStaticBody, SpaceGame game, boolean me) {
 		super(new TextureRegion(Resource.ballTexture, 0, 0, 64, 64));
@@ -85,7 +102,7 @@ public class SimplePlayer extends BodyImageActor {
 	@Override
 	public void act(float delta) {
 		super.act(delta);
-		if(health < 1) {
+		if(health < 1 && !isDead  ) {
 			die();
 		}
 		lastFired += delta;
@@ -111,14 +128,16 @@ public class SimplePlayer extends BodyImageActor {
 		}
 	}
 
-	public void applyDamage(float damage) {
+	public void applyDamage(float damage, int bulletFiredByPlayerId) {
 		this.health -= damage;
 		System.out.println("New health: " + health);
+		lastHitByPlayerId  = bulletFiredByPlayerId;
 	}
 	
 	private void die() {
 		if(isMe()){
-			Command c = new KillCommand(playerId);
+			isDead = true;
+			Command c = new KillCommand(playerId, lastHitByPlayerId);
 			game.writeToServer(c);
 		}
 	}
@@ -146,8 +165,8 @@ public class SimplePlayer extends BodyImageActor {
 		return angleRad;
 	}
 
-	public void registerHit(float damage) {
-		Command c = new ApplyDamageCommand(playerId, damage);
+	public void registerHit(int firedByPlayerId, float damage) {
+		Command c = new ApplyDamageCommand(playerId, damage, firedByPlayerId);
 		game.writeToServer(c);
 	}
 

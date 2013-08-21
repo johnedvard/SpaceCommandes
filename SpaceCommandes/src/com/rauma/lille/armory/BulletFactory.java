@@ -19,11 +19,13 @@ public class BulletFactory {
 	private World world;
 	private short categoryBits;
 	private short maskBits;
+	private int playerId;
 
-	public BulletFactory(short categoryBits, short maskBits, World world) {
+	public BulletFactory(short categoryBits, short maskBits, World world, int playerId) {
 		this.categoryBits = categoryBits;
 		this.maskBits = maskBits;
 		this.world = world;
+		this.playerId = playerId;
 		create(BULLET_LIMIT);
 	}
 
@@ -44,7 +46,7 @@ public class BulletFactory {
 	}
 
 	private Bullet createBullet() {
-		return new Bullet("Bullet " + categoryBits, categoryBits, maskBits, world, this);
+		return new Bullet("Bullet " + categoryBits, categoryBits, maskBits, world, this, playerId);
 	}
 
 	/**

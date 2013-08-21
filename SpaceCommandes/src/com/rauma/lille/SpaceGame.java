@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Json;
 import com.rauma.lille.network.ApplyDamageCommand;
 import com.rauma.lille.network.Command;
 import com.rauma.lille.network.KillCommand;
+import com.rauma.lille.network.KillDeathRatioCommand;
 import com.rauma.lille.network.PlayerAimedCommand;
 import com.rauma.lille.network.PositionCommand;
 import com.rauma.lille.network.StartGameCommand;
@@ -96,6 +97,11 @@ public class SpaceGame extends Game {
 
 	public void killCommand(KillCommand killCommand) {
 		defaultLevelScreen.killCommand(killCommand);
+		
+	}
+
+	public void killDeathRationCommand(KillDeathRatioCommand kdratioCommmad) {
+		defaultLevelScreen.killDeathRationCommand(kdratioCommmad);
 		
 	}
 }
