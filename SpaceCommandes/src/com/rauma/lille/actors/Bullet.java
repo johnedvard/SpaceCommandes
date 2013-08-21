@@ -21,10 +21,11 @@ import com.rauma.lille.armory.BulletFactory;
 public class Bullet extends Actor {
 	private Body body = null;
 	private BulletFactory bulletFactory;
-	private boolean touching;
+	private boolean detonated;
 	private float damage = 5.0f;
 	private int fireCount = 0;
 	private int firedByPlayerId = -1;
+	private int hitCount;
 
 	public Bullet(String name, short categoryBits, short maskBits, World world,
 			BulletFactory bulletFactory, int firedByPlayerId) {
@@ -56,7 +57,7 @@ public class Bullet extends Actor {
 	}
 
 	public void fire(float x, float y, float angleRad) {
-		getBody().setTransform(Utils.Screen2World(new Vector2(x, y)), angleRad);
+		getBody().setTransform(Utils.Screen2World(new Vector2(x, y)), MathUtils.PI/2f);
 //		getBody().setTransform(Utils.Screen2World(new Vector2(x, y)), 0);
 		getBody().setActive(true);
 		getBody().applyLinearImpulse(Utils.getVector(angleRad, 0.000004f),
@@ -65,18 +66,25 @@ public class Bullet extends Actor {
 	}
 
 	public void beginContact(Object other) {
-		touching = true;
-		// inflict damage on other
+		hitCount++;
+		if(!detonated && other instanceof SimplePlayer) {
+			SimplePlayer player = (SimplePlayer) other;
+			if(player.isMe()){
+				// inflict damage
+				player.registerHit(firedByPlayerId,getDamage());
+			}
+			detonated = true;
+		}
 	}
 
 	public void endContact(Object other) {
-		touching = false;
 	}
 
 	private void deactivate() {
-		touching = false;
+		detonated = false;
+		hitCount = 0;
 		getBody().setActive(false);
-		getBody().setTransform(-10, -10, 0);
+		getBody().setTransform(-100, -100, 0);
 		bulletFactory.release(this);
 	}
 
@@ -92,8 +100,8 @@ public class Bullet extends Actor {
 		return body;
 	}
 	
-	public boolean isTouching() {
-		return touching;
+	public boolean isDetonated() {
+		return detonated;
 	}
 
 	public void draw(SpriteBatch batch, float parentAlpha) {
@@ -108,7 +116,7 @@ public class Bullet extends Actor {
 
 	@Override
 	public void act(float delta) {
-		if (touching) {
+		if (detonated || hitCount > 3) {
 			deactivate();
 		}
 		super.act(delta);
@@ -122,7 +130,7 @@ public class Bullet extends Actor {
 
 	@Override
 	public String toString() {
-		return super.toString() + " touching="+ isTouching() + ", awake=" + getBody().isAwake() + ", active=" + getBody().isActive() + ", fireCount="+fireCount;
+		return super.toString() + " touching="+ isDetonated() + ", awake=" + getBody().isAwake() + ", active=" + getBody().isActive() + ", fireCount="+fireCount;
 	}
 
 	public float getDamage() {

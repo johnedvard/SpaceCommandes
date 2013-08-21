@@ -10,6 +10,7 @@ import com.rauma.lille.SpaceGame;
 import com.rauma.lille.actors.SimplePlayer;
 import com.rauma.lille.network.ApplyDamageCommand;
 import com.rauma.lille.network.Command;
+import com.rauma.lille.network.EndGameCommand;
 import com.rauma.lille.network.KillCommand;
 import com.rauma.lille.network.KillDeathRatioCommand;
 import com.rauma.lille.network.PlayerAimedCommand;
@@ -26,6 +27,9 @@ public class DefaultLevelScreen extends DefaultScreen {
 	protected DefaultActorStage actorStage;
 	protected BackgroundStage bgStage;
 	protected UIStage uiStage;
+
+	// used to limit number of position updates to server
+	private float prevX, prevY = 0;
 
 	public DefaultLevelScreen(final SpaceGame game, String mapName) {
 		super(game);
@@ -70,16 +74,14 @@ public class DefaultLevelScreen extends DefaultScreen {
 		Gdx.input.setInputProcessor(controllerStage);
 	}
 
-	private float prevX, prevY = 0;
-	
 	@Override
 	public void render(float delta) {
 		 // the following code clears the screen with the given RGB color (green)
         Gdx.gl.glClearColor( 0.0f, 0.5f, 0.0f, 1f );
         Gdx.gl.glClear( GL10.GL_COLOR_BUFFER_BIT );
         Gdx.graphics.setVSync(false);
-		
-		bgStage.act(delta);
+        
+        bgStage.act(delta);
 		actorStage.act(delta);
 		uiStage.act(delta);
 		controllerStage.act(delta);
@@ -119,9 +121,9 @@ public class DefaultLevelScreen extends DefaultScreen {
 		actorStage.playerAimed(playerId, knobX, knobY, knobPercentX, knobPercentY);
 		
 	}
-
-	public SpaceGame getGame() {
-		return game;
+	@Override
+	public void resize(int width, int height) {
+		actorStage.resize(width, height);
 	}
 
 	public void applyDamageCommand(ApplyDamageCommand applyDmgCommand) {
@@ -132,10 +134,12 @@ public class DefaultLevelScreen extends DefaultScreen {
 		actorStage.killCommand(killCommand);
 		
 	}
-
 	public void killDeathRationCommand(KillDeathRatioCommand kdratioCommmad) {
 		uiStage.killDeathRationCommand(kdratioCommmad);
-		
+	}
+	
+	public void endGame(EndGameCommand endCommand) {
+		actorStage.endGame(endCommand);
 	}
 	
 }

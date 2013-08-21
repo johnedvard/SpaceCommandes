@@ -17,7 +17,8 @@ public class SpaceServer {
 	private static final Logger LOG = Logger.getLogger("SpaceServer");
 
 	private List<SpaceClientConnection> clients = new ArrayList<SpaceClientConnection>();
-
+	private List<Game> games = new ArrayList<Game>();
+	
 	private boolean running = false;
 
 	private int numPlayersPrGame = 2;
@@ -63,9 +64,13 @@ public class SpaceServer {
 
 
 	private synchronized void init(Socket socket) throws IOException {
-		LOG.log(Level.INFO, "Creating client");
 		createSpaceClient(socket);
-		if(clients.size() % numPlayersPrGame == 0){
+		checkForGames();
+	}
+
+
+	private void checkForGames() {
+		while(clients.size() >= numPlayersPrGame && clients.size() % numPlayersPrGame == 0){
 			createGame();
 		}
 	}
@@ -75,14 +80,27 @@ public class SpaceServer {
 		// get clients for the current game.
 		List<SpaceClientConnection> clientsToPlayTogether = new ArrayList<SpaceClientConnection>();
 		for(int i = 0; i<numPlayersPrGame; i++){
-			//TODO (john) Add a list with game states.
 			SpaceClientConnection spaceClientConnection = clients.remove(clients.size()-1);
 			clientsToPlayTogether.add(spaceClientConnection);
 		}
-		new Game(clientsToPlayTogether);
+		Game game = new Game(clientsToPlayTogether, this);
+		games.add(game);
 	}
+	
+	public void gameEnded(Game game) {
+		System.out.println("game ended");
+		games.remove(game);
+		List<SpaceClientConnection> clientsInGame = game.getClientsInGame();
+		for (SpaceClientConnection spaceClientConnection : clientsInGame) {
+			if(spaceClientConnection.isRunning())
+				clients.add(spaceClientConnection);
+		}
+		checkForGames();
+	}
+
 	private synchronized void createSpaceClient(Socket socket) throws IOException {
-		SpaceClientConnection client = new SpaceClientConnection(socket);
+		LOG.log(Level.INFO, "Creating client");
+		SpaceClientConnection client = new SpaceClientConnection(socket, this);
 		clients.add(client);
 	}
 	
@@ -100,5 +118,10 @@ public class SpaceServer {
 			port = Integer.valueOf(args[0]);
 		}
 		new SpaceServer(port);
+	}
+
+
+	public void clientDisconnected(SpaceClientConnection spaceClientConnection) {
+		clients.remove(spaceClientConnection);
 	}
 }

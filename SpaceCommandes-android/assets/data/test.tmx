@@ -48,5 +48,6 @@
  <objectgroup name="spawn" width="100" height="60">
   <object name="sp1" x="317" y="197" width="40" height="36"/>
   <object name="sp2" x="1076" y="173" width="40" height="36"/>
+  <object name="sp3" x="915" y="672" width="39" height="33"/>
  </objectgroup>
 </map>

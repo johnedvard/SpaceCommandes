@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.maps.MapLayer;
@@ -42,6 +45,7 @@ import com.rauma.lille.actors.SimplePlayer;
 import com.rauma.lille.armory.BulletFactory;
 import com.rauma.lille.network.ApplyDamageCommand;
 import com.rauma.lille.network.Command;
+import com.rauma.lille.network.EndGameCommand;
 import com.rauma.lille.network.KillCommand;
 import com.rauma.lille.network.KillDeathRatioCommand;
 import com.rauma.lille.network.PositionCommand;
@@ -68,17 +72,29 @@ public class DefaultActorStage extends AbstractStage {
 	private OrthogonalTiledMapRenderer renderer;
 
 	private SimplePlayer player1;
-	private SimplePlayer player2;
 	
 	private float currentX;
 	private float currentY;
 	private List<Command> commands = new ArrayList<Command>();
 	private Map<String,Vector2> spawnpoints = new HashMap<String,Vector2>();
 	private SpaceGame game;
-	private List<PositionCommand> updatePositions = new ArrayList<PositionCommand>();
 
 	private int playerId = -1;
 	private boolean newGame = false;
+	private Rectangle viewport;
+	private int numberOfPlayers = -1;
+	private String spawnPointName = null;
+	private List<SimplePlayer> otherPlayers = new ArrayList<SimplePlayer>();
+	
+	private Sound dieSound = Gdx.audio.newSound(Gdx.files.internal("sound/die.wav"));
+	private Sound hitSound = Gdx.audio.newSound(Gdx.files.internal("sound/hit.wav"));
+	private Sound jumpSound = Gdx.audio.newSound(Gdx.files.internal("sound/jump2.wav"));
+	private Sound shootSound = Gdx.audio.newSound(Gdx.files.internal("sound/shoot2.wav"));
+	private Sound flySound = Gdx.audio.newSound(Gdx.files.internal("sound/fly.wav"));
+
+//	private Music music = Gdx.audio.newMusic(Gdx.files.internal("music/Nintendo Freak Time's-up.mp3"));
+	private Music intro = Gdx.audio.newMusic(Gdx.files.internal("music/01 HHavok-intro.mp3"));
+	private Music main = Gdx.audio.newMusic(Gdx.files.internal("music/02 HHavok-main.mp3"));
 
 	public DefaultActorStage(SpaceGame game, float width, float height, boolean keepAspectRatio) {
 		super(width, height, keepAspectRatio);
@@ -93,12 +109,12 @@ public class DefaultActorStage extends AbstractStage {
 
 
 		OrthographicCamera camera = (OrthographicCamera) getCamera();
-		float width = getWidth();
-		float height = getHeight();
+		float width = getWidth()/2;
+		float height = getHeight()/2;
 //		float aspectRatio = width/height;
 //		float scale = 128f;
 //		camera.setToOrtho(false, scale*aspectRatio, scale);
-		camera.setToOrtho(false, width/2, height/2);
+		camera.setToOrtho(false, width, height);
 //		debugMatrix.scale(SpaceGame.WORLD_SCALE*SCALE*aspectRatio, SpaceGame.WORLD_SCALE*SCALE, 1f);
 
 		world.setContactListener(new SpaceGameContactListener());
@@ -166,8 +182,8 @@ public class DefaultActorStage extends AbstractStage {
 		}
 		
 		shape.dispose();
-
-		player1 = spawnPlayerAtPosition(-1,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,false,true);
+		
+		endGame = true;
 	}
 
 	private SimplePlayer spawnPlayerAtPosition(int playerId, String name, short categoryBits, short maskBits, float x, float y,boolean isStaticBody, boolean isMe) {
@@ -188,10 +204,19 @@ public class DefaultActorStage extends AbstractStage {
 		float angleRad = (float) Math.atan2(-knobPercentY, knobPercentX);
 		if(player1.getId() == playerId){
 			player1.setAngleRad(angleRad);
-		}else if(player2.getId() == playerId){
-			player2.setAngleRad(angleRad);
+		}
+		else{
+			for(SimplePlayer sp : otherPlayers){
+				if(sp.getId() == playerId){
+					sp.setAngleRad(angleRad);
+				}
+			}
 		}
 	}
+	
+	private float flyPlayedDuration = 0;
+	private float jumpPlayedDuration = 0;
+	private boolean endGame;
 
 	public void updatePlayer(SimplePlayer player, float delta) {
 		if(player == null || player.getBody() == null){
@@ -216,10 +241,28 @@ public class DefaultActorStage extends AbstractStage {
 			}
 			player.getBody().applyForceToCenter(
 					new Vector2(0, (float) (currentY * .1)), true);
+
+			if(player.getBody().getLinearVelocity().y < 0.5) {
+				if((jumpPlayedDuration -= delta) < 0) {
+					jumpSound.play();
+					jumpPlayedDuration = 2;
+				}
+			} else {
+				if((flyPlayedDuration -= delta) < 0) {
+					flySound.play();
+					flyPlayedDuration = 0.5f;
+				}
+			}
+		} else if(player.getBody().getLinearVelocity().y == 0){
+			player1.setAnimation("idle");
 		}
 
 		if (player.getAngleRad() != 0 && player.getRotation() != player.getAngleRad()) {
-			player.fireWeapon(player.getAngleRad()+MathUtils.PI/2); // adjusted +90 deg
+			
+			boolean fireWeapon = player.fireWeapon(player.getAngleRad()+MathUtils.PI/2); // adjusted +90 deg
+			if(fireWeapon) {
+				shootSound.play();
+			}
 		}
 	}
 	
@@ -229,8 +272,7 @@ public class DefaultActorStage extends AbstractStage {
 
 	@Override
 	public void act(float delta) {
-		if(newGame) {
-
+		if(endGame) {
 			for(Actor a : this.getActors()){
 				if (a instanceof BodyImageActor) {
 					BodyImageActor bodyActor = (BodyImageActor) a;
@@ -238,46 +280,86 @@ public class DefaultActorStage extends AbstractStage {
 					bodyActor.remove();
 				}
 			}
+
+			endGame = false;
+		} else if(newGame) {
+			otherPlayers.clear();
+			for(int i = 0; i<numberOfPlayers; i++){
+				if(i == playerId){
+					System.out.println("spawning me: " + i);
+					Vector2 s = spawnpoints.get(spawnPointName);
+					System.out.println("vector2: with name: " + spawnPointName + " - " + s);
+					player1 = spawnPlayerAtPosition(playerId,"Player "+playerId, CATEGORY_PLAYER_1, MASK_PLAYER_1, s.x, s.y, false,true);
+				}else{
+					System.out.println("spawning other player: " + i);
+					otherPlayers.add(spawnPlayerAtPosition(i, "Player "+i, CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150, true, false));
+				}
+			}
 			
-			//hardcoded for two players
-			if(playerId == 1){
-				player1 = spawnPlayerAtPosition(playerId,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,false,true);
-				player2 = spawnPlayerAtPosition(2,"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,true,false);
-			}
-			else{
-				player1 = spawnPlayerAtPosition(playerId,"Player 2", CATEGORY_PLAYER_2, MASK_PLAYER_2, 400, 150,false,true);
-				player2 = spawnPlayerAtPosition(1,"Player 1", CATEGORY_PLAYER_1, MASK_PLAYER_1, 100, 100,true,false);
-			}
+			if(intro.isPlaying()) intro.stop();
+			if(main.isPlaying()) main.stop();
+			main.play();
 			newGame = false;
+		} else {
+			if(player1 == null || player1.getBody() == null) {
+				Vector2 s = spawnpoints.get("sp1");
+				player1 = spawnPlayerAtPosition(playerId,"Player "+playerId, CATEGORY_PLAYER_1, MASK_PLAYER_1, s.x, s.y, false,true);
+
+				if(intro.isPlaying()) intro.stop();
+				if(main.isPlaying()) main.stop();
+				intro.play();
+				intro.setLooping(true);
+			}
 		}
 		super.act(delta);
 		updatePlayer(player1, delta);
-		updatePlayer(player2, delta);
+		updateOtherPlayers(delta);
+
 		executeCommandQueue();
-		
 		getCamera().position.set(getPlayerPosition());
+
+		if(player1 != null) {
+			getCamera().position.set(getPlayerPosition());
+		}
 		getCamera().update();
+        getCamera().apply(Gdx.gl10);
 		debugMatrix = getCamera().combined.cpy();
 		debugMatrix.scale(SpaceGame.WORLD_SCALE, SpaceGame.WORLD_SCALE, 1f);
 		renderer.setView((OrthographicCamera) getCamera());
 		
 	}
 
+	private void updateOtherPlayers(float delta) {
+		for(SimplePlayer sp : otherPlayers){
+			updatePlayer(sp, delta);
+		}
+	}
+
 	@Override
 	public void draw() {
+ 
+        // set viewport
+        Gdx.gl.glViewport((int) viewport.x, (int) viewport.y,
+                          (int) viewport.width, (int) viewport.height);
+        
+        debugMatrix = getCamera().combined.cpy();
+		debugMatrix.scale(SpaceGame.WORLD_SCALE, SpaceGame.WORLD_SCALE, 1f);
+		renderer.setView((OrthographicCamera) getCamera());
 		super.draw();
 		renderer.render();
 		debugRenderer.render(world, debugMatrix);
 		world.step(1 / 45f, 6, 2);
 	}
 
-	public Vector3 getPlayerPosition() {
+	private Vector3 getPlayerPosition() {
 		float centerX = player1.getX()+player1.getWidth()/2;
 		float centerY = player1.getY()+player1.getHeight()/2;
-		float minWidth = getWidth()/4;
-		float maxWidth = getWidth() - minWidth;
-		float minHeight = getHeight()/4;
-		float maxHeight = getHeight() - minHeight;
+		float screenWidth = getWidth();
+		float screenHeight = getHeight();
+		float minWidth = screenWidth/4;
+		float maxWidth = screenWidth - minWidth;
+		float minHeight = screenHeight/4;
+		float maxHeight = screenHeight - minHeight;
 
 		if(centerX < minWidth) {
 			centerX = minWidth;
@@ -296,6 +378,9 @@ public class DefaultActorStage extends AbstractStage {
 
 	public void createNewGame(StartGameCommand startGameCommand) {
 		playerId = startGameCommand.getPlayerId();
+		numberOfPlayers = startGameCommand.getNumPlayers();
+		spawnPointName = startGameCommand.getSpawnPointName();
+		endGame = true;
 		newGame = true;
 	}
 
@@ -305,10 +390,6 @@ public class DefaultActorStage extends AbstractStage {
 			if (command instanceof PositionCommand) {
 				PositionCommand commandPos = (PositionCommand) command;
 				
-				if(commandPos == null){
-					//TODO (john)(cast and error?)
-					continue;
-				}
 				int id = commandPos.getId();
 				float x = commandPos.getX();
 				float y = commandPos.getY();
@@ -319,11 +400,8 @@ public class DefaultActorStage extends AbstractStage {
 					return;
 				}
 				
-				//hardcoded for two players
-				if (player1.getId() == 1 && id == 2) {
-					movePlayer2(x, y, angle);
-				} else if (player1.getId() == 2 && id == 1) {
-					movePlayer2(x, y, angle);
+				if(player1.getId() != id){
+					moveOtherPlayers(x, y, angle);
 				}
 			}
 			else if (command instanceof KillCommand) {
@@ -333,9 +411,25 @@ public class DefaultActorStage extends AbstractStage {
 		}
 	}
 	
+	private void moveOtherPlayers(float x, float y, float angle) {
+		for(SimplePlayer sp : otherPlayers){
+			if (sp != null && sp.getBody() != null) {
+				Body body = sp.getBody();
+				Transform transform = body.getTransform();
+				Vector2 position = transform.getPosition();
+				float newX = x + sp.getWidth() / 2;
+				float newY = y + sp.getHeight() / 2;
+				if (position.x != newX && position.y != newY) {
+					body.setTransform(Utils.Screen2World(newX, newY), angle);
+				}
+			}
+		}
+	}
+
 	private void killPlayer(KillCommand killCommand) {
 		int id = killCommand.getPlayerId();
-		if(player1.getId() == id) {
+		dieSound.play();
+		if(player1.getId() == id){
 			String name = player1.getName();
 			short maskBits = player1.getMaskBits();
 			short categoryBits = player1.getCategoryBits();
@@ -343,46 +437,24 @@ public class DefaultActorStage extends AbstractStage {
 			boolean isMe = player1.isMe();
 			player1.destroyBody();
 			player1.remove();
-			Vector2 spawnPoint = null;
-			if(id==1){
-				spawnPoint = spawnpoints.get("sp1");
-			}else if(id==2){
-				spawnPoint = spawnpoints.get("sp2");
-			}
+			Vector2 spawnPoint = spawnpoints.get("sp"+(id+1));
 			player1 = spawnPlayerAtPosition(id, name, categoryBits, maskBits, spawnPoint.x, spawnPoint.y, isStaticBody, isMe);
 		}
-		else if(player2.getId() == id) {
-			String name = player2.getName();
-			short maskBits = player2.getMaskBits();
-			short categoryBits = player2.getCategoryBits();
-			boolean isStaticBody = player2.isStaticBody();
-			boolean isMe = player2.isMe();
-			player2.destroyBody();
-			player2.remove();
-			Vector2 spawnPoint = null;
-			if(id==1){
-				spawnPoint = spawnpoints.get("sp1");
-			}else if(id==2){
-				spawnPoint = spawnpoints.get("sp2");
-			}
-			player2 = spawnPlayerAtPosition(id, name, categoryBits, maskBits, spawnPoint.x, spawnPoint.y, isStaticBody, isMe);
-		}
-		
-	}
-
-	private void movePlayer2(float x, float y, float angle) {
-
-		if (player2 != null && player2.getBody() != null) {
-			Body body = player2.getBody();
-			Transform transform = body.getTransform();
-			Vector2 position = transform.getPosition();
-			float newX = x + player2.getWidth() / 2;
-			float newY = y + player2.getHeight() / 2;
-			if (position.x != newX && position.y != newY) {
-				body.setTransform(Utils.Screen2World(newX, newY), angle);
+		else {
+			for(SimplePlayer sp : otherPlayers){
+				if(sp.getId() == id){
+//					String name = sp.getName();
+//					sp.destroyBody();
+//					sp.remove();
+//					Vector2 spawnPoint = spawnpoints.get("sp"+(sp.getId()+1));
+//					System.out.println("spawingn other player");
+//					sp = spawnPlayerAtPosition(sp.getId(), name, CATEGORY_PLAYER_2, MASK_PLAYER_2, spawnPoint.x, spawnPoint.y, true, false);
+					sp.setHealth(100);
+				}
 			}
 		}
 	}
+
 	public void updatePlayerPos(PositionCommand commandPos) {
 		commands.add(commandPos);
 	}
@@ -393,6 +465,7 @@ public class DefaultActorStage extends AbstractStage {
 		int bulletFiredByPlayerId = applyDmgCommand.getFiredByOtherPlayerId();
 		if(id == player1.getId()){
 			player1.applyDamage(dmg, bulletFiredByPlayerId);
+			hitSound.play();
 		}
 		else {
 			for(SimplePlayer sp : otherPlayers){
@@ -407,4 +480,33 @@ public class DefaultActorStage extends AbstractStage {
 		commands.add(killCommand);
 	}
 
+	public void resize(int width, int height) {
+
+		float aspectRatio = (float)width/(float)height;
+		float scale = 1f;
+		Vector2 crop = new Vector2(0f, 0f);
+		if(aspectRatio > SpaceGame.ASPECT_RATIO)
+		{
+			scale = (float)height/SpaceGame.VIRTUAL_HEIGHT;
+			crop.x = (width - SpaceGame.VIRTUAL_WIDTH*scale)/2f;
+		}
+		else if(aspectRatio < SpaceGame.ASPECT_RATIO)
+		{
+			scale = (float)width/SpaceGame.VIRTUAL_WIDTH;
+			crop.y = (height - SpaceGame.VIRTUAL_HEIGHT*scale)/2f;
+		}
+		else
+		{
+			scale = (float)width/SpaceGame.VIRTUAL_WIDTH;
+		}
+
+		float w = SpaceGame.VIRTUAL_WIDTH*scale;
+		float h = SpaceGame.VIRTUAL_HEIGHT*scale;
+		viewport = new Rectangle(crop.x, crop.y, w, h);
+	}
+
+	public void endGame(EndGameCommand endCommand) {
+		playerId = -1;
+		endGame = true;
+	}
 }
