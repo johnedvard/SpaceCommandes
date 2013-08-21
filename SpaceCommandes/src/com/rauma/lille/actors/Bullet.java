@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.rauma.lille.Resource;
 import com.rauma.lille.SpaceGame;
 import com.rauma.lille.Utils;
 import com.rauma.lille.armory.BulletFactory;
@@ -108,8 +109,9 @@ public class Bullet extends Actor {
 			setX(getBody().getPosition().x * SpaceGame.WORLD_SCALE - getWidth() / 2);
 			setY(getBody().getPosition().y * SpaceGame.WORLD_SCALE - getHeight() / 2);
 		}
-
+		
 		super.draw(batch, parentAlpha);
+		batch.draw(Resource.bubbleTexture2, getX(), getY(), 3f, 3f);
 	}
 
 	@Override

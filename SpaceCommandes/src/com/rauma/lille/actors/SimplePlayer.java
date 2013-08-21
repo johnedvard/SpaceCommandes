@@ -64,7 +64,7 @@ public class SimplePlayer extends BodyImageActor {
 	float time;
 	
 	public SimplePlayer(int playerId, String name, short categoryBits, short maskBits, float x, float y, World world, BulletFactory bulletFactory, boolean isStaticBody, SpaceGame game, boolean me) {
-		super(new TextureRegion(Resource.emptyTexture, 0, 0, 64, 64));
+		super(new TextureRegion(Resource.emptyTexture, 0, 0, 0, 0));
 		this.categoryBits = categoryBits;
 		this.maskBits = maskBits;
 		this.world = world;
@@ -125,6 +125,19 @@ public class SimplePlayer extends BodyImageActor {
 		if(health < 1) {
 			die();
 		}
+		
+		if(MathUtils.sin(angleRad) == 0) {
+			if (getBody().getLinearVelocity().x < 0) {
+				if (!skeleton.getFlipX()) {
+					skeleton.setFlipX(true);
+				}
+			} else if (getBody().getLinearVelocity().x > 0) {
+				if (skeleton.getFlipX()) {
+					skeleton.setFlipX(false);
+				}
+			}
+		}
+		
 		lastFired += delta;
 	}
 
@@ -196,11 +209,11 @@ public class SimplePlayer extends BodyImageActor {
 		Bone bodyBone = skeleton.findBone("body");
 		Array<Event> events = new Array<Event>();
 		animation.apply(skeleton, lastTime, time, true, events);
-		for(Event e : events){
-			String name = e.getString();
-			System.out.println(e);
-			System.out.println(name);
-		}
+//		for(Event e : events){
+//			String name = e.getString();
+//			System.out.println(e);
+//			System.out.println(name);
+//		}
 		bodyBone.setRotation(bodyBone.getRotation());
 		skeleton.updateWorldTransform();
 		skeletonRenderer.draw(batch, skeleton);

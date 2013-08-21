@@ -230,9 +230,9 @@ public class DefaultActorStage extends AbstractStage {
 				currentY = minPower;
 
 			if(player.getBody().getLinearVelocity().y == 0){
-				player1.setAnimation("fly-in");
+				player.setAnimation("fly-in");
 			}else{
-				player1.setAnimation("fly");
+				player.setAnimation("fly");
 			}
 			player.getBody().applyForceToCenter(
 					new Vector2(0, (float) (currentY * .1)), true);
@@ -340,7 +340,7 @@ public class DefaultActorStage extends AbstractStage {
 		renderer.setView((OrthographicCamera) getCamera());
 		super.draw();
 		renderer.render();
-		debugRenderer.render(world, debugMatrix);
+//		debugRenderer.render(world, debugMatrix);
 		world.step(1 / 45f, 6, 2);
 	}
 
@@ -393,7 +393,7 @@ public class DefaultActorStage extends AbstractStage {
 					return;
 				}
 				
-				if(player1.getId() != id){
+				if(player1 == null || player1.getId() != id){
 					moveOtherPlayers(x, y, angle);
 				}
 			}else if (command instanceof KillCommand) {
