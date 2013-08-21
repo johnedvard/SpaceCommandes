@@ -1,8 +1,10 @@
 SpaceCommandes
 ==============
 
-A multiplayer space game with lasers!
+A cross platform multiplayer space game with mechs!
+By John Edvard Reiten and Frank Paaske 
 
+Music by [Eric Skiff][4], thanks!
 
 Getting started
 -----------
@@ -48,3 +50,4 @@ If you're unlucky, there will be other problems. If so, `<insert preferred cours
 [1]: https://github.com/libgdx/libgdx "LibGDX"
 [2]: https://github.com/EsotericSoftware/spine-runtimes "Spine Runtimes"
 [3]: https://github.com/johnedvard/SpaceCommandes "Space Commandes"
+[4]: http://ericskiff.com/music/ "Eric Skiff"
