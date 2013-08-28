@@ -54,6 +54,7 @@ public class SimplePlayer extends BodyImageActor {
 	private short maskBits;
 	private boolean isStaticBody;
 	private World world;
+	private boolean dead = false;
 	
 	private TextureAtlas atlas; // The information used to find the correct texture
 	private SkeletonData skeletonData; //The json file from Spine
@@ -62,6 +63,7 @@ public class SimplePlayer extends BodyImageActor {
 	private SkeletonRenderer skeletonRenderer = new SkeletonRenderer(); // The object used to draw the skeleton
 	private Box2dAttachment bodyAttachment;
 	float time;
+	private int playerWhoGotTheLastHit;
 	
 	public SimplePlayer(int playerId, String name, short categoryBits, short maskBits, float x, float y, World world, BulletFactory bulletFactory, boolean isStaticBody, SpaceGame game, boolean me) {
 		super(new TextureRegion(Resource.ballTexture, 0, 0, 10, 10));
@@ -173,13 +175,15 @@ public class SimplePlayer extends BodyImageActor {
 		return shotFired;
 	}
 
-	public void applyDamage(float damage) {
+	public void applyDamage(float damage, int playerWhoShotTheBullet) {
+		playerWhoGotTheLastHit = playerWhoShotTheBullet;
 		this.health -= damage;
 	}
 	
 	private void die() {
-		if(isMe()){
-			Command c = new KillCommand(playerId);
+		if(isMe() && !dead){
+			dead = true;
+			Command c = new KillCommand(playerId,playerWhoGotTheLastHit);
 			game.writeToServer(c);
 		}
 	}
@@ -231,8 +235,8 @@ public class SimplePlayer extends BodyImageActor {
 		return angleRad;
 	}
 
-	public void registerHit(float damage) {
-		Command c = new ApplyDamageCommand(playerId, damage);
+	public void registerHit(float damage, int playerWhoShotTheBulletId) {
+		Command c = new ApplyDamageCommand(playerId, damage, playerWhoShotTheBulletId);
 		game.writeToServer(c);
 	}
 

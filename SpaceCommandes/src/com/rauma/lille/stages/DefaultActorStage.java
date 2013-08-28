@@ -43,6 +43,7 @@ import com.rauma.lille.network.Command;
 import com.rauma.lille.network.EndGameCommand;
 import com.rauma.lille.network.KillCommand;
 import com.rauma.lille.network.PositionCommand;
+import com.rauma.lille.network.ScoreCommand;
 import com.rauma.lille.network.StartGameCommand;
 
 /**
@@ -181,7 +182,7 @@ public class DefaultActorStage extends AbstractStage {
 	}
 
 	private SimplePlayer spawnPlayerAtPosition(int playerId, String name, short categoryBits, short maskBits, float x, float y,boolean isStaticBody, boolean isMe) {
-		BulletFactory bulletFactory = new BulletFactory(categoryBits, maskBits, world);
+		BulletFactory bulletFactory = new BulletFactory(categoryBits, maskBits, world, playerId);
 		SimplePlayer simplePlayer = new SimplePlayer(playerId, name, categoryBits, maskBits, x, y, world, bulletFactory, isStaticBody, game, isMe);
 		addActor(simplePlayer);
 		return simplePlayer;
@@ -456,12 +457,12 @@ public class DefaultActorStage extends AbstractStage {
 		float dmg = applyDmgCommand.getDamage();
 		hitSound.play();
 		if(id == player1.getId()){
-			player1.applyDamage(dmg);
+			player1.applyDamage(dmg, applyDmgCommand.getPlayerWhoDealtDamageId());
 		}
 		else {
 			for(SimplePlayer sp : otherPlayers){
 				if(sp.getId() == id){
-					sp.applyDamage(dmg);
+					sp.applyDamage(dmg, applyDmgCommand.getPlayerWhoDealtDamageId());
 				}
 			}
 		}
@@ -500,4 +501,5 @@ public class DefaultActorStage extends AbstractStage {
 		playerId = -1;
 		endGame = true;
 	}
+
 }

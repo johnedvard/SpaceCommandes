@@ -26,11 +26,13 @@ public class Bullet extends Actor {
 	private float damage = 5.0f;
 	private int fireCount = 0;
 	private int hitCount;
+	private int playerWhoShotTheBulletId = -1;
+	
 
 	public Bullet(String name, short categoryBits, short maskBits, World world,
-			BulletFactory bulletFactory) {
+			BulletFactory bulletFactory, int playerId) {
 		this.bulletFactory = bulletFactory;
-
+		this.playerWhoShotTheBulletId = playerId;
 		BodyDef def = new BodyDef();
 		def.type = BodyType.DynamicBody;
 		def.bullet = true;
@@ -70,7 +72,7 @@ public class Bullet extends Actor {
 			SimplePlayer player = (SimplePlayer) other;
 			if(player.isMe()){
 				// inflict damage
-				player.registerHit(getDamage());
+				player.registerHit(getDamage(),playerWhoShotTheBulletId);
 			}
 			detonated = true;
 		}

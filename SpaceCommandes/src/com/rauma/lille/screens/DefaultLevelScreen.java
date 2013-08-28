@@ -14,6 +14,7 @@ import com.rauma.lille.network.EndGameCommand;
 import com.rauma.lille.network.KillCommand;
 import com.rauma.lille.network.PlayerAimedCommand;
 import com.rauma.lille.network.PositionCommand;
+import com.rauma.lille.network.ScoreCommand;
 import com.rauma.lille.network.StartGameCommand;
 import com.rauma.lille.stages.BackgroundStage;
 import com.rauma.lille.stages.ControllerStage;
@@ -104,6 +105,7 @@ public class DefaultLevelScreen extends DefaultScreen {
 
 	public void createNewGame(StartGameCommand startGameCommand) {
 		actorStage.createNewGame(startGameCommand);
+		uiStage.createNewGame(startGameCommand);
 	}
 
 	public void updatePlayerPos(PositionCommand commandPos) {
@@ -135,6 +137,11 @@ public class DefaultLevelScreen extends DefaultScreen {
 
 	public void endGame(EndGameCommand endCommand) {
 		actorStage.endGame(endCommand);
+	}
+
+	public void scoreCommand(ScoreCommand scoreCommand) {
+		uiStage.scoreCommand(scoreCommand);
+		
 	}
 	
 }

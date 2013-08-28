@@ -15,6 +15,7 @@ import com.rauma.lille.network.EndGameCommand;
 import com.rauma.lille.network.KillCommand;
 import com.rauma.lille.network.PlayerAimedCommand;
 import com.rauma.lille.network.PositionCommand;
+import com.rauma.lille.network.ScoreCommand;
 import com.rauma.lille.network.SpaceServerConnection;
 import com.rauma.lille.network.StartGameCommand;
 import com.rauma.lille.screens.DefaultLevelScreen;
@@ -102,10 +103,13 @@ public class SpaceGame extends Game {
 
 	public void killCommand(KillCommand killCommand) {
 		defaultLevelScreen.killCommand(killCommand);
-		
 	}
 
 	public void end(EndGameCommand endCommand) {
 		defaultLevelScreen.endGame(endCommand);
+	}
+
+	public void scoreCommand(ScoreCommand scoreCommand) {
+		defaultLevelScreen.scoreCommand(scoreCommand);
 	}
 }
