@@ -53,7 +53,9 @@ public class SpaceGame extends Game {
 //		String host = "10.254.9.140";
 //		String host = "10.254.9.151";
 //		String host = "goat.dag.im";
-		String host = "54.213.154.186"; // john's micro instance on Amazon
+//		String host = "54.213.154.186"; // john's micro instance on Amazon
+		String host = "spacegame.dyndns.org";
+		
 		int port = 1337;
 		Socket socket = Gdx.net.newClientSocket(Protocol.TCP, host, port, null);
 		client = new SpaceServerConnection(socket, this);
