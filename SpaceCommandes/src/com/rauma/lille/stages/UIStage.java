@@ -56,7 +56,7 @@ public class UIStage extends AbstractStage {
 				ScoreCommand scoreCommand = (ScoreCommand) c;
 				killDeathRatio = scoreCommand.getKillDeathRatio(playerId);
 				System.out.println("score is: "+ killDeathRatio);
-				lblKillDeathRatio.setText(killDeathRatio.x+","+killDeathRatio.y);
+				lblKillDeathRatio.setText((int)killDeathRatio.x+","+(int)killDeathRatio.y);
 			}
 		}
 		
